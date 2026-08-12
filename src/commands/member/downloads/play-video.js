@@ -5,7 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 const { spawn } = require("child_process");
-const ffmpegPath =  require("ffmpeg-static");
+const ffmpegPath = require("ffmpeg-static");
 
 const queue = require(`${BASE_DIR}/utils/queue`);
 
@@ -109,10 +109,13 @@ async function executePlay({
 
         const ytDlpPath = path.join(process.cwd(), "yt-dlp.exe");
 
+        // Uso del cliente android y selector de formato optimizado para video
         const args = [
-          "-f", "mp4[height<=480]/best[height<=480]",
+          "-f", "bv*[height<=480][ext=mp4]+ba[ext=m4a]/b[height<=480]/ba/b",
           "--no-playlist",
           "--quiet",
+          "--no-warnings",
+          "--extractor-args", "youtube:player_client=android",
           "-o", tempFile.replace(/\\/g, "/"),
           videoUrl
         ];
@@ -203,3 +206,4 @@ function cleanCache() {
 
   console.log("🧹 Cache de video limpiado automáticamente (200MB máximo).");
 }
+

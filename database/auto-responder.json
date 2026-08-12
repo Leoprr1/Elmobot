@@ -4247,7 +4247,8 @@
     "match": "¡Función de auto-respuesta activado con éxito!",
     "answers": [
       ".besar",
-      "hola"
+      "hola",
+      "que tal funcionas wachin"
     ]
   },
   {
@@ -68065,6 +68066,12 @@
     "match": "ARIDEY01",
     "answers": [
       "ese es el alias"
+    ]
+  },
+  {
+    "match": "⚠️ ¡Atención! ¡La función de anti-enlace ya está activada!",
+    "answers": [
+      "a joya"
     ]
   }
 ]

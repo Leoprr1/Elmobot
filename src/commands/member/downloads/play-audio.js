@@ -103,7 +103,6 @@ async function executePlay({
       if (fs.existsSync(cacheFile)) {
         console.log("⚡ Usando audio cacheado");
 
-
         // Luego enviamos la imagen
         if (thumb) {
           await sendImageFromURL(
@@ -122,34 +121,48 @@ async function executePlay({
           ptt: true
         });
 
-       
-
       } else {
         const uniqueId = Date.now() + "_" + Math.floor(Math.random() * 9999);
         const tempFile = path.join(os.tmpdir(), `${uniqueId}.opus`);
 
         const ytDlpPath = path.join(process.cwd(), "yt-dlp.exe");
+        
+        // Uso del cliente android y fallback a ba/b para saltear el bloqueo de IP sin usar cookies
         const yt = spawn(ytDlpPath, [
-          "-f", "bestaudio",
+          "-f", "ba/b",
           "--no-playlist",
           "--quiet",
+          "--no-warnings",
+          "--extractor-args", "youtube:player_client=android",
           "-o", "-",
           videoUrl
         ], {
           windowsHide: true,
-          stdio: ["ignore", "pipe", "ignore"],
+          stdio: ["ignore", "pipe", "pipe"],
           creationFlags: 0x08000000
         });
 
+        // FFmpeg formateado explícitamente con corrección de timestamps y metadatos
         const ff = spawn(ffmpegPath, [
           "-i", "pipe:0",
+          "-vn",
           "-c:a", "libopus",
           "-b:a", audioBitrate,
+          "-ar", "48000",
+          "-ac", "2",
+          "-avoid_negative_ts", "make_zero",
+          "-map_metadata", "-1",
+          "-f", "ogg",
           tempFile
         ], {
           windowsHide: true,
           stdio: ["pipe", "ignore", "ignore"],
           creationFlags: 0x08000000
+        });
+
+        let ytErrorLog = "";
+        yt.stderr.on("data", (chunk) => {
+          ytErrorLog += chunk.toString();
         });
 
         yt.stdout.pipe(ff.stdin);
@@ -158,7 +171,6 @@ async function executePlay({
           ff.on("error", reject);
           ff.on("close", async code => {
             if (code === 0 && fs.existsSync(tempFile)) {
-
 
               // Luego enviamos la imagen
               if (thumb) {
@@ -183,6 +195,9 @@ async function executePlay({
               cleanCache();
               resolve();
             } else {
+              if (ytErrorLog) {
+                console.error("🔴 LOG REAL DE YT-DLP:\n", ytErrorLog.trim());
+              }
               reject(new Error("Error generando audio opus"));
             }
           });
@@ -234,5 +249,4 @@ function cleanCache() {
 
   console.log("🧹 Cache limpiado automáticamente para no superar 100MB.");
 }
-
 
