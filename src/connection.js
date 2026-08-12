@@ -25,16 +25,11 @@ if (!fs.existsSync(TEMP_DIR)) {
 
 const logger = pino({ level: "silent" });
 
-// 🔥 CACHE OPTIMIZADO (IMPORTANTE)
-const msgRetryCounterCache = new NodeCache({
-  stdTTL: 60,
-  checkperiod: 120,
-  useClones: false,
-});
-
+const msgRetryCounterCache = new NodeCache();
 const groupCache = new NodeCache({ stdTTL: 60 * 60 * 24 });
 
 async function connect() {
+  // 🔥 IMPORT ESM CORRECTO DE BAILEYS
   const {
     default: makeWASocket,
     DisconnectReason,
@@ -54,74 +49,66 @@ async function connect() {
     version,
     logger,
     auth: state,
-    printQRInTerminal: false,
-
-    // 🔥 OPTIMIZACIONES CLAVE
+    printQRInTerminal: false, // 🔥 QR EN CONSOLA
     msgRetryCounterCache,
-    retryRequestDelayMs: 0,
-    maxMsgRetryCount: 1,
     defaultQueryTimeoutMs: undefined,
-    getMessage: async () => undefined,
-
     shouldIgnoreJid: (jid) =>
       isJidBroadcast(jid) ||
       isJidStatusBroadcast(jid) ||
       isJidNewsletter(jid),
   });
 
-  // =========================
-  // PRESENCE CONTROLADO
-  // =========================
-  const lastPresence = new Map();
-
   socket.ev.on("messages.upsert", async ({ messages, type }) => {
-    if (type !== "notify") return;
+  if (type !== "notify") return;
 
-    for (const msg of messages) {
-      if (!msg.key || msg.key.fromMe) continue;
+  for (const msg of messages) {
+    if (!msg.key) continue;
+    if (msg.key.fromMe) continue;
 
-      const jid = msg.key.remoteJid;
-      const participant = msg.key.participant ?? null;
+    const jid = msg.key.remoteJid;
+    const participant = msg.key.participant ?? null; // ✅ clave para privados
 
+    try {
+      // FORZAR DOBLE TILDE + VISTO
+      await socket.sendReceipt(
+        jid,
+        participant,
+        [msg.key.id],
+        "read"
+      );
+
+      // Obtener mensaje de texto
       const text =
-        msg.message?.conversation ||
-        msg.message?.extendedTextMessage?.text ||
-        "";
+  msg.message?.conversation ||
+  msg.message?.extendedTextMessage?.text ||
+  "";
 
-      try {
-        await socket.sendReceipt(jid, participant, [msg.key.id], "read");
+      // 🔹 Filtrar solo comandos que empiezan con "."
+      if (!text.startsWith(".")) return;
 
-        if (!text.startsWith(".")) continue;
+      // mostrar que el bot está escribiendo
+      await socket.sendPresenceUpdate("composing", jid);
 
-        const now = Date.now();
+      await new Promise((r) => setTimeout(r, 2000)); // 2s de "escribiendo"
 
-        if (lastPresence.get(jid) && now - lastPresence.get(jid) < 10000) {
-          continue;
-        }
+      // detener presencia
+      await socket.sendPresenceUpdate("paused", jid);
 
-        lastPresence.set(jid, now);
-
-        await socket.sendPresenceUpdate("composing", jid);
-
-        setTimeout(() => {
-          socket.sendPresenceUpdate("paused", jid);
-        }, 2000);
-
-      } catch (err) {
-        warningLog("Error enviando visto:", err.message);
-      }
+    } catch (err) {
+      warningLog("Error enviando visto:", err.message);
     }
-  });
+  }
+});
 
-  // =========================
-  // CONEXIÓN
-  // =========================
+
+
+
   socket.ev.on("connection.update", (update) => {
     const { connection, lastDisconnect, qr } = update;
 
     if (qr) {
       sayLog("Escaneá este QR con WhatsApp:");
-      qrcode.generate(qr, { small: true });
+      qrcode.generate(qr, { small: true }); // 🔥 QR REAL
     }
 
     if (connection === "open") {
@@ -144,21 +131,10 @@ async function connect() {
     }
   });
 
-  // =========================
-  // GUARDADO OPTIMIZADO
-  // =========================
-  let saveTimeout;
-
-  socket.ev.on("creds.update", () => {
-    clearTimeout(saveTimeout);
-
-    saveTimeout = setTimeout(() => {
-      saveCreds();
-    }, 5000);
-  });
+  socket.ev.on("creds.update", saveCreds);
+  
 
   return socket;
 }
 
 exports.connect = connect;
-
