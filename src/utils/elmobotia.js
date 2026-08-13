@@ -1,13 +1,13 @@
 /**
- * ElmoBotia - Sistema generativo inteligente con control de confianza
- * + Mejora estructural gramatical en español
- * + Adaptación básica por tipo de mensaje
- * + Aprendizaje de mini-frases y mezcla para coherencia
+ * ElmoBotia - Sistema generativo inteligente con control de coherencia
+ * + Sintesis optimizada por oraciones aprendidas y bigramas estrictos
+ * + Lectura de 'generated-memory' de brainbuilder
  */
 
-const {getDB} = require("./jsoncache");
+const fs = require("fs");
+const { getDB } = require("./jsoncache");
 
-const MIN_CONFIDENCE = 0.8;
+const MIN_CONFIDENCE = 0.55; // Ajuste de umbral balanceado para respuesta activa y lógica
 
 let lastGeneratedMessage = null;
 
@@ -24,12 +24,6 @@ function normalizeText(text = "") {
     .trim();
 }
 
-function createIfNotExists(fullPath, formatIfNotExists = {}) {
-  if (!fs.existsSync(fullPath)) {
-    fs.writeFileSync(fullPath, JSON.stringify(formatIfNotExists, null, 2));
-  }
-}
-
 function capitalize(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
@@ -41,7 +35,7 @@ function capitalize(text) {
 function getWordType(word) {
   const lower = word.toLowerCase();
 
-  const pronouns = ["yo","tú","él","ella","nosotros","vosotros","ellos","ellas","me","te","se","nos","os","lo","la","los","las"];
+  const pronouns = ["yo","tú","él","ella","nosotros","vosotros","ellos","ellas","me","te","se","nos","os","lo","la","los","las","vos"];
   if (pronouns.includes(lower)) return "pronoun";
 
   const articles = ["el","la","los","las","un","una","unos","unas"];
@@ -136,95 +130,70 @@ function weightedRandom(words, frequencyMap) {
 }
 
 /* ===========================
-   GENERADOR CON PHRASES
+   GENERADOR CON COHERENCIA MEJORADA
 =========================== */
 
-function generateSentence(topicData, messageType, maxWords = 12) {
-  if (!topicData.wordFrequency) return { sentence: null, bigramHits: 0 };
+function generateSentence(topicData, messageType, maxWords = 10) {
+  if (!topicData) return { sentence: null, bigramHits: 0 };
 
-  const vocabulary = Object.keys(topicData.wordFrequency);
-  if (!vocabulary.length) return { sentence: null, bigramHits: 0 };
-
-  // Si hay mini-frases, hay un 50% de chance de usar una
-  if (topicData.phrases && topicData.phrases.length && Math.random() < 0.5) {
-    let phrase = topicData.phrases[Math.floor(Math.random() * topicData.phrases.length)];
-    // Mezclar con keywords
-    const keywordsInPhrase = topicData.keywords?.filter(k => phrase.includes(k));
-    if (!keywordsInPhrase?.length && topicData.keywords?.length) {
-      phrase += " " + topicData.keywords[Math.floor(Math.random() * topicData.keywords.length)];
+  // 1. PRIORIDAD (70%): Usar frases u oraciones completas aprendidas del tema
+  const sentencesList = topicData.sentences || topicData.phrases || [];
+  if (sentencesList.length > 0 && Math.random() < 0.7) {
+    const validSentences = sentencesList.filter((s) => s.split(/\s+/).length >= 2);
+    if (validSentences.length > 0) {
+      let chosen = validSentences[Math.floor(Math.random() * validSentences.length)];
+      chosen = capitalize(chosen);
+      if (messageType === "question" && !chosen.endsWith("?")) chosen += "?";
+      else if (messageType === "statement" && !chosen.endsWith(".")) chosen += ".";
+      return { sentence: chosen, bigramHits: 3 };
     }
-    phrase = capitalize(phrase);
-    if (messageType === "question" && !phrase.endsWith("?")) phrase += "?";
-    else if (!phrase.endsWith(".")) phrase += ".";
-    return { sentence: phrase, bigramHits: 1 };
   }
 
-  // Mezcla palabras si no se usó frase
-  const statementStructures = [
-    ["noun","verb","noun","adjective","adverb","verb","noun"],
-    ["pronoun","verb","adjective","noun","verb","noun"],
-    ["noun","verb","adverb","noun","adjective"]
-  ];
-  const questionStructures = [
-    ["pronoun","verb","noun","adjective"],
-    ["pronoun","verb","adverb","noun"]
-  ];
+  // 2. GENERACIÓN POR BIGRAMAS ESTRICTOS (Pares de palabras frecuentes)
+  const bigrams = topicData.bigrams || {};
+  const strongBigrams = Object.entries(bigrams)
+    .filter(([_, count]) => count >= 1)
+    .map(([pair]) => pair);
 
-  const structures = { statement: statementStructures, question: questionStructures };
-  const structure = structures[messageType][Math.floor(Math.random() * structures[messageType].length)];
+  if (!strongBigrams.length) return { sentence: null, bigramHits: 0 };
 
-  let startCandidates = vocabulary.filter(w => ["noun","pronoun"].includes(getWordType(w)));
-  if (topicData.keywords) {
-    const kwStart = startCandidates.filter(w => topicData.keywords.includes(w));
-    if (kwStart.length) startCandidates = kwStart;
-  }
-  if (!startCandidates.length) startCandidates = vocabulary;
+  const startPair = strongBigrams[Math.floor(Math.random() * strongBigrams.length)];
+  const sentence = startPair.split(" ");
+  let bigramHits = 1;
 
-  let current = weightedRandom(startCandidates, topicData.wordFrequency);
-  const sentence = [current];
-  let bigramHits = 0;
+  for (let i = 2; i < maxWords; i++) {
+    const lastWord = sentence[sentence.length - 1];
+    const possibleNext = strongBigrams
+      .filter((pair) => pair.startsWith(lastWord + " "))
+      .map((pair) => pair.split(" ")[1]);
 
-  for (let i = 1; i < maxWords; i++) {
-    const expectedType = structure[i % structure.length];
-    let possibleNext = Object.keys(topicData.bigrams || {})
-      .filter(pair => pair.startsWith(current + " "))
-      .map(pair => pair.split(" ")[1]);
+    if (!possibleNext.length) break;
 
-    let typedCandidates = possibleNext.filter(w => getWordType(w) === expectedType);
-
-    if (!typedCandidates.length) {
-      typedCandidates = vocabulary.filter(w => getWordType(w) === expectedType);
-      if (topicData.keywords) {
-        const kwCandidates = typedCandidates.filter(w => topicData.keywords.includes(w));
-        if (kwCandidates.length) typedCandidates = kwCandidates;
-      }
-    }
-
-    if (!typedCandidates.length) break;
-
+    const nextWord = weightedRandom(possibleNext, topicData.wordFrequency || {});
+    sentence.push(nextWord);
     bigramHits++;
-    current = weightedRandom(typedCandidates, topicData.wordFrequency);
-    sentence.push(current);
   }
 
   let finalSentence = sentence.join(" ");
-  if (finalSentence.length < 4) return { sentence: null, bigramHits: 0 };
+
+  // Validar que la oración tenga sentido mínimo (al menos 2 palabras)
+  if (sentence.length < 2) return { sentence: null, bigramHits: 0 };
 
   finalSentence = capitalize(finalSentence);
-  if (messageType === "question") finalSentence += "?";
-  else finalSentence += ".";
+  if (messageType === "question" && !finalSentence.endsWith("?")) finalSentence += "?";
+  else if (messageType === "statement" && !finalSentence.endsWith(".")) finalSentence += ".";
 
   return { sentence: finalSentence, bigramHits };
 }
 
 /* ===========================
-   CONFIANZA
+   CONFIANZA Y FILTRO
 =========================== */
 
 function calculateConfidence({ relevance, sentenceLength, bigramHits, topicData }) {
-  const densityScore = topicData.totalSentences > 0 ? Math.min(topicData.totalSentences / 50, 1) : 0;
-  const structureScore = Math.min(bigramHits / 5, 1);
-  const lengthScore = Math.min(sentenceLength / 8, 1);
+  const densityScore = topicData.totalSentences > 0 ? Math.min(topicData.totalSentences / 20, 1) : 0;
+  const structureScore = Math.min(bigramHits / 3, 1);
+  const lengthScore = Math.min(sentenceLength / 6, 1);
   return relevance * 0.4 + densityScore * 0.2 + structureScore * 0.2 + lengthScore * 0.2;
 }
 
@@ -233,17 +202,20 @@ function calculateConfidence({ relevance, sentenceLength, bigramHits, topicData 
 =========================== */
 
 exports.getElmoBotiaResponse = (webMessage) => {
-  if (!webMessage?.message) return null;
-  if (webMessage?.key?.fromMe) return null;
+  if (!webMessage?.message || webMessage?.key?.fromMe) return null;
 
   const messageText = extractTextFromMessage(webMessage.message);
   if (!messageText || messageText.length < 2) return null;
 
+  // Ignorar comandos con prefijo
   if (messageText.trim().startsWith(".")) return null;
 
-  if (lastGeneratedMessage && normalizeText(messageText) === normalizeText(lastGeneratedMessage)) return null;
+  // Evitar bucles de repetición
+  if (lastGeneratedMessage && normalizeText(messageText) === normalizeText(lastGeneratedMessage)) {
+    return null;
+  }
 
-  const brain = getDB("generated-memory")
+  const brain = getDB("generated-memory") || {};
   if (!brain.topics || Object.keys(brain.topics).length === 0) return null;
 
   const { topic, relevance } = detectTopicWithScore(messageText, brain);
@@ -263,3 +235,4 @@ exports.getElmoBotiaResponse = (webMessage) => {
   lastGeneratedMessage = sentence;
   return sentence;
 };
+

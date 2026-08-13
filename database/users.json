@@ -4,7 +4,7 @@
     "age": 23,
     "profilePic": "https://pps.whatsapp.net/v/t61.24694-24/620485926_1206638688260707_2153868945442048660_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa3wFsx_qZjifc35bhJRLTlYkWmLvkIF33aUmV_A_uu5qH2A&oe=69B559BF&_nc_sid=5e03e0&_nc_cat=107",
     "registeredAt": 1772594534960,
-    "commandsUsed": 10972
+    "commandsUsed": 10983
   },
   "148137834471521@lid": {
     "name": "cande",
@@ -382,14 +382,14 @@
     "age": 18,
     "profilePic": "https://pps.whatsapp.net/v/t61.24694-24/716449938_1597166545328827_4911400566722482576_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa5QH58WDLtYwLTOxr0qjGVcdYyZr4U6N6wy-zoPxTw_TpgA&oe=6A8A4D1E&_nc_sid=5e03e0&_nc_cat=100",
     "registeredAt": 1786589124155,
-    "commandsUsed": 25
+    "commandsUsed": 26
   },
   "175394267340972@lid": {
     "name": "Alejo",
     "age": 18,
     "profilePic": null,
     "registeredAt": 1786589196318,
-    "commandsUsed": 22
+    "commandsUsed": 26
   },
   "245647030648922@lid": {
     "name": "rio",
@@ -431,7 +431,7 @@
     "age": 17,
     "profilePic": null,
     "registeredAt": 1786597161449,
-    "commandsUsed": 0
+    "commandsUsed": 13
   },
   "114440007610596@lid": {
     "name": "Almejandro",
@@ -439,5 +439,19 @@
     "profilePic": "https://pps.whatsapp.net/v/t61.24694-24/615826168_2244635153038800_4047654884838777268_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa5QGVashpaJ9vKphxiQCVheXDrtc1NBNIctcSUW-XAnwbig&oe=6A8A4C4F&_nc_sid=5e03e0&_nc_cat=107",
     "registeredAt": 1786597177205,
     "commandsUsed": 0
+  },
+  "266241046536341@lid": {
+    "name": "Miguel",
+    "age": 22,
+    "profilePic": null,
+    "registeredAt": 1786598261375,
+    "commandsUsed": 1
+  },
+  "251745582198966@lid": {
+    "name": "José",
+    "age": 15,
+    "profilePic": null,
+    "registeredAt": 1786598384598,
+    "commandsUsed": 4
   }
 }
