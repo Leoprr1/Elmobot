@@ -89,6 +89,10 @@
       "desc": "activa esto y solo los admins pueden usar el bot"
     },
     {
+      "command": "only-admin (+/-) @mencion",
+      "desc": "le da autorizacion de utilizar el bot a usuarios individualmente"
+    },
+    {
       "command": "add-auto-responder",
       "desc": "para agregar mensaje y respuesta"
     },

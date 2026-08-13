@@ -25,6 +25,7 @@ const {
   isActiveGroup,
   isActiveAntiLinkGroup,
   isActiveOnlyAdmins,
+  isOnlyAdminException, 
   getPrefix,
   readUserProfiles,
   saveUserProfiles,
@@ -284,9 +285,11 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
       return;
     }
 
-    if (
+     if (
       isActiveOnlyAdmins(remoteJid) &&
-      !(await isAdmin({ remoteJid, userJid, socket }))
+      !(await isAdmin({ remoteJid, userJid, socket })) &&
+      !isBotOwner({ userJid, isLid }) &&
+      !isOnlyAdminException(remoteJid, userJid) 
     ) {
       await sendWarningReply(
         "¡Solo los administradores pueden ejecutar comandos!"

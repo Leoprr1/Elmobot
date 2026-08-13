@@ -15,6 +15,7 @@ const GROUP_RESTRICTIONS_FILE = "group-restrictions";
 const INACTIVE_GROUPS_FILE = "inactive-groups";
 const MUTE_FILE = "muted";
 const ONLY_ADMINS_FILE = "only-admins";
+const ONLY_ADMINS_EXCEPTIONS_FILE = "only-admins-exceptions";
 const PREFIX_GROUPS_FILE = "prefix-groups";
 const RESTRICTED_MESSAGES_FILE = "restricted-messages";
 const WELCOME_GROUPS_FILE = "welcome-groups";
@@ -139,6 +140,35 @@ exports.deactivateGroup = (groupId) => {
 };
 
 exports.isActiveGroup = (groupId) => !readJSON(INACTIVE_GROUPS_FILE).includes(groupId);
+
+// =====================
+// EXCEPCIONES DE ONLY-ADMINS
+// =====================
+exports.addOnlyAdminException = (groupId, userJid) => {
+  const exceptions = readJSON(ONLY_ADMINS_EXCEPTIONS_FILE, {});
+  if (!exceptions[groupId]) exceptions[groupId] = [];
+  if (!exceptions[groupId].includes(userJid)) {
+    exceptions[groupId].push(userJid);
+    writeJSON(ONLY_ADMINS_EXCEPTIONS_FILE, exceptions);
+  }
+};
+
+exports.removeOnlyAdminException = (groupId, userJid) => {
+  const exceptions = readJSON(ONLY_ADMINS_EXCEPTIONS_FILE, {});
+  if (!exceptions[groupId]) return;
+  const index = exceptions[groupId].indexOf(userJid);
+  if (index !== -1) {
+    exceptions[groupId].splice(index, 1);
+    writeJSON(ONLY_ADMINS_EXCEPTIONS_FILE, exceptions);
+  }
+};
+
+exports.isOnlyAdminException = (groupId, userJid) => {
+  const exceptions = readJSON(ONLY_ADMINS_EXCEPTIONS_FILE, {});
+  return exceptions[groupId]?.includes(userJid) || false;
+};
+
+
 
 // =====================
 // ANTI LINK
