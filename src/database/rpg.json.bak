@@ -1,12 +1,12 @@
 {
   "65489778770156@lid": {
-    "nivel": 375,
-    "xp": 24834,
-    "hp": 8595,
-    "hpMax": 7570,
-    "mana": 4290,
-    "manamax": 3840,
-    "monedas": 49858778773,
+    "nivel": 378,
+    "xp": 4957,
+    "hp": 8670,
+    "hpMax": 7630,
+    "mana": 4365,
+    "manamax": 3885,
+    "monedas": 167851245253,
     "arma": {
       "code": "H05",
       "nombre": "🌑 Guante de zeno Sama 🌙⚔️",
@@ -23,13 +23,6 @@
     },
     "inventario": [
       {
-        "code": "F01",
-        "nombre": "⚔️ Espada del Alba Eterna 🌅✨",
-        "dano": 1500,
-        "precio": 500000,
-        "uid": "mmv0e0i4796"
-      },
-      {
         "code": "H04",
         "nombre": "🌪️ Arco Absorvedor de Materia ⚡🏹",
         "dano": 2000,
@@ -37,33 +30,33 @@
         "uid": "mmv0fkqt321"
       },
       {
-        "code": "C20",
-        "nombre": "Armadura de Tela",
-        "defensa": 6,
-        "precio": 800,
-        "uid": "mmv0fkqt299"
+        "code": "F05",
+        "nombre": "🌑 Mandoble del Eclipse Oscuro 🌙⚔️",
+        "dano": 1500,
+        "precio": 500000,
+        "uid": "mss85r35939"
       },
       {
-        "code": "C05",
-        "nombre": "Ballesta de Madera",
-        "dano": 10,
-        "precio": 1000,
-        "uid": "msqp98qh72"
+        "code": "F06",
+        "nombre": "🛡️ Armadura del Guardián Celestial 🌌✨",
+        "defensa": 1500,
+        "precio": 500000,
+        "uid": "mss72gaz959"
       },
       {
-        "code": "L18",
-        "nombre": "Escudo Celestial",
-        "defensa": 500,
-        "precio": 100000,
-        "uid": "msqp98qh183"
+        "code": "F10",
+        "nombre": "⚡ Manto del Señor de las Tormentas 🌪️🌩️",
+        "defensa": 1500,
+        "precio": 500000,
+        "uid": "mss85r3551"
       }
     ],
     "lastDaily": 1786576004117,
-    "lastWork": 1786576435775,
-    "lastHunt": 1786576471317,
-    "lastMine": 1786576430352,
-    "lastFish": 1786576463344,
-    "lastDungeon": 1786576057720,
+    "lastWork": 1786640977045,
+    "lastHunt": 1786640959722,
+    "lastMine": 1786640965676,
+    "lastFish": 1786640962903,
+    "lastDungeon": 1786668273760,
     "lastGuildMission": 0,
     "nick": "Astaroth★",
     "gremio": "Aventureros",
@@ -571,7 +564,7 @@
     ],
     "profecion": null,
     "lid": "65489778770156@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "homeChest": [
       {
         "tipo": "mascota",
@@ -665,10 +658,10 @@
     "hasHouse": true,
     "enCasa": true,
     "golem": {
-      "nivel": 250,
-      "atk": 5030,
-      "hp": 0,
-      "lastKO": 1773774076621
+      "nivel": 260,
+      "atk": 5230,
+      "hp": 1000,
+      "lastKO": 1786670890452
     },
     "misionesCooldown": {
       "principe": 1759378495074,
@@ -684,65 +677,65 @@
     },
     "manaMax": 3750,
     "lastManaRegen": 0,
-    "inmunidadKO": false,
-    "inmunidadKOStart": 0,
+    "inmunidadKO": true,
+    "inmunidadKOStart": 1786670907599,
     "academia": {
       "especialidades": {
-        "fuerza": 45,
-        "agilidad": 45,
-        "defensa": 45,
-        "magia": 45,
-        "curacion": 45,
+        "fuerza": 48,
+        "agilidad": 48,
+        "defensa": 48,
+        "magia": 48,
+        "curacion": 48,
         "controlespada": 0,
-        "manaMax": 45,
+        "manaMax": 48,
         "manamax": 3,
-        "controlEspada": 45
+        "controlEspada": 48
       },
       "entrenosHoy": {
         "fuerza": {
-          "count": 0,
-          "last": 1759378672965
+          "count": 3,
+          "last": 1786637940800
         },
         "agilidad": {
-          "count": 0,
-          "last": 1759378673017
+          "count": 3,
+          "last": 1786637977391
         },
         "defensa": {
-          "count": 0,
-          "last": 1759378673219
+          "count": 3,
+          "last": 1786637958155
         },
         "magia": {
-          "count": 0,
-          "last": 1759378673289
+          "count": 3,
+          "last": 1786638097183
         },
         "curacion": {
-          "count": 0,
-          "last": 1759378673328
+          "count": 3,
+          "last": 1786638037701
         },
         "controlespada": {
           "count": 0,
           "last": 0
         },
         "manaMax": {
-          "count": 0,
-          "last": 1759378673494
+          "count": 3,
+          "last": 1786637998505
         },
         "manamax": {
           "count": 3,
           "last": 1756578621525
         },
         "controlEspada": {
-          "count": 0,
-          "last": 1759378673399
+          "count": 3,
+          "last": 1786638069462
         }
       }
     },
-    "fuerzaBonus": 90,
-    "agilidadBonus": 67.5,
-    "defensaBonus": 80.99999999999993,
-    "magiaBonus": 99.00000000000007,
-    "curacionBonus": 90,
-    "precisionBonus": 67.5,
+    "fuerzaBonus": 96,
+    "agilidadBonus": 72,
+    "defensaBonus": 86.39999999999992,
+    "magiaBonus": 105.60000000000008,
+    "curacionBonus": 96,
+    "precisionBonus": 72,
     "mascotas": [],
     "mascotaEquipada": {
       "uid": "mf9x8tfcftifuh",
@@ -770,12 +763,12 @@
   },
   "117639842140266@lid": {
     "nivel": 509,
-    "xp": 1003,
-    "hp": 11855,
+    "xp": 1503,
+    "hp": 11675,
     "hpMax": 10200,
     "mana": 7170,
     "manamax": 5180,
-    "monedas": 23000549943395,
+    "monedas": 23000548136395,
     "arma": {
       "code": "H03",
       "nombre": "🐉 Lanza de Agujero Negro 🔥🔥",
@@ -792,81 +785,28 @@
     },
     "inventario": [
       {
-        "code": "MP4",
-        "nombre": "Poción de Mana (400)",
-        "tipo": "mana",
-        "mana": 400,
-        "precio": 4500,
-        "uid": "mf0gveb9627"
+        "uid": "mss9ey3cltuyd3",
+        "tipo": "mascota",
+        "code": "T02",
+        "nombre": "Fénix (Rara)",
+        "atkBuff": 108,
+        "defBuff": 100,
+        "hpBuff": 320,
+        "rareza": "Rara",
+        "emoji": "🔥🔵",
+        "precio": 240000
       },
       {
-        "code": "P1",
-        "nombre": "Poción de Vida (100)",
-        "tipo": "pocion",
-        "curacion": 100,
-        "precio": 1000,
-        "uid": "mf0gveb9741"
-      },
-      {
-        "code": "P4",
-        "nombre": "Poción de Vida (400)",
-        "tipo": "pocion",
-        "curacion": 400,
-        "precio": 4000,
-        "uid": "mf0gveb9989"
-      },
-      {
-        "code": "P3",
-        "nombre": "Poción de Vida (300)",
-        "tipo": "pocion",
-        "curacion": 300,
-        "precio": 3000,
-        "uid": "mf0gveb9680"
-      },
-      {
-        "code": "MP3",
-        "nombre": "Poción de Mana (300)",
-        "tipo": "mana",
-        "mana": 300,
-        "precio": 3500,
-        "uid": "mf0gveb9446"
-      },
-      {
-        "code": "P2",
-        "nombre": "Poción de Vida (200)",
-        "tipo": "pocion",
-        "curacion": 200,
-        "precio": 2000,
-        "uid": "mf1plj2t31"
-      },
-      {
-        "code": "L09",
-        "nombre": "Espadón del Olimpo",
-        "dano": 950,
-        "precio": 100000,
-        "uid": "mgr0rn8d744"
-      },
-      {
-        "code": "Z13",
-        "nombre": "Armadura de Hierro",
-        "defensa": 30,
-        "precio": 5000,
-        "uid": "mgr0rn8e715"
-      },
-      {
-        "code": "L19",
-        "nombre": "Casco del Olimpo",
-        "defensa": 495,
-        "precio": 100000,
-        "uid": "mgr0rn8e994"
-      },
-      {
-        "code": "P5",
-        "nombre": "Poción de Vida (500)",
-        "tipo": "pocion",
-        "curacion": 500,
-        "precio": 5000,
-        "uid": "mgra4g3q78"
+        "uid": "mf9x8ts181zzia",
+        "tipo": "mascota",
+        "code": "T05",
+        "nombre": "Ser de Luz (Legendaria)",
+        "atkBuff": 320,
+        "defBuff": 120,
+        "hpBuff": 660,
+        "rareza": "Legendaria",
+        "emoji": "✨🟣",
+        "precio": 600000
       }
     ],
     "lastDaily": 1774484216975,
@@ -874,7 +814,7 @@
     "lastHunt": 1771726031657,
     "lastMine": 1771726020834,
     "lastFish": 1771726027795,
-    "lastDungeon": 1786573858354,
+    "lastDungeon": 1786623233242,
     "lastGuildMission": 0,
     "nick": "742617000027",
     "gremio": "Aventureros",
@@ -1237,15 +1177,15 @@
     ],
     "profecion": null,
     "lid": "117639842140266@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "homeChest": [],
     "hasHouse": true,
     "enCasa": true,
     "golem": {
-      "nivel": 405,
-      "atk": 8130,
-      "hp": 40600,
-      "lastKO": 1758820568858
+      "nivel": 406,
+      "atk": 8150,
+      "hp": 40700,
+      "lastKO": 1786670519129
     },
     "misionesCooldown": {
       "ruinas": 1758993472502,
@@ -1259,8 +1199,8 @@
       "lobos": 1758993472468
     },
     "manaMax": 5170,
-    "inmunidadKO": false,
-    "inmunidadKOStart": 0,
+    "inmunidadKO": true,
+    "inmunidadKOStart": 1786670740415,
     "lastManaRegen": 0,
     "mascotas": [],
     "academia": {
@@ -1305,16 +1245,16 @@
       }
     },
     "mascotaEquipada": {
-      "uid": "mf9x8ts181zzia",
+      "uid": "mss9gfrlazb4p4",
       "tipo": "mascota",
-      "code": "T05",
-      "nombre": "Ser de Luz (Legendaria)",
-      "atkBuff": 320,
-      "defBuff": 120,
-      "hpBuff": 660,
+      "code": "T04",
+      "nombre": "Lobo Espiritual (Legendaria)",
+      "atkBuff": 280,
+      "defBuff": 160,
+      "hpBuff": 480,
       "rareza": "Legendaria",
-      "emoji": "✨🟣",
-      "precio": 600000
+      "emoji": "🐺🟣",
+      "precio": 390000
     },
     "totalHP": 100,
     "fuerzaBonus": 402,
@@ -1322,16 +1262,22 @@
     "defensaBonus": 358.2000000000013,
     "magiaBonus": 437.79999999999853,
     "curacionBonus": 398,
-    "precisionBonus": 298.5
+    "precisionBonus": 298.5,
+    "ancestral": {
+      "floor": 0,
+      "inside": false,
+      "paid": false,
+      "lastBossTime": {}
+    }
   },
   "223256997032099@lid": {
-    "nivel": 1420,
-    "xp": 43129,
-    "hp": 31135,
-    "hpMax": 28420,
-    "mana": 17875,
-    "manamax": 14845,
-    "monedas": 918737016428047700,
+    "nivel": 1546,
+    "xp": 101810,
+    "hp": 33685,
+    "hpMax": 30940,
+    "mana": 19225,
+    "manamax": 16135,
+    "monedas": 918738416546024200,
     "arma": {
       "code": "X05",
       "nombre": "🕳️⚔️ Espada del Fin de los Tiempos ⏳💀",
@@ -1347,12 +1293,12 @@
       "uid": "mmsxgjtl755"
     },
     "inventario": [],
-    "lastDaily": 1786523037616,
-    "lastWork": 1776940069709,
-    "lastHunt": 1776940066309,
-    "lastMine": 1776940056619,
-    "lastFish": 1776940062890,
-    "lastDungeon": 1776940041858,
+    "lastDaily": 1786675436838,
+    "lastWork": 1786675458557,
+    "lastHunt": 1786675453239,
+    "lastMine": 1786675445954,
+    "lastFish": 1786675448723,
+    "lastDungeon": 1786675430382,
     "lastGuildMission": 0,
     "nick": "👑⛧ᏞᎬᎾᏢᎡᎡ⛧👑",
     "gremio": "Aventureros",
@@ -2768,11 +2714,29 @@
       "mago",
       "dragon",
       "rey-demonio",
+      "salvar-mundo",
+      "flores",
+      "lobos",
+      "ruinas",
+      "ogro",
+      "principe",
+      "mago",
+      "dragon",
+      "rey-demonio",
+      "salvar-mundo",
+      "flores",
+      "lobos",
+      "ruinas",
+      "ogro",
+      "principe",
+      "mago",
+      "dragon",
+      "rey-demonio",
       "salvar-mundo"
     ],
     "profecion": null,
     "lid": "223256997032099@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "homeChest": [
       {
         "uid": "mfciizw2gv1whm",
@@ -2787,18 +2751,6 @@
         "precio": 600000
       },
       {
-        "uid": "mmxqkdrke28ad4",
-        "tipo": "mascota",
-        "code": "T03",
-        "nombre": "Golem de Piedra (Fantástica)",
-        "atkBuff": 400,
-        "defBuff": 640,
-        "hpBuff": 1600,
-        "rareza": "Fantástica",
-        "emoji": "🪨🔶",
-        "precio": 750000
-      },
-      {
         "code": "X09",
         "nombre": "🌌🛡️ Armadura de la Singularidad Suprema ⚡🕳️",
         "defensa": 10000,
@@ -2811,6 +2763,32 @@
         "defensa": 10000,
         "precio": 100000000,
         "uid": "mobbiiwx193"
+      },
+      {
+        "code": "X08",
+        "nombre": "❄️🌑 Placas del Coloso del Abismo 🧊👑",
+        "defensa": 10000,
+        "precio": 100000000,
+        "uid": "mss246kl871"
+      },
+      {
+        "code": "X03",
+        "nombre": "🐲🔥 Lanza del Dragón Ancestral del Vacío 🌌⚡",
+        "dano": 10000,
+        "precio": 100000000,
+        "uid": "mss26vz372"
+      },
+      {
+        "uid": "msschlgmdvc1ww",
+        "tipo": "mascota",
+        "code": "T03",
+        "nombre": "Golem de Piedra (Fantástica)",
+        "atkBuff": 400,
+        "defBuff": 640,
+        "hpBuff": 1600,
+        "rareza": "Fantástica",
+        "emoji": "🪨🔶",
+        "precio": 750000
       }
     ],
     "hasHouse": true,
@@ -2819,19 +2797,19 @@
       "nivel": 400,
       "atk": 8030,
       "hp": 40100,
-      "lastKO": 0
+      "lastKO": 1786673591105
     },
     "misionesCooldown": {
-      "salvar-mundo": 1776938751662,
-      "rey-demonio": 1776938751397,
+      "salvar-mundo": 1786676051340,
+      "rey-demonio": 1786676051092,
       "dragón": 1772726694792,
-      "mago": 1776938750897,
-      "principe": 1776938750662,
-      "ogro": 1776938750413,
-      "ruinas": 1776938750163,
-      "lobos": 1776938749882,
-      "flores": 1776938749632,
-      "dragon": 1776938751147
+      "mago": 1786676050115,
+      "principe": 1786676049828,
+      "ogro": 1786676049592,
+      "ruinas": 1786676048873,
+      "lobos": 1786676048544,
+      "flores": 1786676048331,
+      "dragon": 1786676050380
     },
     "manaMax": 5010,
     "lastManaRegen": 0,
@@ -2839,38 +2817,38 @@
     "inmunidadKOStart": 0,
     "academia": {
       "especialidades": {
-        "fuerza": 303,
-        "agilidad": 303,
-        "defensa": 303,
-        "magia": 303,
-        "curacion": 303,
-        "controlEspada": 303,
-        "manaMax": 303,
+        "fuerza": 309,
+        "agilidad": 309,
+        "defensa": 309,
+        "magia": 309,
+        "curacion": 309,
+        "controlEspada": 309,
+        "manaMax": 309,
         "controlespada": 0,
         "manamax": 1
       },
       "entrenosHoy": {
         "fuerza": 1,
         "agilidad": {
-          "count": 0,
-          "last": 1776938769834
+          "count": 3,
+          "last": 1786676068104
         },
         "defensa": {
-          "count": 0,
-          "last": 1776938770641
+          "count": 3,
+          "last": 1786676069134
         },
         "magia": 1,
         "curacion": {
-          "count": 0,
-          "last": 1776938772137
+          "count": 3,
+          "last": 1786676071151
         },
         "controlEspada": {
-          "count": 0,
-          "last": 1776938772874
+          "count": 3,
+          "last": 1786676072035
         },
         "manaMax": {
-          "count": 0,
-          "last": 1776938773593
+          "count": 3,
+          "last": 1786676072929
         },
         "controlespada": {
           "count": 0,
@@ -2882,12 +2860,12 @@
         }
       }
     },
-    "fuerzaBonus": 606,
-    "agilidadBonus": 454.5,
-    "defensaBonus": 545.4000000000015,
-    "magiaBonus": 666.6000000000014,
-    "curacionBonus": 606,
-    "precisionBonus": 454.5,
+    "fuerzaBonus": 618,
+    "agilidadBonus": 463.5,
+    "defensaBonus": 556.2000000000012,
+    "magiaBonus": 679.8000000000017,
+    "curacionBonus": 618,
+    "precisionBonus": 463.5,
     "mascotas": [],
     "mascotaEquipada": {
       "uid": "mf9xj4rr67falu",
@@ -2907,47 +2885,49 @@
     "hpMaxBuffed": 14406,
     "manaMaxBuffed": 6310,
     "ancestral": {
-      "floor": 370,
+      "floor": 390,
       "inside": true,
       "paid": true,
       "lastBossTime": {
-        "10": 1776938800040,
-        "20": 1776938804554,
-        "30": 1776938807912,
-        "40": 1776938811177,
-        "50": 1776938814676,
-        "60": 1776938822361,
-        "70": 1776938825391,
-        "80": 1776938829249,
-        "90": 1776938836168,
-        "100": 1776938839390,
-        "110": 1776938843448,
-        "120": 1776938854209,
-        "130": 1776939053402,
-        "140": 1776939058019,
-        "150": 1776939067093,
-        "160": 1776939071810,
-        "170": 1776939082376,
-        "180": 1776939087624,
-        "190": 1776939096966,
-        "200": 1776939102323,
-        "210": 1776939111883,
-        "220": 1776939120880,
-        "230": 1776939182589,
-        "240": 1776939253401,
-        "250": 1776939320328,
-        "260": 1776939404063,
-        "270": 1776939462645,
-        "280": 1776939516603,
-        "290": 1776939567331,
-        "300": 1776939620688,
-        "310": 1776939679534,
-        "320": 1776939736395,
-        "330": 1776939788659,
-        "340": 1776939851400,
-        "350": 1776939909206,
-        "360": 1776939971642,
-        "370": 1776940030456
+        "10": 1786675311474,
+        "20": 1786675305487,
+        "30": 1786675292500,
+        "40": 1786675284415,
+        "50": 1786675275147,
+        "60": 1786675245503,
+        "70": 1786675232485,
+        "80": 1786675210607,
+        "90": 1786675201304,
+        "100": 1786675183568,
+        "110": 1786675166818,
+        "120": 1786675146152,
+        "130": 1786675129541,
+        "140": 1786658305139,
+        "150": 1786675096033,
+        "160": 1786675078279,
+        "170": 1786675054376,
+        "180": 1786675036535,
+        "190": 1786675020411,
+        "200": 1786675004853,
+        "210": 1786674985143,
+        "220": 1786674969366,
+        "230": 1786674950443,
+        "240": 1786674930428,
+        "250": 1786674912390,
+        "260": 1786674895051,
+        "270": 1786674879201,
+        "280": 1786674858730,
+        "290": 1786674843616,
+        "300": 1786674828068,
+        "310": 1786657981319,
+        "320": 1786674810258,
+        "330": 1786674788380,
+        "340": 1786674762218,
+        "350": 1786674745250,
+        "360": 1786674726552,
+        "370": 1786674708307,
+        "380": 1786674686318,
+        "390": 1786675413076
       }
     },
     "limitBreaker": {
@@ -2958,13 +2938,13 @@
     "_lastLBState": false
   },
   "65919745306692@lid": {
-    "nivel": 410,
-    "xp": 25837,
-    "hp": 11825,
-    "hpMax": 8270,
-    "mana": 6440,
-    "manamax": 4190,
-    "monedas": 123138997830768,
+    "nivel": 416,
+    "xp": 21610,
+    "hp": 11945,
+    "hpMax": 8390,
+    "mana": 6500,
+    "manamax": 4250,
+    "monedas": 123169510280353,
     "arma": {
       "code": "H04",
       "nombre": "🌪️ Arco Absorvedor de Materia ⚡🏹",
@@ -2981,41 +2961,72 @@
     },
     "inventario": [
       {
-        "code": "L19",
-        "nombre": "Casco del Olimpo",
-        "defensa": 495,
-        "precio": 100000,
-        "uid": "msqp5tho31"
+        "uid": "mss99p9tcqeqet",
+        "tipo": "mascota",
+        "code": "T03",
+        "nombre": "Golem de Piedra (Común)",
+        "atkBuff": 50,
+        "defBuff": 80,
+        "hpBuff": 320,
+        "rareza": "Común",
+        "emoji": "🪨⚪",
+        "precio": 150000
       },
       {
-        "code": "P5",
-        "nombre": "Poción de Vida (500)",
-        "tipo": "pocion",
-        "curacion": 500,
-        "precio": 5000,
-        "uid": "msqp5tho749"
+        "uid": "mssc13f3q6u1gg",
+        "tipo": "mascota",
+        "code": "T01",
+        "nombre": "Draco (Legendaria)",
+        "atkBuff": 240,
+        "defBuff": 120,
+        "hpBuff": 600,
+        "rareza": "Legendaria",
+        "emoji": "🐉🟣",
+        "precio": 300000
       },
       {
-        "code": "Z08",
-        "nombre": "Maza de Acero",
-        "dano": 30,
-        "precio": 4800,
-        "uid": "msqp5tho645"
+        "uid": "msscad3vpcr0hi",
+        "tipo": "mascota",
+        "code": "T02",
+        "nombre": "Fénix (Mítica)",
+        "atkBuff": 540,
+        "defBuff": 500,
+        "hpBuff": 1200,
+        "rareza": "Mítica",
+        "emoji": "🔥🐲",
+        "precio": 900000
       },
       {
-        "code": "C01",
-        "nombre": "Espada de Madera",
-        "dano": 10,
-        "precio": 1000,
-        "uid": "msqp5tho357"
+        "uid": "msscc4tr3dqzfk",
+        "tipo": "mascota",
+        "code": "T02",
+        "nombre": "Fénix (Común)",
+        "atkBuff": 54,
+        "defBuff": 50,
+        "hpBuff": 160,
+        "rareza": "Común",
+        "emoji": "🔥⚪",
+        "precio": 120000
+      },
+      {
+        "uid": "msschmooy23lar",
+        "tipo": "mascota",
+        "code": "T02",
+        "nombre": "Fénix (Rara)",
+        "atkBuff": 108,
+        "defBuff": 100,
+        "hpBuff": 320,
+        "rareza": "Rara",
+        "emoji": "🔥🔵",
+        "precio": 240000
       }
     ],
-    "lastDaily": 1786576046657,
-    "lastWork": 1772041223864,
-    "lastHunt": 1786587218411,
-    "lastMine": 1786587241150,
-    "lastFish": 1786587234109,
-    "lastDungeon": 1786575897995,
+    "lastDaily": 1786666766386,
+    "lastWork": 1786636155933,
+    "lastHunt": 1786675194047,
+    "lastMine": 1786675180315,
+    "lastFish": 1786675189117,
+    "lastDungeon": 1786666787280,
     "lastGuildMission": 0,
     "nick": "Romeo celestial",
     "gremio": "Aventureros",
@@ -3492,14 +3503,14 @@
     ],
     "profecion": null,
     "lid": "65919745306692@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "homeChest": [],
     "hasHouse": true,
     "enCasa": true,
     "golem": {
-      "nivel": 441,
-      "atk": 8850,
-      "hp": 42100,
+      "nivel": 447,
+      "atk": 8970,
+      "hp": 42700,
       "lastKO": 1786588681884
     },
     "misionesCooldown": {
@@ -3516,7 +3527,7 @@
     "manaMax": 4190,
     "lastManaRegen": 0,
     "inmunidadKO": true,
-    "inmunidadKOStart": 1786588701500,
+    "inmunidadKOStart": 1786673641601,
     "mascotas": [],
     "academia": {
       "especialidades": {
@@ -3534,27 +3545,27 @@
           "last": 1770868265495
         },
         "agilidad": {
-          "count": 3,
+          "count": 0,
           "last": 1770829880849
         },
         "defensa": {
-          "count": 3,
+          "count": 0,
           "last": 1770829880895
         },
         "magia": {
-          "count": 3,
+          "count": 0,
           "last": 1770829881110
         },
         "curacion": {
-          "count": 3,
+          "count": 0,
           "last": 1770829881195
         },
         "controlEspada": {
-          "count": 3,
+          "count": 0,
           "last": 1770829883816
         },
         "manaMax": {
-          "count": 3,
+          "count": 0,
           "last": 1770829883899
         }
       }
@@ -3579,20 +3590,23 @@
     "curacionBonus": 462,
     "precisionBonus": 342,
     "ancestral": {
-      "floor": 0,
-      "inside": false,
-      "paid": false,
-      "lastBossTime": {}
+      "floor": 20,
+      "inside": true,
+      "paid": true,
+      "lastBossTime": {
+        "10": 1786667152043,
+        "20": 1786667263317
+      }
     }
   },
   "231108700590308@lid": {
-    "nivel": 166,
-    "xp": 7772,
-    "hp": 4580,
-    "hpMax": 3390,
-    "mana": 2500,
-    "manamax": 1750,
-    "monedas": 483747717530048,
+    "nivel": 172,
+    "xp": 13076,
+    "hp": 5500,
+    "hpMax": 3510,
+    "mana": 2560,
+    "manamax": 1810,
+    "monedas": 486580786544490,
     "arma": {
       "code": "H03",
       "nombre": "🐉 Lanza de Agujero Negro 🔥🔥",
@@ -3608,12 +3622,12 @@
       "uid": "mfxw5tgr418"
     },
     "inventario": [],
-    "lastDaily": 1786591085601,
-    "lastWork": 1770941958392,
-    "lastHunt": 1786591068921,
-    "lastMine": 1786591074774,
-    "lastFish": 1770999594592,
-    "lastDungeon": 1770999620320,
+    "lastDaily": 1786679769920,
+    "lastWork": 1786679785383,
+    "lastHunt": 1786679780140,
+    "lastMine": 1786679777912,
+    "lastFish": 1786679782419,
+    "lastDungeon": 1786679774271,
     "lastGuildMission": 0,
     "nick": "Maricarmen",
     "gremio": "Aventureros",
@@ -3800,7 +3814,7 @@
     ],
     "profecion": null,
     "lid": "231108700590308@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "homeChest": [
       {
         "uid": "mg34oue6d38o2s",
@@ -3830,10 +3844,10 @@
     "hasHouse": true,
     "enCasa": true,
     "golem": {
-      "nivel": 237,
-      "atk": 4770,
-      "hp": 23800,
-      "lastKO": 1786573983681
+      "nivel": 238,
+      "atk": 4790,
+      "hp": 23900,
+      "lastKO": 1786670792041
     },
     "misionesCooldown": {
       "flores": 1770743265058,
@@ -3846,8 +3860,8 @@
       "rey-demonio": 1770743322077
     },
     "manaMax": 1750,
-    "inmunidadKO": false,
-    "inmunidadKOStart": 0,
+    "inmunidadKO": true,
+    "inmunidadKOStart": 1786671032506,
     "lastManaRegen": 0,
     "academia": {
       "especialidades": {
@@ -3892,16 +3906,16 @@
     },
     "totalHP": 100,
     "mascotaEquipada": {
-      "uid": "mf3ecc7i0pju2x",
+      "uid": "mmxqkdrke28ad4",
       "tipo": "mascota",
-      "code": "T02",
-      "nombre": "Fénix (Fantástica)",
-      "atkBuff": 432,
-      "defBuff": 400,
-      "hpBuff": 800,
+      "code": "T03",
+      "nombre": "Golem de Piedra (Fantástica)",
+      "atkBuff": 400,
+      "defBuff": 640,
+      "hpBuff": 1600,
       "rareza": "Fantástica",
-      "emoji": "🔥🔶",
-      "precio": 600000
+      "emoji": "🪨🔶",
+      "precio": 750000
     },
     "fuerzaBonus": 156,
     "agilidadBonus": 112.5,
@@ -4202,7 +4216,7 @@
     ],
     "profecion": null,
     "lid": "276051070587130@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "homeChest": [
       {
         "code": "P1",
@@ -4344,6 +4358,11 @@
       "id": "65489778770156@lid",
       "monedas": 3500050,
       "inventario": []
+    },
+    {
+      "id": "231108700590308@lid",
+      "monedas": 300000,
+      "inventario": []
     }
   ],
   "3625550801@lid": {
@@ -4370,7 +4389,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "3625550801@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1755955598770,
     "manaMax": 40
@@ -4399,7 +4418,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "5493625550801@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1755955630685,
     "manaMax": 420
@@ -4428,7 +4447,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "171605586141203@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": 90,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756511256842,
@@ -4459,7 +4478,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "193686298173471@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1755964581145,
     "manaMax": null
@@ -4495,7 +4514,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "223265704439840@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1758123142464,
     "manaMax": 40
@@ -4575,7 +4594,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "110986719670373@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1776656549132,
     "manaMax": 150
@@ -4604,7 +4623,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "55800735232010@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1755964755786,
     "manaMax": 50
@@ -4633,7 +4652,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "233942959579163@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1755980064023,
     "manaMax": 10
@@ -4662,7 +4681,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "90624380432443@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756049553320
   },
@@ -4690,7 +4709,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "217257162600661@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756050372881,
     "manaMax": null
@@ -4719,7 +4738,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "18232840827114@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756050388618
   },
@@ -4747,18 +4766,18 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "17351818915976@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756050395568,
     "manaMax": null
   },
   "15492618166445@lid": {
-    "nivel": 5,
-    "xp": 360,
-    "hp": 180,
-    "hpMax": 180,
-    "mana": 140,
-    "manamax": 140,
+    "nivel": 6,
+    "xp": 40,
+    "hp": 200,
+    "hpMax": 200,
+    "mana": 150,
+    "manamax": 150,
     "monedas": 2106,
     "arma": null,
     "armadura": null,
@@ -4776,9 +4795,9 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "15492618166445@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
-    "inmunidadKOStart": 1756059644416,
+    "inmunidadKOStart": 1786667575948,
     "manaMax": 30
   },
   "158566300254308@lid": {
@@ -4805,7 +4824,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "158566300254308@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756070477048
   },
@@ -4846,7 +4865,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "209633494999104@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773774953219,
     "manaMax": 40
@@ -4875,7 +4894,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "276051070597130@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756129830130
   },
@@ -4903,7 +4922,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "127753852563539@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756254581933
   },
@@ -4944,7 +4963,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "153373315743771@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756261555798,
     "mascotaEquipada": {
@@ -5219,7 +5238,7 @@
     ],
     "profecion": null,
     "lid": "88262081273896@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759093332659,
     "manaMax": 450,
@@ -5283,7 +5302,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "222643101909077@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756267518637,
     "manaMax": null
@@ -5312,7 +5331,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "49705807536244@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756267536151,
     "manaMax": null
@@ -5341,7 +5360,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "263569610383412@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756267542448
   },
@@ -5369,7 +5388,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "276051070587130276051070587130@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756335369487
   },
@@ -5421,7 +5440,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "224773305045001@lid": {
     "nivel": 4,
@@ -5447,7 +5466,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "224773305045001@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756506312731,
     "manaMax": 20
@@ -5476,7 +5495,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "62964254163090@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756511228376
   },
@@ -5504,7 +5523,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "227590837153821@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756511262220
   },
@@ -5532,7 +5551,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "92424139472985@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756511267204
   },
@@ -5560,7 +5579,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "78735860596930@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756511273170
   },
@@ -5588,7 +5607,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "141554186457341@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756511321124,
     "manaMax": null
@@ -5617,7 +5636,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "67916569518178@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756511338325
   },
@@ -5645,7 +5664,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "162741092405487@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756511351527
   },
@@ -5673,7 +5692,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "221693930950900@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756511359750
   },
@@ -5701,7 +5720,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "77855509708967@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756511443014,
     "manaMax": null
@@ -5730,7 +5749,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "78486886731791@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756511447697,
     "manaMax": null
@@ -5759,7 +5778,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "4849689178278@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756511452399
   },
@@ -5787,14 +5806,14 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "116750448365745@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1756511458807,
     "manaMax": null
   },
   "122604958572601@lid": {
     "nivel": 134,
-    "xp": 10589,
+    "xp": 10689,
     "hp": 3580,
     "hpMax": 2750,
     "mana": 1490,
@@ -5919,7 +5938,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "122604958572601@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "homeChest": [],
     "hasHouse": true,
     "enCasa": true,
@@ -5927,13 +5946,13 @@
       "nivel": 45,
       "atk": 930,
       "hp": 2500,
-      "lastKO": 1786573956071
+      "lastKO": 1786636716079
     },
     "misionesCooldown": {},
     "manaMax": 1430,
     "lastManaRegen": 0,
     "inmunidadKO": true,
-    "inmunidadKOStart": 1786573981465,
+    "inmunidadKOStart": 1786636729304,
     "mascotas": [],
     "academia": {
       "especialidades": {
@@ -6009,13 +6028,13 @@
     "_lastLBState": false
   },
   "98629712916662@lid": {
-    "nivel": 386,
-    "xp": 5006,
-    "hp": 9315,
-    "hpMax": 7800,
-    "mana": 5990,
-    "manamax": 3950,
-    "monedas": 1000471605481,
+    "nivel": 450,
+    "xp": 1943,
+    "hp": 11730,
+    "hpMax": 9080,
+    "mana": 6630,
+    "manamax": 4590,
+    "monedas": 1149448259780,
     "arma": {
       "code": "H04",
       "nombre": "🌪️ Arco Absorvedor de Materia ⚡🏹",
@@ -6030,147 +6049,66 @@
       "precio": 1000000,
       "uid": "mf6w9svk503"
     },
-    "inventario": [
-      {
-        "code": "Z18",
-        "nombre": "Escudo Grande de Hierro",
-        "defensa": 28,
-        "precio": 4800,
-        "uid": "mf8kolix267"
-      },
-      {
-        "code": "Z08",
-        "nombre": "Maza de Acero",
-        "dano": 30,
-        "precio": 4800,
-        "uid": "mf9rjhij804"
-      },
-      {
-        "code": "L12",
-        "nombre": "Casco de los Titanes",
-        "defensa": 480,
-        "precio": 100000,
-        "uid": "mf9rjhij959"
-      },
-      {
-        "code": "Z05",
-        "nombre": "Ballesta de Acero",
-        "dano": 25,
-        "precio": 4000,
-        "uid": "mf9rjhij323"
-      },
-      {
-        "uid": "mfcteqg7xmilal",
-        "tipo": "mascota",
-        "code": "T04",
-        "nombre": "Lobo Espiritual (Común)",
-        "atkBuff": 70,
-        "defBuff": 40,
-        "hpBuff": 160,
-        "rareza": "Común",
-        "emoji": "🐺⚪",
-        "precio": 130000
-      },
-      {
-        "code": "Z14",
-        "nombre": "Guantes de Acero",
-        "defensa": 15,
-        "precio": 3500,
-        "uid": "mfd3yu7l786"
-      },
-      {
-        "code": "C18",
-        "nombre": "Escudo Pequeño",
-        "defensa": 5,
-        "precio": 600,
-        "uid": "mfd3yu7l894"
-      },
-      {
-        "code": "Z15",
-        "nombre": "Botas de Hierro",
-        "defensa": 18,
-        "precio": 3800,
-        "uid": "mfd3yu7l77"
-      },
-      {
-        "uid": "mfx3t4n9vz0owp",
-        "tipo": "mascota",
-        "code": "T03",
-        "nombre": "Golem de Piedra (Común)",
-        "atkBuff": 50,
-        "defBuff": 80,
-        "hpBuff": 320,
-        "rareza": "Común",
-        "emoji": "🪨⚪",
-        "precio": 150000
-      },
-      {
-        "code": "L10",
-        "nombre": "Hacha de Mano Divina",
-        "dano": 880,
-        "precio": 100000,
-        "uid": "mfyl8lh5421"
-      }
-    ],
+    "inventario": [],
     "academia": {
       "especialidades": {
-        "fuerza": 207,
-        "agilidad": 207,
-        "defensa": 204,
-        "magia": 204,
-        "curacion": 207,
-        "controlEspada": 198,
+        "fuerza": 213,
+        "agilidad": 213,
+        "defensa": 210,
+        "magia": 210,
+        "curacion": 210,
+        "controlEspada": 204,
         "manaMax": 204
       },
       "entrenosHoy": {
         "fuerza": {
           "count": 3,
-          "last": 1759450844640
+          "last": 1786675887345
         },
         "agilidad": {
           "count": 3,
-          "last": 1759450850335
+          "last": 1786675912671
         },
         "defensa": {
           "count": 3,
-          "last": 1759450844862
+          "last": 1786675945482
         },
         "magia": {
           "count": 3,
-          "last": 1759450850603
+          "last": 1786675985719
         },
         "curacion": {
           "count": 3,
-          "last": 1759450845126
+          "last": 1786676048521
         },
         "controlEspada": {
           "count": 3,
-          "last": 1759450838148
+          "last": 1786676092400
         },
         "manaMax": {
-          "count": 3,
+          "count": 0,
           "last": 1759450850823
         }
       }
     },
     "mascotas": [],
     "mascotaEquipada": {
-      "uid": "mf1g0zswew91n0",
+      "uid": "mssb7l424xmtce",
       "tipo": "mascota",
-      "code": "T02",
-      "nombre": "Fénix (Legendaria)",
-      "atkBuff": 216,
-      "defBuff": 200,
-      "hpBuff": 480,
-      "rareza": "Legendaria",
-      "emoji": "🔥🟣",
-      "precio": 360000
+      "code": "T03",
+      "nombre": "Golem de Piedra (Fantástica)",
+      "atkBuff": 400,
+      "defBuff": 640,
+      "hpBuff": 1600,
+      "rareza": "Fantástica",
+      "emoji": "🪨🔶",
+      "precio": 750000
     },
     "golem": {
       "nivel": 147,
       "atk": 2970,
       "hp": 14800,
-      "lastKO": 1756927939277
+      "lastKO": 1786670725768
     },
     "hasHouse": true,
     "enCasa": true,
@@ -6230,26 +6168,25 @@
         "uid": "mf3bir7g312"
       }
     ],
-    "fuerzaBonus": 414,
-    "agilidadBonus": 310.5,
-    "defensaBonus": 367.20000000000135,
-    "magiaBonus": 448.7999999999985,
-    "curacionBonus": 414,
-    "precisionBonus": 297,
-    "lastDaily": 1758645247363,
-    "lastWork": 1759450837795,
-    "lastHunt": 1759450850881,
-    "lastMine": 1759450835247,
-    "lastFish": 1759450837831,
-    "lastDungeon": 1759450898323,
+    "fuerzaBonus": 426,
+    "agilidadBonus": 319.5,
+    "defensaBonus": 378.0000000000014,
+    "magiaBonus": 461.9999999999984,
+    "curacionBonus": 420,
+    "precisionBonus": 306,
+    "lastDaily": 1786655886759,
+    "lastWork": 1786676178790,
+    "lastHunt": 1786676160557,
+    "lastMine": 1786676188176,
+    "lastFish": 1786676172677,
+    "lastDungeon": 1786676694174,
     "lastGuildMission": 0,
     "nick": "Thiago el folla abuelitas",
     "gremio": "Aventureros",
     "misionesActivas": [
       "mago",
       "rey-demonio",
-      "dragón",
-      "salvar-mundo"
+      "dragón"
     ],
     "misionesCompletadas": [
       "flores",
@@ -6502,13 +6439,16 @@
       "salvar-mundo",
       "rey-demonio",
       "dragón",
+      "salvar-mundo",
+      "salvar-mundo",
+      "salvar-mundo",
       "salvar-mundo"
     ],
     "profecion": null,
     "lid": "98629712916662@lid",
-    "lastRegen": 1782369753408,
-    "inmunidadKO": false,
-    "inmunidadKOStart": 0,
+    "lastRegen": 1786692153408,
+    "inmunidadKO": true,
+    "inmunidadKOStart": 1786673606210,
     "manaMax": 3820,
     "totalHP": 100,
     "misionesCooldown": {
@@ -6520,9 +6460,33 @@
       "mago": 1757555823779,
       "dragón": 1759450804140,
       "rey-demonio": 1759450803697,
-      "salvar-mundo": 1759450807046
+      "salvar-mundo": 1786676437954
     },
-    "lastManaRegen": 0
+    "lastManaRegen": 0,
+    "ancestral": {
+      "floor": 122,
+      "inside": true,
+      "paid": true,
+      "lastBossTime": {
+        "10": 1786675128769,
+        "20": 1786675123639,
+        "30": 1786675114632,
+        "40": 1786675104661,
+        "50": 1786675093402,
+        "60": 1786675085983,
+        "70": 1786675075595,
+        "80": 1786675056895,
+        "90": 1786675048073,
+        "100": 1786675022088,
+        "110": 1786675000127,
+        "120": 1786675765862
+      }
+    },
+    "limitBreaker": {
+      "unlocked": true,
+      "active": false,
+      "lastTick": 0
+    }
   },
   "81325356806354@lid": {
     "nivel": 3,
@@ -6572,7 +6536,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "81325356806354@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984476313,
     "manaMax": null
@@ -6650,7 +6614,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "257762713976981@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": 30,
     "misionesCooldown": {},
     "inmunidadKO": true,
@@ -6704,7 +6668,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "50000000@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "2000@lid": {
     "nivel": 1,
@@ -6754,7 +6718,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "2000@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "62629297029213@lid": {
     "nivel": 2,
@@ -6804,7 +6768,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "62629297029213@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1757269611824,
     "manaMax": null
@@ -6857,7 +6821,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "65958299332723@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": null,
     "inmunidadKO": true,
     "inmunidadKOStart": 1757629511697
@@ -6910,7 +6874,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "14337221603524@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "251574085488879@lid": {
     "nivel": 6,
@@ -6960,7 +6924,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "251574085488879@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": 20,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004237469
@@ -7433,7 +7397,7 @@
     ],
     "profecion": null,
     "lid": "5373641670712@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": 3680,
     "totalHP": 100,
     "inmunidadKO": false,
@@ -7498,7 +7462,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "5492944800960@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1758167168445,
     "manaMax": null
@@ -7559,7 +7523,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "3999302435071@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": false,
     "inmunidadKOStart": 0,
     "manaMax": 310
@@ -7683,7 +7647,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "57818866524178@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": 80,
     "inmunidadKO": true,
     "inmunidadKOStart": 1758638313820,
@@ -7782,7 +7746,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "10505506812054@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": 170,
     "inmunidadKO": true,
     "inmunidadKOStart": 1758896659490
@@ -7835,7 +7799,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "184769694458032@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1758661831277,
     "manaMax": 10
@@ -7888,7 +7852,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "203414063562988@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1758682324043,
     "manaMax": null
@@ -7941,7 +7905,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "573116078363@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1758682870872,
     "manaMax": null
@@ -7994,7 +7958,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "231520212123708@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1758684615296,
     "manaMax": null
@@ -8047,7 +8011,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "2405819261102@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1758743645665,
     "manaMax": null
@@ -8369,7 +8333,7 @@
     ],
     "profecion": null,
     "lid": "144886577786983@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": 550,
     "totalHP": 100,
     "misionesCooldown": {
@@ -8431,7 +8395,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "136121036099694@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1758755031676,
     "manaMax": 10
@@ -8484,7 +8448,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "10000000@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "182175953584164@lid": {
     "nivel": 2,
@@ -8534,7 +8498,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "182175953584164@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1758809376196,
     "manaMax": null
@@ -8587,7 +8551,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "228823425646649@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": null
   },
   "905957280@lid": {
@@ -8638,7 +8602,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "905957280@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759001852426,
     "manaMax": null
@@ -8730,7 +8694,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "178426245845200@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759181858580,
     "manaMax": 180,
@@ -8785,7 +8749,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "22368743329988@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004127027,
     "manaMax": null
@@ -8838,7 +8802,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "127354974269496@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004132430,
     "manaMax": null
@@ -8891,7 +8855,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "165249588179179@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004145101,
     "manaMax": null
@@ -8944,7 +8908,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "151917456052477@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004204593,
     "manaMax": null
@@ -8997,7 +8961,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "45024460951787@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004213355,
     "manaMax": null
@@ -9050,7 +9014,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "186955648245920@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004220885,
     "manaMax": null
@@ -9103,7 +9067,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "47515793657983@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004373700,
     "manaMax": null
@@ -9156,7 +9120,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "86196336197832@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004395474,
     "manaMax": null
@@ -9209,7 +9173,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "221513575882872@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004420562,
     "manaMax": null
@@ -9262,7 +9226,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "3544052703487@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004451175,
     "manaMax": null
@@ -9315,7 +9279,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "3436628181035@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004465546,
     "manaMax": null
@@ -9368,7 +9332,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "125147377852547@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004478283,
     "manaMax": null
@@ -9421,7 +9385,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "129278566002851@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004509075,
     "manaMax": null
@@ -9474,7 +9438,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "5493625520158@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759004809980,
     "manaMax": null
@@ -9527,7 +9491,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "5492944109890@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759010549569,
     "manaMax": null
@@ -9580,7 +9544,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "999745637@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759038513265,
     "manaMax": 130
@@ -9633,7 +9597,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "237370427322546@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": null,
     "misionesCooldown": {},
     "inmunidadKO": true,
@@ -9687,7 +9651,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "99999999@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "1000000@lid": {
     "nivel": 1,
@@ -9737,7 +9701,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "1000000@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "8987644579@lid": {
     "nivel": 51,
@@ -9787,7 +9751,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "8987644579@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759108178732,
     "manaMax": 340
@@ -9840,7 +9804,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "30872594071641@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759271999497,
     "manaMax": null
@@ -9893,7 +9857,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "3974382763@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759365158587,
     "manaMax": 180
@@ -9946,7 +9910,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "87660903284740@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1759378567032,
     "manaMax": null
@@ -9999,7 +9963,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "280191419027658@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "62178895855731@lid": {
     "nivel": 3,
@@ -10061,7 +10025,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "62178895855731@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "ancestral": {
       "floor": 0,
       "inside": false,
@@ -10120,7 +10084,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "259635453935764@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "179955354886313@lid": {
     "nivel": 1,
@@ -10211,7 +10175,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "179955354886313@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "lastManaRegen": 0
   },
   "48589048967241@lid": {
@@ -10285,7 +10249,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "48589048967241@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": null,
     "misionesCooldown": {}
   },
@@ -10337,7 +10301,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "20929845440635@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": null,
     "inmunidadKO": true,
     "inmunidadKOStart": 1771813590549
@@ -10390,7 +10354,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "183777892507784@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1771864183009,
     "manaMax": null
@@ -10443,7 +10407,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "130825307832455@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1771864204332,
     "manaMax": null
@@ -10496,7 +10460,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "66306225217757@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1771864230336,
     "manaMax": null
@@ -10549,7 +10513,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "246256882462769@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": null
   },
   "193093643059248@lid": {
@@ -10600,7 +10564,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "193093643059248@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": null
   },
   "79156918399062@lid": {
@@ -10651,7 +10615,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "79156918399062@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "45797873848505@lid": {
     "nivel": 1,
@@ -10701,7 +10665,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "45797873848505@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "8285663006882@lid": {
     "nivel": 2,
@@ -10751,7 +10715,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "8285663006882@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1772311728232,
     "manaMax": null
@@ -10804,7 +10768,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "14223211@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1772792547595,
     "manaMax": 70
@@ -10857,7 +10821,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "728263@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "627262@lid": {
     "nivel": 1,
@@ -10907,7 +10871,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "627262@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "727262@lid": {
     "nivel": 2,
@@ -10957,7 +10921,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "727262@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1772914461457,
     "manaMax": null
@@ -11010,7 +10974,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "54941439803441@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": false,
     "inmunidadKOStart": 0,
     "ancestral": {
@@ -11222,7 +11186,7 @@
     ],
     "profecion": null,
     "lid": "149834698879187@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "ancestral": {
       "floor": 0,
       "inside": false,
@@ -11295,7 +11259,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "37302495653948@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": 30,
     "inmunidadKO": false,
     "inmunidadKOStart": 0,
@@ -11354,7 +11318,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "257062802079856@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "manaMax": null,
     "ancestral": {
       "floor": 0,
@@ -11411,7 +11375,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "124382370382065@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "2@lid": {
     "nivel": 4,
@@ -11461,7 +11425,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "2@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773655666587
   },
@@ -11513,7 +11477,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "45@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "98016153309436@lid": {
     "nivel": 1,
@@ -11563,7 +11527,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "98016153309436@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "ancestral": {
       "floor": 0,
       "inside": false,
@@ -11619,7 +11583,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "241355804655651@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984421106
   },
@@ -11671,7 +11635,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "38053578064008@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "ancestral": {
       "floor": 0,
       "inside": false,
@@ -11789,7 +11753,7 @@
     ],
     "profecion": null,
     "lid": "263178902593620@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "ancestral": {
       "floor": 0,
       "inside": false,
@@ -11851,7 +11815,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "50000@lid",
-    "lastRegen": 1782369753408
+    "lastRegen": 1786692153408
   },
   "145617057787995@lid": {
     "nivel": 2,
@@ -11901,7 +11865,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "145617057787995@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": false,
     "inmunidadKOStart": 0,
     "ancestral": {
@@ -11965,7 +11929,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "236863872880757@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1776656439550
   },
@@ -12017,7 +11981,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "161787676729345@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984396037
   },
@@ -12069,7 +12033,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "172331267805199@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984401977
   },
@@ -12121,7 +12085,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "262697480372439@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984430384
   },
@@ -12173,7 +12137,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "227543592472802@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984445342
   },
@@ -12225,7 +12189,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "192273522417671@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984463245
   },
@@ -12277,7 +12241,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "142275170545667@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984469090
   },
@@ -12329,7 +12293,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "121719993970715@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984488555
   },
@@ -12381,7 +12345,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "79092040892514@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984503341
   },
@@ -12433,7 +12397,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "245290615443629@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984517629
   },
@@ -12485,7 +12449,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "249761491894337@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984522333
   },
@@ -12537,7 +12501,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "82961739284568@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984533041
   },
@@ -12589,7 +12553,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "273856275165243@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984540640
   },
@@ -12641,7 +12605,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "158051055185970@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984545408
   },
@@ -12693,7 +12657,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "223394687627504@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984554785
   },
@@ -12745,7 +12709,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "199170770108585@lid",
-    "lastRegen": 1782369753408,
+    "lastRegen": 1786692153408,
     "inmunidadKO": true,
     "inmunidadKOStart": 1773984562078
   },
@@ -12891,7 +12855,7 @@
     ],
     "profecion": null,
     "lid": "143855684976735@lid",
-    "lastRegen": 163166400000,
+    "lastRegen": 168710400000,
     "inmunidadKO": true,
     "inmunidadKOStart": 1776656354322,
     "misionesCooldown": {
@@ -12980,7 +12944,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "92316412989548@lid",
-    "lastRegen": 162759600000,
+    "lastRegen": 168303600000,
     "ancestral": {
       "floor": 0,
       "inside": false,
@@ -13038,7 +13002,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "97337414291537@lid",
-    "lastRegen": 162630000000,
+    "lastRegen": 168174000000,
     "inmunidadKO": true,
     "inmunidadKOStart": 1774590714079
   },
@@ -13090,7 +13054,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "9354505891930@lid",
-    "lastRegen": 162630000000,
+    "lastRegen": 168174000000,
     "inmunidadKO": true,
     "inmunidadKOStart": 1774814713765
   },
@@ -13142,7 +13106,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "190821504651423@lid",
-    "lastRegen": 162630000000,
+    "lastRegen": 168174000000,
     "inmunidadKO": true,
     "inmunidadKOStart": 1774590739258
   },
@@ -13194,7 +13158,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "169479896100874@lid",
-    "lastRegen": 162630000000,
+    "lastRegen": 168174000000,
     "inmunidadKO": true,
     "inmunidadKOStart": 1774590748765
   },
@@ -13246,7 +13210,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "118584130936968@lid",
-    "lastRegen": 162626400000,
+    "lastRegen": 168170400000,
     "inmunidadKO": true,
     "inmunidadKOStart": 1774590760048
   },
@@ -13298,7 +13262,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "55757970133067@lid",
-    "lastRegen": 162626400000,
+    "lastRegen": 168170400000,
     "inmunidadKO": true,
     "inmunidadKOStart": 1774590771405
   },
@@ -13350,7 +13314,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "272537887985717@lid",
-    "lastRegen": 162626400000,
+    "lastRegen": 168170400000,
     "inmunidadKO": true,
     "inmunidadKOStart": 1774590782499
   },
@@ -13402,7 +13366,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "185496013680698@lid",
-    "lastRegen": 162626400000,
+    "lastRegen": 168170400000,
     "inmunidadKO": true,
     "inmunidadKOStart": 1774590792523
   },
@@ -13454,7 +13418,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "107374383738983@lid",
-    "lastRegen": 162626400000,
+    "lastRegen": 168170400000,
     "inmunidadKO": true,
     "inmunidadKOStart": 1774590804232
   },
@@ -13506,7 +13470,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "236911016812582@lid",
-    "lastRegen": 143722800000
+    "lastRegen": 149266800000
   },
   "220877484482798@lid": {
     "nivel": 2,
@@ -13556,7 +13520,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "220877484482798@lid",
-    "lastRegen": 78598800000,
+    "lastRegen": 84142800000,
     "inmunidadKO": true,
     "inmunidadKOStart": 1776716440155,
     "ancestral": {
@@ -13614,7 +13578,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "245255819509838@lid",
-    "lastRegen": 702000000,
+    "lastRegen": 6246000000,
     "inmunidadKO": true,
     "inmunidadKOStart": 1786587669555,
     "ancestral": {
@@ -13683,7 +13647,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "99549406298250@lid",
-    "lastRegen": 680400000,
+    "lastRegen": 6224400000,
     "ancestral": {
       "floor": 0,
       "inside": false,
@@ -13753,7 +13717,7 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "234003441414306@lid",
-    "lastRegen": 673200000,
+    "lastRegen": 6217200000,
     "ancestral": {
       "floor": 0,
       "inside": false,
@@ -13810,8 +13774,305 @@
     "misionesCompletadas": [],
     "profecion": null,
     "lid": "107417853493268@lid",
-    "lastRegen": 104400000,
+    "lastRegen": 5648400000,
     "inmunidadKO": true,
     "inmunidadKOStart": 1786597716566
+  },
+  "114469619421350@lid": {
+    "nivel": 1,
+    "xp": 0,
+    "hp": 100,
+    "hpMax": 100,
+    "mana": 100,
+    "manamax": 100,
+    "monedas": 100,
+    "arma": null,
+    "armadura": null,
+    "inventario": [],
+    "academia": {
+      "especialidades": {
+        "fuerza": 0,
+        "agilidad": 0,
+        "defensa": 0,
+        "magia": 0,
+        "curacion": 0,
+        "controlEspada": 0,
+        "manaMax": 0
+      },
+      "entrenosHoy": {}
+    },
+    "mascotas": [],
+    "mascotaEquipada": null,
+    "golem": null,
+    "hasHouse": false,
+    "enCasa": false,
+    "homeChest": [],
+    "fuerzaBonus": 0,
+    "agilidadBonus": 0,
+    "defensaBonus": 0,
+    "magiaBonus": 0,
+    "curacionBonus": 0,
+    "precisionBonus": 0,
+    "lastDaily": 0,
+    "lastWork": 0,
+    "lastHunt": 0,
+    "lastMine": 0,
+    "lastFish": 0,
+    "lastDungeon": 0,
+    "lastGuildMission": 0,
+    "nick": "",
+    "gremio": null,
+    "misionesActivas": [],
+    "misionesCompletadas": [],
+    "profecion": null,
+    "lid": "114469619421350@lid",
+    "lastRegen": 3121200000,
+    "ancestral": {
+      "floor": 0,
+      "inside": false,
+      "paid": false,
+      "lastBossTime": {}
+    }
+  },
+  "245647030648922@lid": {
+    "nivel": 5,
+    "xp": 188,
+    "hp": 180,
+    "hpMax": 180,
+    "mana": 140,
+    "manamax": 140,
+    "monedas": 2689,
+    "arma": null,
+    "armadura": null,
+    "inventario": [],
+    "academia": {
+      "especialidades": {
+        "fuerza": 0,
+        "agilidad": 0,
+        "defensa": 0,
+        "magia": 0,
+        "curacion": 0,
+        "controlEspada": 0,
+        "manaMax": 0
+      },
+      "entrenosHoy": {
+        "fuerza": {
+          "count": 0,
+          "last": 0
+        },
+        "agilidad": {
+          "count": 0,
+          "last": 0
+        },
+        "defensa": {
+          "count": 0,
+          "last": 0
+        },
+        "magia": {
+          "count": 0,
+          "last": 0
+        },
+        "curacion": {
+          "count": 0,
+          "last": 0
+        },
+        "controlEspada": {
+          "count": 0,
+          "last": 0
+        },
+        "manaMax": {
+          "count": 0,
+          "last": 0
+        }
+      }
+    },
+    "mascotas": [],
+    "mascotaEquipada": null,
+    "golem": null,
+    "hasHouse": false,
+    "enCasa": false,
+    "homeChest": [],
+    "fuerzaBonus": 0,
+    "agilidadBonus": 0,
+    "defensaBonus": 0,
+    "magiaBonus": 0,
+    "curacionBonus": 0,
+    "precisionBonus": 0,
+    "lastDaily": 1786659239700,
+    "lastWork": 0,
+    "lastHunt": 0,
+    "lastMine": 1786671395421,
+    "lastFish": 1786659301217,
+    "lastDungeon": 0,
+    "lastGuildMission": 0,
+    "nick": "rio",
+    "gremio": null,
+    "misionesActivas": [],
+    "misionesCompletadas": [],
+    "profecion": null,
+    "lid": "245647030648922@lid",
+    "lastRegen": 2268000000,
+    "ancestral": {
+      "floor": 0,
+      "inside": false,
+      "paid": false,
+      "lastBossTime": {}
+    }
+  },
+  "179216737898668@lid": {
+    "nivel": 1,
+    "xp": 0,
+    "hp": 100,
+    "hpMax": 100,
+    "mana": 100,
+    "manamax": 100,
+    "monedas": 100,
+    "arma": null,
+    "armadura": null,
+    "inventario": [],
+    "academia": {
+      "especialidades": {
+        "fuerza": 0,
+        "agilidad": 0,
+        "defensa": 0,
+        "magia": 0,
+        "curacion": 0,
+        "controlEspada": 0,
+        "manaMax": 0
+      },
+      "entrenosHoy": {}
+    },
+    "mascotas": [],
+    "mascotaEquipada": null,
+    "golem": null,
+    "hasHouse": false,
+    "enCasa": false,
+    "homeChest": [],
+    "fuerzaBonus": 0,
+    "agilidadBonus": 0,
+    "defensaBonus": 0,
+    "magiaBonus": 0,
+    "curacionBonus": 0,
+    "precisionBonus": 0,
+    "lastDaily": 0,
+    "lastWork": 0,
+    "lastHunt": 0,
+    "lastMine": 0,
+    "lastFish": 0,
+    "lastDungeon": 0,
+    "lastGuildMission": 0,
+    "nick": "",
+    "gremio": null,
+    "misionesActivas": [],
+    "misionesCompletadas": [],
+    "profecion": null,
+    "lid": "179216737898668@lid",
+    "lastRegen": 2217600000,
+    "ancestral": {
+      "floor": 0,
+      "inside": false,
+      "paid": false,
+      "lastBossTime": {}
+    }
+  },
+  "114440007610596@lid": {
+    "nivel": 1,
+    "xp": 88,
+    "hp": 100,
+    "hpMax": 100,
+    "mana": 100,
+    "manamax": 100,
+    "monedas": 299,
+    "arma": null,
+    "armadura": null,
+    "inventario": [],
+    "academia": {
+      "especialidades": {
+        "fuerza": 0,
+        "agilidad": 0,
+        "defensa": 0,
+        "magia": 0,
+        "curacion": 0,
+        "controlEspada": 0,
+        "manaMax": 0
+      },
+      "entrenosHoy": {}
+    },
+    "mascotas": [],
+    "mascotaEquipada": null,
+    "golem": null,
+    "hasHouse": false,
+    "enCasa": false,
+    "homeChest": [],
+    "fuerzaBonus": 0,
+    "agilidadBonus": 0,
+    "defensaBonus": 0,
+    "magiaBonus": 0,
+    "curacionBonus": 0,
+    "precisionBonus": 0,
+    "lastDaily": 0,
+    "lastWork": 0,
+    "lastHunt": 1786664964508,
+    "lastMine": 0,
+    "lastFish": 0,
+    "lastDungeon": 0,
+    "lastGuildMission": 0,
+    "nick": "",
+    "gremio": null,
+    "misionesActivas": [],
+    "misionesCompletadas": [],
+    "profecion": null,
+    "lid": "114440007610596@lid",
+    "lastRegen": 1641600000
+  },
+  "178482164289564@lid": {
+    "nivel": 2,
+    "xp": 52,
+    "hp": 120,
+    "hpMax": 120,
+    "mana": 110,
+    "manamax": 110,
+    "monedas": 470,
+    "arma": null,
+    "armadura": null,
+    "inventario": [],
+    "academia": {
+      "especialidades": {
+        "fuerza": 0,
+        "agilidad": 0,
+        "defensa": 0,
+        "magia": 0,
+        "curacion": 0,
+        "controlEspada": 0,
+        "manaMax": 0
+      },
+      "entrenosHoy": {}
+    },
+    "mascotas": [],
+    "mascotaEquipada": null,
+    "golem": null,
+    "hasHouse": false,
+    "enCasa": false,
+    "homeChest": [],
+    "fuerzaBonus": 0,
+    "agilidadBonus": 0,
+    "defensaBonus": 0,
+    "magiaBonus": 0,
+    "curacionBonus": 0,
+    "precisionBonus": 0,
+    "lastDaily": 0,
+    "lastWork": 0,
+    "lastHunt": 1786670187431,
+    "lastMine": 0,
+    "lastFish": 0,
+    "lastDungeon": 0,
+    "lastGuildMission": 0,
+    "nick": "",
+    "gremio": null,
+    "misionesActivas": [],
+    "misionesCompletadas": [],
+    "profecion": null,
+    "lid": "178482164289564@lid",
+    "lastRegen": 1641600000
   }
 }
