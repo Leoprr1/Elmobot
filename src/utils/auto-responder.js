@@ -1,5 +1,6 @@
 /**
  * Auto-responder optimizado con cache en RAM (sin recalcular por mensaje)
+ * Con priorización por cobertura de palabras, coincidencia de contexto y Cooldown Anti-Spam.
  */
 
 const path = require("node:path");
@@ -12,6 +13,55 @@ const databasePath = path.resolve(__dirname, "..", "..", "database");
 
 const AUTO_RESPONDER_GROUPS_FILE = "auto-responder-groups";
 const AUTO_RESPONDER_FILE = "auto-responder";
+
+// =====================
+// ⏱️ CONFIGURACIÓN Y COOLDOWN (ANTI-SPAM)
+// =====================
+
+// Tiempo de espera (en milisegundos) para no repetir la MISMA respuesta (10 minutos)
+const RESPONSE_COOLDOWN_MS = 10 * 60 * 1000; 
+
+// Mapa en memoria para trackear respuestas recientes { "normalised_answer": timestamp }
+const recentResponsesMap = new Map();
+
+/**
+ * Filtra y selecciona una respuesta que no haya sido usada recientemente.
+ */
+function getFreshAnswer(answers) {
+  if (!Array.isArray(answers) || !answers.length) return null;
+
+  const now = Date.now();
+
+  // Filtrar respuestas que NO estén en cooldown
+  const availableAnswers = answers.filter((ans) => {
+    const key = normalizeText(ans);
+    const lastUsed = recentResponsesMap.get(key);
+    if (!lastUsed) return true;
+    return now - lastUsed > RESPONSE_COOLDOWN_MS;
+  });
+
+  // Si todas las opciones están en cooldown, no respondemos nada para evitar spam
+  if (!availableAnswers.length) return null;
+
+  // Seleccionar una respuesta válida al azar
+  const selectedAnswer = availableAnswers[Math.floor(Math.random() * availableAnswers.length)];
+
+  // Registrar el uso en el mapa de cooldowns
+  recentResponsesMap.set(normalizeText(selectedAnswer), now);
+
+  return selectedAnswer;
+}
+
+// Limpieza automática del Map de cooldowns cada 10 minutos para liberar memoria RAM
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, timestamp] of recentResponsesMap.entries()) {
+    if (now - timestamp > RESPONSE_COOLDOWN_MS) {
+      recentResponsesMap.delete(key);
+    }
+  }
+}, 10 * 60 * 1000);
+
 
 // =====================
 // 🔥 CACHE EN RAM
@@ -41,18 +91,25 @@ function prepareAutoResponder() {
 
     lastHash = currentHash;
 
-    // 🔥 reconstruir cache
+    // 🔥 reconstruir cache ordenando por longitud de palabras y caracteres (mayor a menor)
     cachedResponses = responses
       .map((r) => {
         const normalized = normalizeText(r.match);
+        const words = normalized.split(/\s+/).filter(Boolean);
 
         return {
           raw: r,
           normalized,
-          words: normalized.split(/\s+/),
+          words,
+          wordCount: words.length,
         };
       })
-      .sort((a, b) => b.normalized.length - a.normalized.length);
+      .sort((a, b) => {
+        if (b.wordCount !== a.wordCount) {
+          return b.wordCount - a.wordCount; // Más palabras primero
+        }
+        return b.normalized.length - a.normalized.length; // Más caracteres primero
+      });
 
     console.log("⚡ Auto-responder cache actualizado:", cachedResponses.length);
 
@@ -60,7 +117,6 @@ function prepareAutoResponder() {
     console.log("❌ Error preparando cache auto-responder:", err);
   }
 }
-
 
 // 🔥 delay inicial (espera a que JSONCache cargue)
 setTimeout(() => {
@@ -81,44 +137,70 @@ const getAutoResponderResponse = (match) => {
   if (!match || !cachedResponses.length) return null;
 
   const normalizedMessage = normalizeText(match);
-  const messageWords = normalizedMessage.split(/\s+/);
+  const messageWords = normalizedMessage.split(/\s+/).filter(Boolean);
+  const messageWordCount = messageWords.length;
 
-  const getRandomAnswer = (answers) => {
-    if (!Array.isArray(answers) || !answers.length) return null;
-    return answers[Math.floor(Math.random() * answers.length)];
-  };
-
-  // 1. match exacto
+  // ----------------------------------------------------
+  // PASO 1: Match Exacto Directo (100% idéntico)
+  // ----------------------------------------------------
   for (const r of cachedResponses) {
     if (r.normalized === normalizedMessage) {
-      return getRandomAnswer(r.raw.answers);
+      const answer = getFreshAnswer(r.raw.answers);
+      if (answer) return answer;
     }
   }
 
-  // 2. palabras completas
+  // ----------------------------------------------------
+  // PASO 2: Sistema de Puntaje Exponencial por Frases
+  // ----------------------------------------------------
+  let bestMatch = null;
+  let highestScore = 0;
+
   for (const r of cachedResponses) {
-    if (r.words.length <= 2) continue;
-    if (r.words.every((w) => messageWords.includes(w))) {
-      return getRandomAnswer(r.raw.answers);
+    let score = 0;
+
+    // A) Si la regla guardada tiene múltiples palabras
+    if (r.wordCount > 1) {
+      const matchedWords = r.words.filter((w) => messageWords.includes(w)).length;
+
+      // Si coinciden TODAS las palabras de la regla guardada
+      if (matchedWords === r.wordCount) {
+        // Multiplicador exponencial basado en la cantidad de palabras
+        score = Math.pow(matchedWords, 2) * 0.5 + (matchedWords / messageWordCount);
+      } 
+      // Si coincide la mayoría de las palabras (por ejemplo 4 de 5 palabras)
+      else if (matchedWords >= 2 && matchedWords / r.wordCount >= 0.7) {
+        score = Math.pow(matchedWords, 1.8) * 0.3;
+      }
+    }
+
+    // B) Similitud estricta por String Similarity (para oraciones largas con typos)
+    if (r.normalized.length > 5) {
+      const similarity = stringSimilarity.compareTwoStrings(normalizedMessage, r.normalized);
+      if (similarity >= 0.75) {
+        const simScore = similarity * r.wordCount * 2;
+        if (simScore > score) score = simScore;
+      }
+    }
+
+    // C) Subcadena (includes) - Último recurso para palabras/letras sueltas
+    if (score === 0 && r.normalized.length >= 2) {
+      if (normalizedMessage.includes(r.normalized)) {
+        // Asigna un puntaje mínimo muy bajo para no eclipsar oraciones
+        score = 0.1 * (r.normalized.length / Math.max(normalizedMessage.length, 1));
+      }
+    }
+
+    // Actualizar mejor coincidencia
+    if (score > highestScore) {
+      highestScore = score;
+      bestMatch = r;
     }
   }
 
-  // 3. includes
-  for (const r of cachedResponses) {
-    if (r.normalized.length <= 2) continue;
-    if (normalizedMessage.includes(r.normalized)) {
-      return getRandomAnswer(r.raw.answers);
-    }
-  }
-
-  // 4. similaridad
-  for (const r of cachedResponses) {
-    if (r.normalized.length <= 3) continue;
-    if (
-      stringSimilarity.compareTwoStrings(normalizedMessage, r.normalized) >= 0.75
-    ) {
-      return getRandomAnswer(r.raw.answers);
-    }
+  // Umbral mínimo de confianza para responder
+  if (bestMatch && highestScore >= 0.25) {
+    return getFreshAnswer(bestMatch.raw.answers);
   }
 
   return null;
@@ -209,3 +291,4 @@ module.exports = {
   addAutoResponderItem,
   removeAutoResponderItemByKey,
 };
+
