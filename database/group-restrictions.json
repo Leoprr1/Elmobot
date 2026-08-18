@@ -3,5 +3,12 @@
     "anti-document": true,
     "anti-product": true,
     "anti-event": true
+  },
+  "120363426353704836@g.us": {
+    "anti-sticker": false,
+    "anti-document": false,
+    "anti-video": false,
+    "anti-image": false,
+    "anti-product": false
   }
 }

@@ -37,6 +37,7 @@ const { isGroupGloballyDisabled } = require("../utils/globalGroups");
 
 // 🔥 SET PARA EVITAR MENSAJES DUPLICADOS
 const processedMessages = new Set();
+const ultimaPresencia = new Map();
 
 exports.onMessagesUpsert = async ({ socket, messages, startProcess }) => {
   if (!messages || !messages.length) return;
@@ -59,9 +60,16 @@ exports.onMessagesUpsert = async ({ socket, messages, startProcess }) => {
         continue;
       }
 
-      // marcar como disponible
-      await socket.sendPresenceUpdate("available", jid);
+      // marcar como disponible (Sin saturar y sin usar .catch)
+const ahora = Date.now();
+const ultimoEnvio = ultimaPresencia.get(jid) || 0;
 
+if (ahora - ultimoEnvio > 30000) {
+  ultimaPresencia.set(jid, ahora);
+  try {
+    await socket.sendPresenceUpdate("available", jid);
+  } catch {}
+}
       // marcar como leído
       await socket.readMessages([webMessage]);
 

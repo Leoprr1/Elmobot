@@ -271,16 +271,27 @@ async function startBot() {
 
     await initSocket();
 
-    // ----------------------------
-    // MANTENER VIVO
-    // ----------------------------
-    setInterval(() => {
+    // ✅ SESIÓN ACTIVA 24/7 (Integración directa)
+setInterval(() => {
+  if (socketGlobal && socketGlobal.ws && socketGlobal.ws.readyState === 1) {
+    try {
+      // 1. Mantener la tubería de red viva
+      if (typeof socketGlobal.sendPing === "function") {
+        socketGlobal.sendPing();
+      } else if (socketGlobal.ws.ping) {
+        socketGlobal.ws.ping();
+      }
+
+      // 2. MANTENER VIVO (Código original)
       if (socketGlobal?.sendPresenceUpdate) {
         try {
           socketGlobal.sendPresenceUpdate("available");
         } catch {}
       }
-    }, 10000);
+    } catch {}
+  }
+}, 10000);
+
 
     setInterval(() => {
       const currentStats = badMacHandler.getStats();

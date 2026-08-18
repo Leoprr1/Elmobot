@@ -1,10 +1,7 @@
 const fs = require("fs").promises;
-const fsSync = require("fs");
 const path = require("path");
 
 const databasePath = path.resolve(__dirname, "../../database");
-const AUTO_FILE = path.resolve(databasePath, "auto-responder.json");
-const LB2_FILE = path.resolve(databasePath, "learningbot2.json");
 const GENERATED_FILE = path.resolve(databasePath, "generated-memory.json");
 
 let brain = {
@@ -19,8 +16,9 @@ let brain = {
   },
 };
 
-// 🧠 cache de lo ya procesado (CLAVE DEL FIX)
+// 🧠 Caches de búsqueda instantánea O(1)
 const processedSet = new Set();
+const sentenceSet = new Set();
 
 function normalize(text) {
   return text
@@ -32,8 +30,7 @@ function normalize(text) {
 }
 
 function addFrequency(map, key) {
-  if (!map[key]) map[key] = 0;
-  map[key]++;
+  map[key] = (map[key] || 0) + 1;
 }
 
 function detectTopic(text) {
@@ -53,27 +50,19 @@ function detectTopic(text) {
   return "general";
 }
 
-function uniqueArray(arr) {
-  return [...new Set(arr)];
-}
-
-// 🔥 PROCESAMIENTO INCREMENTAL REAL
+// 🔥 PROCESAMIENTO OPTIMIZADO (RÁPIDO COMO UN RAYO)
 function processEntry(sentence) {
   if (!sentence) return;
 
   const normalized = normalize(sentence);
-  if (!normalized) return;
-
-  // 🚫 evitar reprocesar
-  const hash = normalized;
-  if (processedSet.has(hash)) return;
-  processedSet.add(hash);
+  if (!normalized || processedSet.has(normalized)) return;
+  processedSet.add(normalized);
 
   const topic = detectTopic(normalized);
 
   if (!brain.topics[topic]) {
     brain.topics[topic] = {
-      keywords: [],
+      keywords: new Set(), // Usa Set para no repetir palabras sin hacer uniqueArray
       sentences: [],
       wordFrequency: {},
       bigrams: {},
@@ -82,71 +71,86 @@ function processEntry(sentence) {
   }
 
   const topicData = brain.topics[topic];
-  const words = normalized.split(/\s+/);
 
-  if (!topicData.sentences.includes(normalized)) {
+  if (!sentenceSet.has(normalized)) {
+    sentenceSet.add(normalized);
     topicData.sentences.push(normalized);
     topicData.totalSentences++;
     brain.global.totalSentences++;
   }
 
-  topicData.keywords.push(...words);
-  topicData.keywords = uniqueArray(topicData.keywords);
+  const words = normalized.split(/\s+/);
 
-  words.forEach((word, i) => {
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    topicData.keywords.add(word); // Instantáneo
+
     addFrequency(topicData.wordFrequency, word);
     addFrequency(brain.global.wordFrequency, word);
 
     if (i < words.length - 1) {
-      const bigram = words[i] + " " + words[i + 1];
+      const bigram = word + " " + words[i + 1];
       addFrequency(topicData.bigrams, bigram);
     }
-  });
+  }
 }
 
-// 🔥 carga incremental desde DB (solo nuevos)
+// 🔥 CARGA INCREMENTAL
 async function syncFromDB() {
-  const { getDB } = require("./jsoncache");
+  try {
+    const { getDB } = require("./jsoncache");
 
-  const auto = getDB("auto-responder") || [];
-  const lb2 = getDB("learningbot2") || [];
+    const auto = getDB("auto-responder") || [];
+    const lb2 = getDB("learningbot2") || [];
 
-  for (const entry of auto) {
-    if (!entry.match) continue;
-    processEntry(entry.match);
+    for (const entry of auto) {
+      if (!entry.match) continue;
+      processEntry(entry.match);
 
-    const answers = entry.answers || (entry.answer ? [entry.answer] : []);
-    for (const a of answers) processEntry(a);
+      const answers = entry.answers || (entry.answer ? [entry.answer] : []);
+      for (const a of answers) processEntry(a);
+    }
+
+    for (const msg of lb2) {
+      processEntry(msg);
+    }
+
+    console.log("🧠 Brain actualizado incrementalmente");
+  } catch (err) {
+    console.error("❌ Error sincronizando Brain:", err.message);
   }
-
-  for (const msg of lb2) {
-    processEntry(msg);
-  }
-
-  console.log("🧠 Brain actualizado incrementalmente");
 }
 
-// 🔥 guardado liviano (no bloqueante)
+// 🔥 GUARDADO LIVIANO
 async function saveBrain() {
   try {
-    await fs.writeFile(GENERATED_FILE, JSON.stringify(brain, null, 2));
+    // Convertir keywords de Set a Array solo al momento de guardar
+    const exportBrain = JSON.parse(JSON.stringify(brain));
+    for (const t in exportBrain.topics) {
+      if (brain.topics[t]?.keywords) {
+        exportBrain.topics[t].keywords = Array.from(brain.topics[t].keywords);
+      }
+    }
+    await fs.writeFile(GENERATED_FILE, JSON.stringify(exportBrain, null, 2));
   } catch (err) {
     console.error("❌ Error guardando brain:", err);
   }
 }
 
-// 🚀 loop estable SIN rebuild total
+// 🚀 INICIO DIFERIDO (15 segundos después de arrancar para no trabar la conexión)
 function initWatcher() {
   setTimeout(() => {
     syncFromDB();
 
     setInterval(() => {
-      syncFromDB(); // solo agrega lo nuevo
-      saveBrain(); // guarda snapshot liviano
+      syncFromDB();
+      saveBrain();
     }, 60 * 1000);
-  }, 5000);
+  }, 15000); // 15s le da tiempo a Baileys de conectar limpio sin interrupciones
 }
 
 initWatcher();
 
 module.exports = { syncFromDB };
+
+

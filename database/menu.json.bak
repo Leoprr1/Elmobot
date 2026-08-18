@@ -55,6 +55,10 @@
     {
       "command": "ping",
       "desc": "verifica si el bot está en línea y tiempo de respuesta"
+    },
+    {
+      "command": "vaciar",
+      "desc": "vacia los chats del bot"
     }
   ],
   "perfil": [
