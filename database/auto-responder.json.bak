@@ -303,7 +303,8 @@
       "Hooa",
       "hola amor mío",
       "A vos no te habian mandado a dormir",
-      "Te quiere coger"
+      "Te quiere coger",
+      "buen día amor"
     ]
   },
   {
@@ -10559,7 +10560,8 @@
       "nada JAJAJ",
       "No sé",
       "vos tenes plano o no",
-      "tobi no me dijo que me ama ."
+      "tobi no me dijo que me ama .",
+      "Pues me duele mucho mi pecho"
     ]
   },
   {
@@ -35336,7 +35338,8 @@
       ".kiss",
       "hola amor .",
       "hola ti .",
-      "Eu cómo está s"
+      "Eu cómo está s",
+      "buen día amor"
     ]
   },
   {
@@ -61079,7 +61082,8 @@
       "Me alegro nenaaaa",
       "Bien",
       "Me alegro por vos",
-      "me alegro,sho bien"
+      "me alegro,sho bien",
+      "Mediaedia bien"
     ]
   },
   {
@@ -93298,7 +93302,8 @@
     "match": "@245255819509838",
     "answers": [
       "hola yo",
-      "ke"
+      "ke",
+      "hola brop, k paso"
     ]
   },
   {
@@ -97932,7 +97937,8 @@
   {
     "match": "POBRECITA",
     "answers": [
-      "No es tu gallina"
+      "No es tu gallina",
+      "Me duele mucho 😢"
     ]
   },
   {
@@ -121635,7 +121641,8 @@
   {
     "match": "Buen día amor",
     "answers": [
-      "hola como tas"
+      "hola como tas",
+      "Buen dia"
     ]
   },
   {
@@ -137220,7 +137227,8 @@
   {
     "match": "a q hora salis",
     "answers": [
-      "a las 12 hoy"
+      "a las 12 hoy",
+      "12:30"
     ]
   },
   {
@@ -150125,7 +150133,8 @@
   {
     "match": "Desaburrite",
     "answers": [
-      "Con vos todo mal"
+      "Con vos todo mal",
+      "no lo pensé"
     ]
   },
   {
@@ -151016,7 +151025,8 @@
   {
     "match": "me tiene harta .",
     "answers": [
-      "JAJSAJAJAJ"
+      "JAJSAJAJAJ",
+      "me encantas"
     ]
   },
   {
@@ -160276,6 +160286,140 @@
     "match": "Son las 4:55 acá",
     "answers": [
       "Tarde, no duermes?"
+    ]
+  },
+  {
+    "match": "Media media bien",
+    "answers": [
+      "que pasó"
+    ]
+  },
+  {
+    "match": "Hola buen dia",
+    "answers": [
+      "buen día bruni"
+    ]
+  },
+  {
+    "match": "Pues me duele mucho mi pecho",
+    "answers": [
+      "ohhhh"
+    ]
+  },
+  {
+    "match": "dónde vas",
+    "answers": [
+      "A la escuela de mierda"
+    ]
+  },
+  {
+    "match": "A la escuela de mierda",
+    "answers": [
+      "éxitos amor"
+    ]
+  },
+  {
+    "match": "éxitos amor",
+    "answers": [
+      "No quiero ir"
+    ]
+  },
+  {
+    "match": "yo estoy en llamada con gaspi",
+    "answers": [
+      "Los novios"
+    ]
+  },
+  {
+    "match": "acá no duermen",
+    "answers": [
+      "no me deja nomir"
+    ]
+  },
+  {
+    "match": "Me duele mucho 😢",
+    "answers": [
+      "médico?"
+    ]
+  },
+  {
+    "match": "médico?",
+    "answers": [
+      "Tengo q ir a ver q me dicen"
+    ]
+  },
+  {
+    "match": "me aburro eh",
+    "answers": [
+      "no dormiste?",
+      "Desaburrite"
+    ]
+  },
+  {
+    "match": "no dormiste?",
+    "answers": [
+      "un ratito nomás"
+    ]
+  },
+  {
+    "match": "un ratito nomás",
+    "answers": [
+      "dormite"
+    ]
+  },
+  {
+    "match": "no lo pensé",
+    "answers": [
+      "JAJSJAJAJAJA",
+      "Denadaaa"
+    ]
+  },
+  {
+    "match": "mai te extraño",
+    "answers": [
+      "No me llamaste"
+    ]
+  },
+  {
+    "match": "estabas dormida",
+    "answers": [
+      "4:30 me dormí"
+    ]
+  },
+  {
+    "match": "4:30 me dormí",
+    "answers": [
+      "ohhhhhh"
+    ]
+  },
+  {
+    "match": "12:30",
+    "answers": [
+      "okey suerte"
+    ]
+  },
+  {
+    "match": "me estoy chamuyando a una",
+    "answers": [
+      "me tiene harta"
+    ]
+  },
+  {
+    "match": "bueno ahora a si a hacer la noni",
+    "answers": [
+      "descansa"
+    ]
+  },
+  {
+    "match": "q compraste",
+    "answers": [
+      "Cafe oreos leche"
+    ]
+  },
+  {
+    "match": "Cafe oreos leche",
+    "answers": [
+      "que rico"
     ]
   }
 ]
