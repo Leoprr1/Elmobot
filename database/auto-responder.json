@@ -35336,7 +35336,8 @@
       ".kiss",
       "hola amor .",
       "hola ti .",
-      "Eu cómo está s"
+      "Eu cómo está s",
+      "buen día amor"
     ]
   },
   {
@@ -121635,7 +121636,8 @@
   {
     "match": "Buen día amor",
     "answers": [
-      "hola como tas"
+      "hola como tas",
+      "Buen dia"
     ]
   },
   {

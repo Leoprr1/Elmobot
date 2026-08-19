@@ -3,10 +3,7 @@ assets/auth/baileys
 
 # Ignorar el contenido de audio y video, pero mantener las carpetas
 src/commands/cache/audio/*
-!src/commands/cache/audio/.gitkeep
-
 src/commands/cache/video/*
-!src/commands/cache/video/.gitkeep
 
 # Ignorar cambios futuros en cookies.json para que no se suba con tus cookies reales
 src/commands/cache/cookies.json
