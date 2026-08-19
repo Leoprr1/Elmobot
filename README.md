@@ -7,7 +7,7 @@
 <br />
 
 <div align="center">
-    <a href="https://github.com/Leoprr1/takeshi-new">
+    <a href="https://github.com/Leoprr1/Elmobot">
         <img alt="Versión" src="https://img.shields.io/badge/Vers%C3%A3o-10.0.0-blue">
     </a>
 </div>
@@ -16,7 +16,7 @@
 
 > Bot de WhatsApp multifuncional listo para usar.
 ## este bot fue creado utilizando de base el takeshi-bot original de guiireal
-## el tutorial de instalacion de este bot takeshi-new esta en el repositorio
+## el tutorial de instalacion de este bot Elmobot esta en el repositorio
 
 [![Node.js](https://img.shields.io/badge/Node.js-22.14-green?logo=node.js)](https://nodejs.org/en)
 [![Baileys](https://img.shields.io/badge/Baileys-6.7.18-purple?logo=whatsapp)](https://github.com/WhiskeySockets/Baileys)
@@ -50,8 +50,8 @@ para la instalacion del bot copia y pega esto en el cmd:
 
 ```cmd
 cd C:\ruta donde quieras que se instale
-git clone [https://github.com/Leoprr1/takeshi-new.git](https://github.com/Leoprr1/takeshi-new.git)
-cd takeshi-new
+git clone [https://github.com/Leoprr1/Elmobot.git](https://github.com/Leoprr1/Elmobot.git)
+cd Elmobot
 npm install
 
 📱 Vinculación con WhatsApp
@@ -60,7 +60,7 @@ cuando ya haya enlazado el bot al whatsapp cerra el proceso con control+C
 🔄 Actualización del proyecto
 para actualizar el bot con las nuevas modificaciones del github pone esto:
 
-cd C:\ruta donde instalaste el bot\takeshi-new
+cd C:\ruta donde instalaste el bot\Elmobot
 git pull
 
 ⚙️ Ejecución en segundo plano con PM2
@@ -72,7 +72,7 @@ para arrancar el bot luego de hacer npm start y cerrar el cmd
 copia y pega en el cmd todo esto hasta pm2 save --force:
 
 pm2 install pm2-logrotate
-cd C:\ruta donde instalaste el bot\takeshi-new
+cd C:\ruta donde instalaste el bot\Elmobot
 set UV_THREADPOOL_SIZE=8 && pm2 start index.js --max-memory-restart 800M --node-args="--expose-gc --max-old-space-size=1536 --no-warnings"
 pm2 start backup-rpg.js --name "b"
 pm2 save --force
@@ -91,12 +91,12 @@ pm2 monit
 📦 Actualización de librerías
 esto es un check update, se encarga de buscar las ultimas actualizaciones de las librerias:
 
-cd C:\ruta donde instalaste el bot\takeshi-new
+cd C:\ruta donde instalaste el bot\Elmobot
 npm install -g npm-check-updates
 
 una vez instalado solo pone esto cuando quieras actualizar las librerias:
 
-cd C:\ruta donde instalaste el bot\takeshi-new
+cd C:\ruta donde instalaste el bot\Elmobot
 npx npm-check-updates -u
 npm install
 
@@ -115,6 +115,6 @@ pm2 stop all
 
 ⚡ Actualizar librería Baileys
 por si solo vas a actualizar el baileys:
-cd C:\ruta donde instalaste el bot\takeshi-new
+cd C:\ruta donde instalaste el bot\Elmobot
 npm install @whiskeysockets/baileys@latest
 

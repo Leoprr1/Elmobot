@@ -3,8 +3,8 @@ para correr este bot debes de tener instalado node (se recomienda instalarlo con
 
 para la instalacion del bot copia y pega esto en el cmd:
 cd C:\ruta donde quieras que se instale
-git clone https://github.com/Leoprr1/takeshi-new.git
-cd takeshi-new
+git clone https://github.com/Leoprr1/Elmobot
+cd Elmobot
 npm install
 
 
@@ -15,7 +15,7 @@ cuando ya haya enlazado el bot al whatsapp cerra el proceso con control+C
 
 
 para actualizar el bot con las nuevas modificaciones del github pone esto:
-cd C:\ruta donde instalaste el bot\takeshi-new
+cd C:\ruta donde instalaste el bot\Elmobot
 git pull
 
 
@@ -27,14 +27,14 @@ npm install -g pm2
 para arrancar el bot luego de hacer npm start y cerrar el cmd
 copia y pega en el cmd todo esto hasta pm2 save:
 pm2 install pm2-logrotate
-cd C:\ruta donde instalaste el bot\takeshi-new
+cd C:\ruta donde instalaste el bot\Elmobot
 set UV_THREADPOOL_SIZE=8 && pm2 start index.js --max-memory-restart 800M --node-args="--expose-gc --max-old-space-size=1536 --no-warnings"
 pm2 start backup-rpg.js --name "b"
 pm2 save --force
 
 
 si se te borran los procesos menos el pm2 logrotate en el pm2 monit
-copia y pega en el cmd solo desde el cd C:\ruta donde instalaste el bot\takeshi-new hasta el pm2 save --force
+copia y pega en el cmd solo desde el cd C:\ruta donde instalaste el bot\Elmobot hasta el pm2 save --force
 (y bueno si se te borraron todos los procesos incluso el pm2 logrotate copia todo)
 
 
@@ -45,12 +45,12 @@ pm2 monit
 
 
 esto es un check update, se encarga de buscar las ultimas actualizaciones de las librerias:
-cd C:\ruta donde instalaste el bot\takeshi-new
+cd C:\ruta donde instalaste el bot\Elmobot
 npm install -g npm-check-updates
 
 
 una vez instalado solo pone esto cuando quieras actualizar las librerias:
-cd C:\ruta donde instalaste el bot\takeshi-new
+cd C:\ruta donde instalaste el bot\Elmobot
 npx npm-check-updates -u
 npm install
 
@@ -67,7 +67,7 @@ pm2 stop all
 
 
 por si solo vas a actualizar el baileys:
-cd C:\ruta donde instalaste el bot\takeshi-new
+cd C:\ruta donde instalaste el bot\Elmobot
 npm install @whiskeysockets/baileys@latest
 
 
