@@ -1,70 +1,74 @@
-para correr este bot debes de tener instalado node
+para correr este bot debes de tener instalado node (se recomienda instalarlo con NVM en Windows usando nvm install lts y nvm use lts)
 
-para la instalacion del bot copia y pega esto en el cmd
+
+para la instalacion del bot copia y pega esto en el cmd:
 cd C:\ruta donde quieras que se instale
 git clone https://github.com/Leoprr1/takeshi-new.git
+cd takeshi-new
+npm install
 
-una vez completado arranca el bot con npm start para enlazar el bot al whatsapp con el QR, 
-cuando ya alla enlazado el bot al whatsapp cerra el proceso con control+C
 
-para actualizar el bot con las nuevas modificaciones del github pone esto
-cd C:\misma ruta que elegiste cuando hiciste git clone (por que si lo haces dentro de la carpeta del bot no se actualizan todas las cosas)
-git pull https://github.com/Leoprr1/takeshi-new.git
 
-luego para arrancar el bot con los siguientes comandos debes de instalar pm2
+una vez completado arranca el bot con npm start para enlazar el bot al whatsapp con el QR,
+cuando ya haya enlazado el bot al whatsapp cerra el proceso con control+C
+
+
+
+para actualizar el bot con las nuevas modificaciones del github pone esto:
+cd C:\ruta donde instalaste el bot\takeshi-new
+git pull
+
+
+
+luego para arrancar el bot con los siguientes comandos debes de instalar pm2:
 npm install -g pm2
 
+
 para arrancar el bot luego de hacer npm start y cerrar el cmd
-copia y pega en el cmd todo esto hasta pm2 save
-
+copia y pega en el cmd todo esto hasta pm2 save:
 pm2 install pm2-logrotate
-
-cd C:\ruta donde instalaste el bot
-
+cd C:\ruta donde instalaste el bot\takeshi-new
 set UV_THREADPOOL_SIZE=8 && pm2 start index.js --max-memory-restart 800M --node-args="--expose-gc --max-old-space-size=1536 --no-warnings"
-
 pm2 start backup-rpg.js --name "b"
-
-pm2 save
-
 pm2 save --force
 
+
 si se te borran los procesos menos el pm2 logrotate en el pm2 monit
-copia y pega en el cmd solo desde el cd:\ruta donde instalaste el bot----, hasta el pm2 save
+copia y pega en el cmd solo desde el cd C:\ruta donde instalaste el bot\takeshi-new hasta el pm2 save --force
 (y bueno si se te borraron todos los procesos incluso el pm2 logrotate copia todo)
 
-para ver todos los procesos solo pone(con las flechitas del teclado podes moverte del monit)
+
+para ver todos los procesos solo pone (con las flechitas del teclado podes moverte del monit):
 pm2 monit
-(no hace falta poner el cd:\ruta donde instalaste el bot---)
+(no hace falta poner el cd C:\ruta donde instalaste el bot)
 
 
-esto es un check update, se encarga de buscar las ultimas actualizaciones de las librerias
-cd C:\ruta donde instalaste el bot
-npm install -g npm-check-updates 
+
+esto es un check update, se encarga de buscar las ultimas actualizaciones de las librerias:
+cd C:\ruta donde instalaste el bot\takeshi-new
+npm install -g npm-check-updates
 
 
-una vez instalado solo pone esto cuando quieras actulizar las librerias
-cd C:\ruta donde instalaste el bot
+una vez instalado solo pone esto cuando quieras actualizar las librerias:
+cd C:\ruta donde instalaste el bot\takeshi-new
 npx npm-check-updates -u
 npm install
 
 
-para reiniciar el proceso del bot del pm2
+
+para reiniciar el proceso del bot del pm2:
 pm2 restart index
 
-para pararlo
+para pararlo:
 pm2 stop index
 
-para parar todos los procesos
+para parar todos los procesos:
 pm2 stop all
 
 
-por si solo vas a actualizar el baileys
-cd C:\ruta donde instalaste el bot
-npm install @whiskeysockets/baileys@latest 
-
-
-
+por si solo vas a actualizar el baileys:
+cd C:\ruta donde instalaste el bot\takeshi-new
+npm install @whiskeysockets/baileys@latest
 
 
 
