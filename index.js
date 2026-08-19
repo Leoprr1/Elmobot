@@ -270,20 +270,6 @@ async function startBot() {
     }
 
     await initSocket();
-// ✅ RECONEXIÓN Y LECTURA PASIVA (index.js)
-setInterval(() => {
-  if (socketGlobal && socketGlobal.ws && socketGlobal.ws.readyState === 1) {
-    try {
-      // PING pasivo nativo de WebSocket para mantener el canal abierto
-      if (typeof socketGlobal.sendPing === "function") {
-        socketGlobal.sendPing();
-      } else if (socketGlobal.ws.ping) {
-        socketGlobal.ws.ping();
-      }
-    } catch {}
-  }
-}, 45000); // ⚡ Cada 45 segundos es un tiempo seguro que Meta no detecta como spam
-
 
 
     setInterval(() => {

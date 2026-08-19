@@ -51,6 +51,7 @@ async function connect() {
     auth: state,
     printQRInTerminal: false, // 🔥 QR EN CONSOLA
     msgRetryCounterCache,
+    keepAliveIntervalMs: 30000, // ⚡ Keep-alive nativo y seguro de Baileys
     defaultQueryTimeoutMs: undefined,
     shouldIgnoreJid: (jid) =>
       isJidBroadcast(jid) ||
@@ -138,3 +139,4 @@ async function connect() {
 }
 
 exports.connect = connect;
+
