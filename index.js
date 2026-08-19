@@ -270,27 +270,20 @@ async function startBot() {
     }
 
     await initSocket();
-
-    // ✅ SESIÓN ACTIVA 24/7 (Integración directa)
+// ✅ RECONEXIÓN Y LECTURA PASIVA (index.js)
 setInterval(() => {
   if (socketGlobal && socketGlobal.ws && socketGlobal.ws.readyState === 1) {
     try {
-      // 1. Mantener la tubería de red viva
+      // PING pasivo nativo de WebSocket para mantener el canal abierto
       if (typeof socketGlobal.sendPing === "function") {
         socketGlobal.sendPing();
       } else if (socketGlobal.ws.ping) {
         socketGlobal.ws.ping();
       }
-
-      // 2. MANTENER VIVO (Código original)
-      if (socketGlobal?.sendPresenceUpdate) {
-        try {
-          socketGlobal.sendPresenceUpdate("available");
-        } catch {}
-      }
     } catch {}
   }
-}, 10000);
+}, 45000); // ⚡ Cada 45 segundos es un tiempo seguro que Meta no detecta como spam
+
 
 
     setInterval(() => {
