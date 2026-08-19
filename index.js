@@ -42,8 +42,8 @@ let disconnectTimer = null;
 let watchdogInterval = null;
 let disconnectStartTime = null;
 
-const WATCHDOG_TIMEOUT = 120000;
-const CHECK_INTERVAL = 20000;
+const WATCHDOG_TIMEOUT = 35000;
+const CHECK_INTERVAL = 5000;
 
 // ----------------------------
 // FUNCION CACHEAR METADATA
@@ -163,7 +163,7 @@ async function handleReconnect(reason) {
   infoLog(`⚠️ Reconexión iniciada por: ${reason}`);
 
   try {
-    await new Promise((r) => setTimeout(r, 30000));
+    await new Promise((r) => setTimeout(r, 2000));
 
     const newSocket = await connect();
     socketGlobal = newSocket;
