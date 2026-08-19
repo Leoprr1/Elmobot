@@ -160265,5 +160265,17 @@
     "answers": [
       "Jajaja"
     ]
+  },
+  {
+    "match": "Allá las 9:55, si es que sos de la península",
+    "answers": [
+      "Las 10:21 yess"
+    ]
+  },
+  {
+    "match": "Son las 4:55 acá",
+    "answers": [
+      "Tarde, no duermes?"
+    ]
   }
 ]
