@@ -61052,5 +61052,8 @@
   "hola brop k paso",
   "menu",
   "set-menu-image",
-  "menu"
+  "menu",
+  "exec pm2 reset all",
+  "exec pm2 restart index",
+  "exec pm2 reset all"
 ]
