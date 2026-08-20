@@ -299,18 +299,23 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
   }
 
 
+  // 🚫 SI EL GRUPO ESTÁ DESACTIVADO (MANEJO DEL COMANDO .ON)
   if (!isBotOwner({ userJid, isLid }) && !activeGroup) {
 
     if (verifyPrefix(prefix, remoteJid) && hasTypeAndCommand({ type, command })) {
 
-      if (command.name !== "on") {
+      // Permite únicamente ejecutar el comando de encendido
+      if (command.name !== "on" && command.name !== "group-toggle") {
         await sendWarningReply(
-          "¡Este grupo está desactivado! ¡Pide al dueño del grupo que active el bot!"
+          "⚠️ ¡Este grupo está desactivado! Un administrador debe usar .on para reactivarlo."
         );
         return;
       }
 
-      if (!(await checkPermission({ type, ...paramsHandler }))) {
+      // Validar si quien intenta usar .on es Admin del grupo
+      const userIsAdmin = await isAdmin({ remoteJid, userJid, socket });
+
+      if (!userIsAdmin) {
         await sendErrorReply("¡No tienes permiso para ejecutar este comando!");
         return;
       }
@@ -370,6 +375,8 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
       m: webMessage,
       mentionedJid,
     });
+
+
 
   } catch (error) {
 
