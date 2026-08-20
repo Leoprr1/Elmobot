@@ -1,6 +1,7 @@
 const { readJSON, writeJSON } = require("./database");
 
-const FILE = "disabledGroups";
+// 🔒 Archivo EXCLUSIVO para los baneos globales del Owner
+const FILE = "globallyDisabledGroups";
 
 function getDisabledGroups() {
   const data = readJSON(FILE);
@@ -31,3 +32,4 @@ module.exports = {
   enableGroup,
   isGroupGloballyDisabled
 };
+

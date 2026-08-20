@@ -101,14 +101,6 @@
       "desc": "le da autorizacion de utilizar el bot a usuarios individualmente"
     },
     {
-      "command": "add-auto-responder",
-      "desc": "para agregar mensaje y respuesta"
-    },
-    {
-      "command": "delete-auto-responder",
-      "desc": "elimina el texto agregado"
-    },
-    {
       "command": "anti-audio (1/0)",
       "desc": ""
     },
@@ -191,10 +183,6 @@
     {
       "command": "link-group",
       "desc": "dar el link del grupo"
-    },
-    {
-      "command": "list-auto-responder",
-      "desc": "da la lista de mensajes que puede responder el bot"
     },
     {
       "command": "mute",

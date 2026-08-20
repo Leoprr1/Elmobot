@@ -1,7 +1,6 @@
 /**
  * Interceptadores diversos.
- *
- * @author Dev Gui
+
  */
 const { OWNER_NUMBER, OWNER_LID } = require("../config");
 const { compareUserJidWithOtherNumber } = require("../utils");
@@ -56,13 +55,15 @@ exports.isLink = (text, prefix = ".") => {
   }
 };
 
-
 exports.isAdmin = async ({ remoteJid, userJid, socket }) => {
   const { participants, owner } = await socket.groupMetadata(remoteJid);
 
-  const participant = participants.find(
-    (participant) => participant.id === userJid
-  );
+  const cleanUserJid = userJid?.split(":")[0].split("@")[0];
+
+  const participant = participants.find((p) => {
+    const cleanParticipantId = p.id?.split(":")[0].split("@")[0];
+    return p.id === userJid || cleanParticipantId === cleanUserJid;
+  });
 
   if (!participant) {
     return false;
@@ -82,7 +83,6 @@ exports.isAdmin = async ({ remoteJid, userJid, socket }) => {
 };
 
 exports.isBotOwner = ({ userJid, webMessage }) => {
-
   let jid = userJid;
 
   // ⚡ Si viene webMessage lo usamos
@@ -113,7 +113,6 @@ exports.isBotOwner = ({ userJid, webMessage }) => {
   });
 };
 
-
 exports.checkPermission = async ({ type, socket, userJid, remoteJid }) => {
 
   const isBotOwner =
@@ -140,34 +139,41 @@ exports.checkPermission = async ({ type, socket, userJid, remoteJid }) => {
   }
 
   try {
-
     const { participants, owner } = await socket.groupMetadata(remoteJid);
 
-    const participant = participants.find(
-      (participant) => participant.id === userJid
-    );
+    // Extraer solo la parte numérica sin sufijos de servidor
+    const cleanUserJid = userJid?.split(":")[0].split("@")[0];
+
+    // Búsqueda flexible (por JID exacto o comparando solo el número base)
+    const participant = participants.find((p) => {
+      const cleanParticipantId = p.id?.split(":")[0].split("@")[0];
+      return p.id === userJid || cleanParticipantId === cleanUserJid;
+    });
 
     if (!participant) {
-      return false;
+      // Si la búsqueda estricta falla y es Owner, se aprueba directamente
+      return isBotOwner;
     }
 
-    const isOwner =
+    const isGroupOwner =
       participant.id === owner || participant.admin === "superadmin";
 
     const isAdmin = participant.admin === "admin";
 
     if (type === "admin") {
-      return isOwner || isAdmin || isBotOwner;
+      return isGroupOwner || isAdmin || isBotOwner;
     }
 
     if (type === "owner") {
-      return isOwner || isBotOwner;
+      return isGroupOwner || isBotOwner;
     }
 
     return false;
 
   } catch (error) {
-    return false;
+    return isBotOwner;
   }
 };
+
+
 

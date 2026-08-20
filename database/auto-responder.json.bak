@@ -558,7 +558,7 @@
     "answers": [
       "Estoy bien, gracias por preguntar.",
       "Bien amikito",
-      "Bien y vos",
+      "Bien y vos?",
       "Bien bien, vs?",
       "No me quejo",
       "Bien y tu",
@@ -8356,7 +8356,7 @@
       "bien bld  recien me despierto",
       "Me alegra yo tmb bien gracias",
       "m alegro muchote",
-      "me alegro",
+      "Me alegro!",
       "Me alegro. Yo todo bien. Sabés que me parece que te conozco jajaja",
       "xomo el orto",
       "Mee alegroooooo yo biennn",
@@ -78286,7 +78286,8 @@
     "answers": [
       "Hola",
       "hola almi",
-      "Hola todo bien"
+      "Hola todo bien",
+      "como estas crack"
     ]
   },
   {
@@ -156650,7 +156651,8 @@
   {
     "match": "hola clara",
     "answers": [
-      "todo bien nico?"
+      "todo bien nico?",
+      "Hola renz9"
     ]
   },
   {
@@ -165862,7 +165864,9 @@
   {
     "match": "❌ ¡Error! No estás casado 💔",
     "answers": [
-      "COM QUE NO"
+      "COM QUE NO",
+      ".divorce",
+      ".casarse"
     ]
   },
   {
@@ -172674,6 +172678,55 @@
     "match": "mira si voy a leer alto testamento",
     "answers": [
       ".tts"
+    ]
+  },
+  {
+    "match": "Y es una verga esto",
+    "answers": [
+      "salite entonces"
+    ]
+  },
+  {
+    "match": "m resfrié",
+    "answers": [
+      "uhh"
+    ]
+  },
+  {
+    "match": "como estas crack",
+    "answers": [
+      "Holis leo como estass",
+      "Yo mal"
+    ]
+  },
+  {
+    "match": "Buenn diiaa @all",
+    "answers": [
+      "Buenos dias"
+    ]
+  },
+  {
+    "match": "Qué lindo. Sí, es parecido pero siento que adopté demasiado el papel de madre con ella JAJJA",
+    "answers": [
+      "Jajajajaja, puede pasar"
+    ]
+  },
+  {
+    "match": "Que tengas buen viaje y que descanses bien :) hablamos luego. Ya me levanté y me estoy alistando para ir a trabajar",
+    "answers": [
+      "Gracias! Espero que tengas linda jornada. Yo ya llegué a lo de mis hermanos"
+    ]
+  },
+  {
+    "match": "QUE FRIO",
+    "answers": [
+      "Hola, Clara"
+    ]
+  },
+  {
+    "match": "@99128231071808 hola despertate",
+    "answers": [
+      "buenos días me he despertao 🙈🙈🙈🙈😘😘😘"
     ]
   }
 ]

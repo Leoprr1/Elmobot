@@ -1,8 +1,6 @@
 /**
  * Evento llamado cuando un mensaje
  * es enviado al grupo de WhatsApp
- *
- * @author Dev Gui
  */
 
 const {
@@ -48,6 +46,9 @@ exports.onMessagesUpsert = async ({ socket, messages, startProcess }) => {
       const jid = webMessage?.key?.remoteJid;
       if (!jid) continue;
 
+      // 🚫 IGNORAR MENSAJES DEL PROPIO BOT
+      if (webMessage?.key?.fromMe) continue;
+
       const isGroup = jid.endsWith("@g.us");
       const userJid = webMessage.key?.participant || webMessage.key?.remoteJid;
       const isLid = userJid.endsWith("@lid");
@@ -60,23 +61,36 @@ exports.onMessagesUpsert = async ({ socket, messages, startProcess }) => {
         continue;
       }
 
-      // marcar como disponible (Sin saturar y sin usar .catch)
-const ahora = Date.now();
-const ultimoEnvio = ultimaPresencia.get(jid) || 0;
+      // 🚫 🔥 CHEQUEO PRIORITARIO DE SILENCIADO (MUTE) PARA TODO TIPO DE CONTENIDO
+      if (isGroup && userJid) {
+        const isMuted = await checkIfMemberIsMuted(jid, userJid);
+        if (isMuted) {
+          try {
+            await socket.sendMessage(jid, { delete: webMessage.key });
+          } catch (error) {
+            errorLog(
+              `Error al eliminar mensaje de miembro silenciado: ${error.message}`
+            );
+          }
+          continue; // Detiene todo: no entra a stats, ni a messageHandler, ni a comandos
+        }
+      }
 
-if (ahora - ultimoEnvio > 30000) {
-  ultimaPresencia.set(jid, ahora);
-  try {
-    await socket.sendPresenceUpdate("available", jid);
-  } catch {}
-}
+      // marcar como disponible (Sin saturar y sin usar .catch)
+      const ahora = Date.now();
+      const ultimoEnvio = ultimaPresencia.get(jid) || 0;
+
+      if (ahora - ultimoEnvio > 30000) {
+        ultimaPresencia.set(jid, ahora);
+        try {
+          await socket.sendPresenceUpdate("available", jid);
+        } catch {}
+      }
+
       // marcar como leído
       await socket.readMessages([webMessage]);
 
       const messageId = webMessage?.key?.id;
-
-      // 🚫 IGNORAR MENSAJES DEL PROPIO BOT
-      if (webMessage?.key?.fromMe) continue;
 
       // 🚫 IGNORAR DUPLICADOS
       if (messageId) {
@@ -157,22 +171,6 @@ if (ahora - ultimoEnvio > 30000) {
       const commonFunctions = await loadCommonFunctions({ socket, webMessage });
       if (!commonFunctions) continue;
 
-      const isMuted = await checkIfMemberIsMuted(
-        commonFunctions.remoteJid,
-        commonFunctions.userJid
-      );
-
-      if (isMuted) {
-        try {
-          await commonFunctions.deleteMessage(webMessage.key);
-        } catch (error) {
-          errorLog(
-            `Error al eliminar mensaje de miembro silenciado: ${error.message}`
-          );
-        }
-        continue;
-      }
-
       // 🔥 SISTEMA NORMAL
       await dynamicCommand(commonFunctions, startProcess);
 
@@ -210,3 +208,4 @@ if (ahora - ultimoEnvio > 30000) {
     }
   }
 };
+

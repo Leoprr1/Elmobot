@@ -4,7 +4,7 @@
     "age": 23,
     "profilePic": "https://pps.whatsapp.net/v/t61.24694-24/620485926_1206638688260707_2153868945442048660_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa3wFsx_qZjifc35bhJRLTlYkWmLvkIF33aUmV_A_uu5qH2A&oe=69B559BF&_nc_sid=5e03e0&_nc_cat=107",
     "registeredAt": 1772594534960,
-    "commandsUsed": 12768
+    "commandsUsed": 12795
   },
   "148137834471521@lid": {
     "name": "cande",
@@ -354,7 +354,7 @@
     "age": 15,
     "profilePic": "https://pps.whatsapp.net/v/t61.24694-24/677156900_1034328656119047_9216490372990120098_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa5QE1yIUQt3Yg1NnueH2nQJf5ZTipBASXLgdQizintmrUVg&oe=6A8A00DC&_nc_sid=5e03e0&_nc_cat=107",
     "registeredAt": 1786569015479,
-    "commandsUsed": 230
+    "commandsUsed": 237
   },
   "65919745306692@lid": {
     "name": "frangay",
@@ -466,7 +466,7 @@
     "age": 19,
     "profilePic": "https://pps.whatsapp.net/v/t61.24694-24/760441299_1482146857271363_8700336751470368080_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa5QEOIMRmtKLT3aUZQv2vG745-x_2KmC2Ztq7_WimQxC1qA&oe=6A8A96BB&_nc_sid=5e03e0&_nc_cat=104",
     "registeredAt": 1786617291359,
-    "commandsUsed": 77
+    "commandsUsed": 79
   },
   "178224818598019@lid": {
     "name": "elmascapingo",
@@ -852,5 +852,12 @@
     "profilePic": "https://pps.whatsapp.net/v/t61.24694-24/660760262_1481352213753387_5610670894910537029_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa5QH-GBEXbLRK8NregTVVduyGY_KnPJYVcou5KxIhyIHDog&oe=6A935331&_nc_sid=5e03e0&_nc_cat=104",
     "registeredAt": 1787178753326,
     "commandsUsed": 0
+  },
+  "103474721230874@lid": {
+    "name": "abel",
+    "age": 20,
+    "profilePic": "https://pps.whatsapp.net/v/t61.24694-24/592099636_1647827439637932_6262692558224942398_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa5QHG4j6nDtWXJ1lNEJpXTpNP71a0qvddtxhkwE-t6jJWtA&oe=6A93FD5A&_nc_sid=5e03e0&_nc_cat=106",
+    "registeredAt": 1787231295721,
+    "commandsUsed": 1
   }
 }
