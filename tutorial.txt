@@ -28,7 +28,7 @@ para arrancar el bot luego de hacer npm start y cerrar el cmd
 copia y pega en el cmd todo esto hasta pm2 save:
 pm2 install pm2-logrotate
 cd C:\ruta donde instalaste el bot\Elmobot
-set UV_THREADPOOL_SIZE=8 && pm2 start index.js --max-memory-restart 800M --node-args="--expose-gc --max-old-space-size=1536 --no-warnings"
+set UV_THREADPOOL_SIZE=8 && pm2 start index.js --max-memory-restart 800M --node-args="--expose-gc --max-old-space-size=300 --no-warnings"
 pm2 start backup-rpg.js --name "b"
 pm2 save --force
 
