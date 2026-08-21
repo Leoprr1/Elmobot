@@ -2367,7 +2367,9 @@
       "sos un denso",
       "hols",
       "que tal liu",
-      "Te nota activa"
+      "Te nota activa",
+      "Qdq",
+      "iQ-"
     ]
   },
   {
@@ -3400,7 +3402,8 @@
       "Me dormí a las 5",
       "Me quiero ir, estos profes de mierda",
       "Por qué es un pelotudo osea jode cada rato",
-      "un chiste esta bien"
+      "un chiste esta bien",
+      "Por cra"
     ]
   },
   {
@@ -15538,7 +15541,8 @@
       "Q estudias",
       "Te lo follaras",
       "Ya descargue",
-      "No eras un bot?"
+      "No eras un bot?",
+      "No se me cagué toda"
     ]
   },
   {
@@ -37383,7 +37387,9 @@
       "ENCIMA ENTRASTE RECIEN",
       "Facto",
       "Todas son malas",
-      "Si casi me mata esa mina"
+      "Si casi me mata esa mina",
+      "Cosas que pasan que se le va a hacer",
+      "@79942612164854 será que me agrega?"
     ]
   },
   {
@@ -195993,6 +195999,90 @@
     "match": "Duerma noma",
     "answers": [
       "Bueno"
+    ]
+  },
+  {
+    "match": "Puedo ser pelotudo pero jamás me van a ver en una batalla de aura",
+    "answers": [
+      "Jajajajaja mi dislexia confunde farmear con traumar"
+    ]
+  },
+  {
+    "match": "iQ-",
+    "answers": [
+      "Lpm"
+    ]
+  },
+  {
+    "match": "@73358058197181 lcdtm",
+    "answers": [
+      "Yo que"
+    ]
+  },
+  {
+    "match": "Buen díaa",
+    "answers": [
+      "Buen día"
+    ]
+  },
+  {
+    "match": "Casi me balasean",
+    "answers": [
+      "Ahh tranqui"
+    ]
+  },
+  {
+    "match": "Ahh tranqui",
+    "answers": [
+      "Me negrearon por ahí"
+    ]
+  },
+  {
+    "match": "Me negrearon por ahí",
+    "answers": [
+      "Por?"
+    ]
+  },
+  {
+    "match": "@156710522064952",
+    "answers": [
+      "Buen día pendejo putazo"
+    ]
+  },
+  {
+    "match": "Por pollera",
+    "answers": [
+      "Todavía no estoy de pollera"
+    ]
+  },
+  {
+    "match": "Todavía no estoy de pollera",
+    "answers": [
+      "Cuánto tiempo tengo?"
+    ]
+  },
+  {
+    "match": "Déjame cambiarme que en 40 min entro a la escu",
+    "answers": [
+      "Estás atrasado"
+    ]
+  },
+  {
+    "match": "Mandale msjs a la Bri",
+    "answers": [
+      "No la conozco"
+    ]
+  },
+  {
+    "match": "Cuanto consumiste?",
+    "answers": [
+      "Solo una manzana"
+    ]
+  },
+  {
+    "match": "@79942612164854 será que me agrega?",
+    "answers": [
+      "Gato duermanla"
     ]
   }
 ]

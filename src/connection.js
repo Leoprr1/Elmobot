@@ -45,14 +45,23 @@ async function connect() {
   const { state, saveCreds } = await useMultiFileAuthState(authPath);
   const { version, isLatest } = await fetchLatestBaileysVersion();
 
-  const socket = makeWASocket({
+   const socket = makeWASocket({
     version,
     logger,
     auth: state,
-    printQRInTerminal: false, // 🔥 QR EN CONSOLA
+    printQRInTerminal: false,
     msgRetryCounterCache,
-    keepAliveIntervalMs: 30000, // ⚡ Keep-alive nativo y seguro de Baileys
-    defaultQueryTimeoutMs: undefined,
+    
+    // ⚡ Configuración de estabilidad y tolerancias de red:
+    keepAliveIntervalMs: 15000, // Pings de mantenimiento cada 15s
+    connectTimeoutMs: 15000, // Tolera hasta 15s sin respuesta en el apretón de manos inicial
+    defaultQueryTimeoutMs: undefined, // Evita timeout en consultas lentas
+    
+    // ⚡ Margen para que el socket no se rompa si Node congela el hilo un par de segundos:
+    options: {
+      timeout: 25000, // Timeout de lectura del socket (25s)
+    },
+
     shouldIgnoreJid: (jid) =>
       isJidBroadcast(jid) ||
       isJidStatusBroadcast(jid) ||
