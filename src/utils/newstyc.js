@@ -1,12 +1,7 @@
 /**
  * newtyc.js — Sistema de noticias desde Instagram (TyC Sports)
- * Login manual solo la primera vez + cookies + detección de sesión expirada
- * Envía las últimas 5 publicaciones si no fueron enviadas antes
- * Soporta posts y reels
- */
-
-/**
- * newtyc.js — Sistema de noticias desde Instagram (TyC Sports) optimizado con hash de contenido
+ * Método original de imágenes + Extracción limpia de título vía Meta Tags
+ * Historial expandido a 20 elementos y escaneo de hasta 10 noticias.
  */
 
 const puppeteer = require("puppeteer");
@@ -16,27 +11,19 @@ const { readJSON, writeJSON } = require("./database");
 const ffmpegService = require("../services/ffmpeg");
 
 let intervalStarted = false;
-const MAX_ARTICLES = 5;
+const MAX_ARTICLES = 10; // Extrae hasta las últimas 10 publicaciones
+const HISTORY_LIMIT = 20; // Guarda en memoria los últimos 20 posteos enviados
 const INSTAGRAM_USER = "tycsports";
 const COOKIES_PATH = "./src/commands/cache/cookies.json";
 
-// --------------------------------------------------
-// FUNCIÓN PARA ESPERAR TIEMPO
-// --------------------------------------------------
 function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// --------------------------------------------------
-// HASH SHA1 DE TEXTO
-// --------------------------------------------------
 function generateHash(text) {
   return crypto.createHash("sha1").update(text).digest("hex");
 }
 
-// --------------------------------------------------
-// LOGIN INSTAGRAM CON DETECCIÓN DE SESIÓN EXPIRADA
-// --------------------------------------------------
 async function instagramLogin(page) {
   if (fs.existsSync(COOKIES_PATH)) {
     console.log("🍪 Cargando cookies guardadas...");
@@ -63,9 +50,6 @@ async function instagramLogin(page) {
   console.log("🍪 Cookies guardadas correctamente.");
 }
 
-// --------------------------------------------------
-// ESPERA ROBUSTA DEL FEED
-// --------------------------------------------------
 async function waitForFeed(page) {
   const timeout = 20000;
   const startTime = Date.now();
@@ -84,9 +68,6 @@ async function waitForFeed(page) {
   }
 }
 
-// --------------------------------------------------
-// OBTENER ÚLTIMAS PUBLICACIONES (POSTS Y REELS)
-// --------------------------------------------------
 async function getLatestNews(limit = MAX_ARTICLES) {
   let browser;
   try {
@@ -105,7 +86,6 @@ async function getLatestNews(limit = MAX_ARTICLES) {
       const links = Array.from(document.querySelectorAll("a[href*='/p/'], a[href*='/reel/']")).slice(0, max);
       return links.map(a => ({
         url: a.href,
-        title: a.querySelector("img")?.alt || "",
         imageUrl: a.querySelector("img")?.src || "",
       }));
     }, limit);
@@ -120,9 +100,6 @@ async function getLatestNews(limit = MAX_ARTICLES) {
   }
 }
 
-// --------------------------------------------------
-// DETALLES DE CADA PUBLICACIÓN
-// --------------------------------------------------
 async function fetchNewsDetails(items) {
   const articles = [];
   let browser;
@@ -136,17 +113,26 @@ async function fetchNewsDetails(items) {
         await wait(1500);
 
         const detail = await page.evaluate(() => {
-          const spanEls = Array.from(document.querySelectorAll("article span"));
+          const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute("content") || "";
+          const metaDesc = document.querySelector('meta[name="description"]')?.getAttribute("content") || "";
+          const ogDescription = document.querySelector('meta[property="og:description"]')?.getAttribute("content") || "";
           const timeEl = document.querySelector("time");
+
           const imgEl = document.querySelector("article img");
 
-          const summaryText = spanEls
-            .map(span => span.innerText.trim())
-            .filter(t => t && t.length > 0)
-            .join("\n");
+          let rawText = ogTitle || metaDesc || ogDescription;
+          let cleanText = rawText
+            .replace(/^.*?:/i, "")
+            .replace(/^["'“\s]+|["'”\s]+$/g, "")
+            .trim();
+
+          if (rawText.includes(":") && cleanText.length < 5) {
+            const parts = rawText.split(":");
+            cleanText = parts.slice(1).join(":").replace(/^["'“\s]+|["'”\s]+$/g, "").trim();
+          }
 
           return {
-            summary: summaryText,
+            summary: cleanText || rawText,
             time: timeEl ? new Date(timeEl.getAttribute("datetime")).toISOString() : "",
             imageUrl: imgEl ? imgEl.src : "",
           };
@@ -168,17 +154,18 @@ async function fetchNewsDetails(items) {
           }
         }
 
-        // Generamos hash único basado en url + summary
-        const contentHash = generateHash(item.url + detail.summary);
+        const cleanUrl = item.url.split("?")[0];
+        const contentHash = generateHash(cleanUrl);
 
         articles.push({
-          title: item.title,
           url: item.url,
-          summary: detail.summary,
+          summary: detail.summary || "Sin descripción",
           time: detail.time,
           imageBuffer,
           hash: contentHash,
         });
+
+        await wait(300);
       } catch (err) {
         console.error("Error procesando publicación:", err.message);
       }
@@ -192,29 +179,27 @@ async function fetchNewsDetails(items) {
   return articles.sort((a, b) => new Date(a.time) - new Date(b.time));
 }
 
-// --------------------------------------------------
-// ENVIAR A GRUPOS
-// --------------------------------------------------
 async function sendNewsToGroups(sock, newsItem, db) {
   if (!newsItem || !db.groupsEnabled?.length) return;
+
+  const captionText = `📰 *Noticias TyC Sports*\n\n${newsItem.summary}\n\n🔗 ${newsItem.url}`;
 
   for (const group of db.groupsEnabled) {
     try {
       const msgOptions = newsItem.imageBuffer
-        ? { image: newsItem.imageBuffer, caption: `📰 *Noticias TyC Sports*\n\n*${newsItem.title}*\n\n_${newsItem.summary}_\n\n🔗 ${newsItem.url}` }
-        : { text: `📰 *Noticias TyC Sports*\n\n*${newsItem.title}*\n\n_${newsItem.summary}_\n\n🔗 ${newsItem.url}` };
+        ? { image: newsItem.imageBuffer, caption: captionText }
+        : { text: captionText };
 
       await sock.sendMessage(group, msgOptions);
-      console.log("✅ Publicación enviada a:", group, "-", newsItem.title);
+      console.log("✅ Publicación enviada a:", group);
+
+      await wait(1000);
     } catch (err) {
       console.error("Error enviando publicación al grupo", group, ":", err.message);
     }
   }
 }
 
-// --------------------------------------------------
-// CHEQUEAR NUEVAS PUBLICACIONES (Últimos 5) - con hash
-// --------------------------------------------------
 let newsLock = false;
 
 async function checkNews(sock) {
@@ -245,8 +230,7 @@ async function checkNews(sock) {
     const articles = await fetchNewsDetails(scraped);
     if (!articles.length) return;
 
-    // Set de hashes para filtrar duplicados
-    const sentHashes = new Set(db.lastPosts.map(post => post.hash || post)); // soporta antiguas versiones
+    const sentHashes = new Set(db.lastPosts.map(post => (typeof post === "object" ? post.hash : post)));
     const newPosts = articles.filter(article => !sentHashes.has(article.hash));
 
     if (!newPosts.length) {
@@ -260,9 +244,8 @@ async function checkNews(sock) {
       sentHashes.add(post.hash);
     }
 
-    // Mantener solo los últimos MAX_ARTICLES
-    db.lastPosts = db.lastPosts.slice(-MAX_ARTICLES);
-
+    // Conserva las últimas 20 publicaciones en el historial de la BD
+    db.lastPosts = db.lastPosts.slice(-HISTORY_LIMIT);
     writeJSON("news-tyc", db);
   } catch (err) {
     console.error("Error checkNews:", err.message);
@@ -271,9 +254,6 @@ async function checkNews(sock) {
   }
 }
 
-// --------------------------------------------------
-// INICIO
-// --------------------------------------------------
 function startTyCSystem(sock) {
   if (intervalStarted) return;
   intervalStarted = true;
@@ -289,3 +269,4 @@ function startTyCSystem(sock) {
 }
 
 module.exports = { startTyCSystem };
+
