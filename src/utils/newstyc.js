@@ -1,7 +1,6 @@
 /**
  * newtyc.js — Sistema de noticias desde Instagram (TyC Sports)
- * Método original de imágenes + Extracción limpia de título vía Meta Tags
- * Historial expandido a 20 elementos y escaneo de hasta 10 noticias.
+ * Instancia persistente + Verificación de sesión inteligente (solo lee cookies si vence la sesión).
  */
 
 const puppeteer = require("puppeteer");
@@ -11,8 +10,11 @@ const { readJSON, writeJSON } = require("./database");
 const ffmpegService = require("../services/ffmpeg");
 
 let intervalStarted = false;
-const MAX_ARTICLES = 10; // Extrae hasta las últimas 10 publicaciones
-const HISTORY_LIMIT = 20; // Guarda en memoria los últimos 20 posteos enviados
+let globalBrowser = null;
+let globalPage = null;
+
+const MAX_ARTICLES = 10;
+const HISTORY_LIMIT = 20;
 const INSTAGRAM_USER = "tycsports";
 const COOKIES_PATH = "./src/commands/cache/cookies.json";
 
@@ -24,34 +26,78 @@ function generateHash(text) {
   return crypto.createHash("sha1").update(text).digest("hex");
 }
 
-async function instagramLogin(page) {
-  if (fs.existsSync(COOKIES_PATH)) {
-    console.log("🍪 Cargando cookies guardadas...");
-    const cookies = JSON.parse(fs.readFileSync(COOKIES_PATH, "utf8"));
-    await page.setCookie(...cookies);
-    await page.goto("https://www.instagram.com/", { waitUntil: "networkidle2" });
-    try {
-      await waitForFeed(page);
-      console.log("✅ Sesión válida con cookies.");
-      return;
-    } catch {
-      console.log("⚠ Sesión expirada. Necesario login manual.");
+async function initBrowser() {
+  if (globalBrowser) return;
+
+  console.log("🚀 Iniciando navegador persistente de Instagram...");
+  globalBrowser = await puppeteer.launch({
+    headless: fs.existsSync(COOKIES_PATH),
+    defaultViewport: null,
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--disable-gpu",
+    ],
+  });
+
+  globalPage = await globalBrowser.newPage();
+
+  // Bloqueo de recursos no esenciales para máxima velocidad y ahorro de memoria
+  await globalPage.setRequestInterception(true);
+  globalPage.on("request", (req) => {
+    const resource = req.resourceType();
+    if (["font", "stylesheet"].includes(resource)) {
+      req.abort();
+    } else {
+      req.continue();
     }
+  });
+
+  await ensureActiveSession(globalPage);
+}
+
+// Verifica si la sesión está activa; si caducó, recién ahí aplica las cookies guardadas
+async function ensureActiveSession(page) {
+  try {
+    // Si la URL actual ya es Instagram y no estamos en la pantalla de login, comprobamos si estamos adentro
+    const currentUrl = page.url();
+    if (currentUrl.includes("instagram.com") && !currentUrl.includes("/accounts/login")) {
+      const isLoggedIn = await page.evaluate(() => !!document.querySelector("a[href*='/p/'], a[href*='/reel/'], nav, svg[aria-label*='Home']"));
+      if (isLoggedIn) return; // La sesión sigue perfecta en memoria, no hace nada.
+    }
+
+    console.log("🔑 Verificando / Restaurando sesión de Instagram...");
+
+    if (fs.existsSync(COOKIES_PATH)) {
+      const cookies = JSON.parse(fs.readFileSync(COOKIES_PATH, "utf8"));
+      await page.setCookie(...cookies);
+      await page.goto("https://www.instagram.com/", { waitUntil: "networkidle2" });
+
+      try {
+        await waitForFeed(page);
+        console.log("✅ Sesión restaurada con cookies guardadas.");
+        return;
+      } catch {
+        console.log("⚠ Las cookies expiraron o la sesión caducó.");
+      }
+    }
+
+    console.log("🔐 Abriendo pantalla de login manual...");
+    await page.goto("https://www.instagram.com/accounts/login/", { waitUntil: "networkidle2" });
+    await waitForFeed(page);
+
+    console.log("✅ Nueva sesión detectada, actualizando cookies...");
+    const newCookies = await page.cookies();
+    fs.writeFileSync(COOKIES_PATH, JSON.stringify(newCookies, null, 2));
+  } catch (err) {
+    console.error("⚠ Error en el control de sesión:", err.message);
   }
-
-  console.log("🔐 Abriendo Instagram para login manual...");
-  await page.goto("https://www.instagram.com/accounts/login/", { waitUntil: "networkidle2" });
-  console.log("⌛ Por favor, iniciá sesión manualmente en la ventana del navegador.");
-  await waitForFeed(page);
-
-  console.log("✅ Sesión detectada, guardando cookies...");
-  const cookies = await page.cookies();
-  fs.writeFileSync(COOKIES_PATH, JSON.stringify(cookies, null, 2));
-  console.log("🍪 Cookies guardadas correctamente.");
 }
 
 async function waitForFeed(page) {
-  const timeout = 20000;
+  const timeout = 15000;
   const startTime = Date.now();
   let feedDetected = false;
 
@@ -64,25 +110,23 @@ async function waitForFeed(page) {
   }
 
   if (!feedDetected) {
-    console.log("⚠ No se detectó feed, se tomará la primera publicación si existe.");
+    throw new Error("Feed no detectado");
   }
 }
 
 async function getLatestNews(limit = MAX_ARTICLES) {
-  let browser;
   try {
-    browser = await puppeteer.launch({
-      headless: fs.existsSync(COOKIES_PATH),
-      defaultViewport: null,
-      args: ["--start-maximized", "--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    if (!globalPage || globalPage.isClosed()) {
+      await initBrowser();
+    } else {
+      // Revisa que la sesión siga activa antes de scrapear
+      await ensureActiveSession(globalPage);
+    }
 
-    const page = await browser.newPage();
-    await instagramLogin(page);
-    await page.goto(`https://www.instagram.com/${INSTAGRAM_USER}/`, { waitUntil: "networkidle2" });
-    await waitForFeed(page);
+    await globalPage.goto(`https://www.instagram.com/${INSTAGRAM_USER}/`, { waitUntil: "networkidle2" });
+    await waitForFeed(globalPage);
 
-    const posts = await page.evaluate((max) => {
+    const posts = await globalPage.evaluate((max) => {
       const links = Array.from(document.querySelectorAll("a[href*='/p/'], a[href*='/reel/']")).slice(0, max);
       return links.map(a => ({
         url: a.href,
@@ -91,89 +135,79 @@ async function getLatestNews(limit = MAX_ARTICLES) {
     }, limit);
 
     console.log("📝 Posts detectados:", posts.map(p => p.url));
-    await browser.close();
     return posts;
   } catch (err) {
     console.error("❌ Instagram Puppeteer error:", err.message);
-    if (browser) await browser.close();
+    if (globalBrowser) {
+      await globalBrowser.close().catch(() => {});
+      globalBrowser = null;
+    }
     return [];
   }
 }
 
 async function fetchNewsDetails(items) {
   const articles = [];
-  let browser;
-  try {
-    browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox"] });
 
-    for (const item of items) {
-      try {
-        const page = await browser.newPage();
-        await page.goto(item.url, { waitUntil: "networkidle2" });
-        await wait(1500);
+  for (const item of items) {
+    try {
+      await globalPage.goto(item.url, { waitUntil: "networkidle2" });
+      await wait(1000);
 
-        const detail = await page.evaluate(() => {
-          const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute("content") || "";
-          const metaDesc = document.querySelector('meta[name="description"]')?.getAttribute("content") || "";
-          const ogDescription = document.querySelector('meta[property="og:description"]')?.getAttribute("content") || "";
-          const timeEl = document.querySelector("time");
+      const detail = await globalPage.evaluate(() => {
+        const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute("content") || "";
+        const metaDesc = document.querySelector('meta[name="description"]')?.getAttribute("content") || "";
+        const ogDescription = document.querySelector('meta[property="og:description"]')?.getAttribute("content") || "";
+        const timeEl = document.querySelector("time");
+        const imgEl = document.querySelector("article img");
 
-          const imgEl = document.querySelector("article img");
+        let rawText = ogTitle || metaDesc || ogDescription;
+        let cleanText = rawText
+          .replace(/^.*?:/i, "")
+          .replace(/^["'“\s]+|["'”\s]+$/g, "")
+          .trim();
 
-          let rawText = ogTitle || metaDesc || ogDescription;
-          let cleanText = rawText
-            .replace(/^.*?:/i, "")
-            .replace(/^["'“\s]+|["'”\s]+$/g, "")
-            .trim();
-
-          if (rawText.includes(":") && cleanText.length < 5) {
-            const parts = rawText.split(":");
-            cleanText = parts.slice(1).join(":").replace(/^["'“\s]+|["'”\s]+$/g, "").trim();
-          }
-
-          return {
-            summary: cleanText || rawText,
-            time: timeEl ? new Date(timeEl.getAttribute("datetime")).toISOString() : "",
-            imageUrl: imgEl ? imgEl.src : "",
-          };
-        });
-
-        await page.close();
-
-        let imageBuffer = null;
-        const finalImageUrl = detail.imageUrl || item.imageUrl;
-
-        if (finalImageUrl) {
-          try {
-            const tmpPath = await ffmpegService._createTempFilePath("jpg");
-            await ffmpegService.downloadImage(finalImageUrl, tmpPath);
-            imageBuffer = fs.readFileSync(tmpPath);
-            await ffmpegService.cleanup(tmpPath);
-          } catch (e) {
-            console.error("⚠ Error bajando imagen:", e.message);
-          }
+        if (rawText.includes(":") && cleanText.length < 5) {
+          const parts = rawText.split(":");
+          cleanText = parts.slice(1).join(":").replace(/^["'“\s]+|["'”\s]+$/g, "").trim();
         }
 
-        const cleanUrl = item.url.split("?")[0];
-        const contentHash = generateHash(cleanUrl);
+        return {
+          summary: cleanText || rawText,
+          time: timeEl ? new Date(timeEl.getAttribute("datetime")).toISOString() : "",
+          imageUrl: imgEl ? imgEl.src : "",
+        };
+      });
 
-        articles.push({
-          url: item.url,
-          summary: detail.summary || "Sin descripción",
-          time: detail.time,
-          imageBuffer,
-          hash: contentHash,
-        });
+      let imageBuffer = null;
+      const finalImageUrl = detail.imageUrl || item.imageUrl;
 
-        await wait(300);
-      } catch (err) {
-        console.error("Error procesando publicación:", err.message);
+      if (finalImageUrl) {
+        try {
+          const tmpPath = await ffmpegService._createTempFilePath("jpg");
+          await ffmpegService.downloadImage(finalImageUrl, tmpPath);
+          imageBuffer = fs.readFileSync(tmpPath);
+          await ffmpegService.cleanup(tmpPath);
+        } catch (e) {
+          console.error("⚠ Error bajando imagen:", e.message);
+        }
       }
+
+      const cleanUrl = item.url.split("?")[0];
+      const contentHash = generateHash(cleanUrl);
+
+      articles.push({
+        url: item.url,
+        summary: detail.summary || "Sin descripción",
+        time: detail.time,
+        imageBuffer,
+        hash: contentHash,
+      });
+
+      await wait(200);
+    } catch (err) {
+      console.error("Error procesando publicación:", err.message);
     }
-  } catch (err) {
-    console.error("Error en browser detalles:", err.message);
-  } finally {
-    if (browser) await browser.close();
   }
 
   return articles.sort((a, b) => new Date(a.time) - new Date(b.time));
@@ -214,15 +248,7 @@ async function checkNews(sock) {
     if (!Array.isArray(db.lastPosts)) db.lastPosts = [];
     if (!Array.isArray(db.groupsEnabled)) db.groupsEnabled = [];
 
-    if (!db.enabled) {
-      console.log("⏸ Sistema TyC desactivado.");
-      return;
-    }
-
-    if (!db.groupsEnabled.length) {
-      console.log("⚠ No hay grupos habilitados en news-tyc.json");
-      return;
-    }
+    if (!db.enabled || !db.groupsEnabled.length) return;
 
     const scraped = await getLatestNews(MAX_ARTICLES);
     if (!scraped.length) return;
@@ -244,7 +270,6 @@ async function checkNews(sock) {
       sentHashes.add(post.hash);
     }
 
-    // Conserva las últimas 20 publicaciones en el historial de la BD
     db.lastPosts = db.lastPosts.slice(-HISTORY_LIMIT);
     writeJSON("news-tyc", db);
   } catch (err) {
@@ -254,11 +279,13 @@ async function checkNews(sock) {
   }
 }
 
-function startTyCSystem(sock) {
+async function startTyCSystem(sock) {
   if (intervalStarted) return;
   intervalStarted = true;
 
   console.log("📡 Sistema TyC Instagram iniciado");
+  await initBrowser();
+
   setInterval(async () => {
     try {
       await checkNews(sock);
@@ -269,4 +296,5 @@ function startTyCSystem(sock) {
 }
 
 module.exports = { startTyCSystem };
+
 
