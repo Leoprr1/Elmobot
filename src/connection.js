@@ -96,13 +96,12 @@ async function connect() {
       // 🔹 Filtrar solo comandos que empiezan con "."
       if (!text.startsWith(".")) return;
 
-      // mostrar que el bot está escribiendo
-      await socket.sendPresenceUpdate("composing", jid);
-
-      await new Promise((r) => setTimeout(r, 2000)); // 2s de "escribiendo"
-
-      // detener presencia
-      await socket.sendPresenceUpdate("paused", jid);
+      // ⚡ Presencia asíncrona no bloqueante
+      socket.sendPresenceUpdate("composing", jid).then(() => {
+        setTimeout(() => {
+          socket.sendPresenceUpdate("paused", jid).catch(() => {});
+        }, 2000);
+      }).catch(() => {});
 
     } catch (err) {
       warningLog("Error enviando visto:", err.message);
@@ -148,4 +147,5 @@ async function connect() {
 }
 
 exports.connect = connect;
+
 
