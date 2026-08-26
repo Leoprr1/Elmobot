@@ -1,6 +1,7 @@
 /**
  * newtyc.js — Sistema de noticias desde Instagram (TyC Sports)
- * Instancia persistente + Verificación de sesión inteligente (solo lee cookies si vence la sesión).
+ * Instancia persistente + Verificación de sesión inteligente.
+ * Respeta el estado desactivado (enabled: false) sin tocar cookies ni abrir Puppeteer.
  */
 
 const puppeteer = require("puppeteer");
@@ -24,6 +25,16 @@ function wait(ms) {
 
 function generateHash(text) {
   return crypto.createHash("sha1").update(text).digest("hex");
+}
+
+// Cierra el navegador de forma limpia si se desactiva el sistema
+async function closeBrowser() {
+  if (globalBrowser) {
+    console.log("🛑 Cerrando navegador Puppeteer de TyC (Sistema en OFF)...");
+    await globalBrowser.close().catch(() => {});
+    globalBrowser = null;
+    globalPage = null;
+  }
 }
 
 async function initBrowser() {
@@ -61,7 +72,6 @@ async function initBrowser() {
 // Verifica si la sesión está activa; si caducó, recién ahí aplica las cookies guardadas
 async function ensureActiveSession(page) {
   try {
-    // Si la URL actual ya es Instagram y no estamos en la pantalla de login, comprobamos si estamos adentro
     const currentUrl = page.url();
     if (currentUrl.includes("instagram.com") && !currentUrl.includes("/accounts/login")) {
       const isLoggedIn = await page.evaluate(() => !!document.querySelector("a[href*='/p/'], a[href*='/reel/'], nav, svg[aria-label*='Home']"));
@@ -119,7 +129,6 @@ async function getLatestNews(limit = MAX_ARTICLES) {
     if (!globalPage || globalPage.isClosed()) {
       await initBrowser();
     } else {
-      // Revisa que la sesión siga activa antes de scrapear
       await ensureActiveSession(globalPage);
     }
 
@@ -138,10 +147,7 @@ async function getLatestNews(limit = MAX_ARTICLES) {
     return posts;
   } catch (err) {
     console.error("❌ Instagram Puppeteer error:", err.message);
-    if (globalBrowser) {
-      await globalBrowser.close().catch(() => {});
-      globalBrowser = null;
-    }
+    await closeBrowser();
     return [];
   }
 }
@@ -248,8 +254,15 @@ async function checkNews(sock) {
     if (!Array.isArray(db.lastPosts)) db.lastPosts = [];
     if (!Array.isArray(db.groupsEnabled)) db.groupsEnabled = [];
 
-    if (!db.enabled || !db.groupsEnabled.length) return;
+    // 🔥 FILTRO PREVIO: Si está desactivado o no hay grupos, cerramos navegador (si estaba abierto) y salimos sin tocar NADA de cookies ni red
+    if (!db.enabled || !db.groupsEnabled.length) {
+      if (globalBrowser) {
+        await closeBrowser();
+      }
+      return;
+    }
 
+    // Recién acá, si está en ON y tiene grupos, se ejecuta el raspado
     const scraped = await getLatestNews(MAX_ARTICLES);
     if (!scraped.length) return;
 
@@ -283,8 +296,9 @@ async function startTyCSystem(sock) {
   if (intervalStarted) return;
   intervalStarted = true;
 
-  console.log("📡 Sistema TyC Instagram iniciado");
-  await initBrowser();
+  console.log("📡 Sistema TyC Instagram activado (monitoreando estado...)");
+
+  // ❌ Se removió initBrowser() de acá. No abre Puppeteer en el arranque si está deshabilitado.
 
   setInterval(async () => {
     try {
@@ -296,5 +310,7 @@ async function startTyCSystem(sock) {
 }
 
 module.exports = { startTyCSystem };
+
+
 
 

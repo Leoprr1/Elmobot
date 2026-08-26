@@ -1,12 +1,10 @@
-const { isGroup } = require(`${BASE_DIR}/utils`);
-const { toUserJid } = require(`${BASE_DIR}/utils`);
+const { isGroup, onlyNumbers, toUserJid } = require(`${BASE_DIR}/utils`);
 const { errorLog } = require(`${BASE_DIR}/utils/logger`);
 const { PREFIX, ASSETS_DIR } = require(`${BASE_DIR}/config`);
 const { InvalidParameterError } = require(`${BASE_DIR}/errors`);
 const { getProfileImageData } = require(`${BASE_DIR}/services/baileys`);
-const {getDB} = require("../../utils/jsoncache")
-
-
+const { getDB } = require("../../utils/jsoncache");
+const { getMarriage, isMarried } = require(`${BASE_DIR}/utils/marriageDB`);
 
 function normalizeJid(jid) {
   const number = jid.split("@")[0];
@@ -117,6 +115,23 @@ module.exports = {
       const rango = getRangoAventurero(nivel);
 
       // ====================
+      // MATRIMONIO
+      // ====================
+
+      let estadoCivil = "Soltero/a 💔";
+      const mentions = [targetJid];
+
+      if (isMarried(targetJid)) {
+        const marriage = getMarriage(targetJid);
+        if (marriage && marriage.partner) {
+          const partnerJid = marriage.partner;
+          const partnerNumber = onlyNumbers(partnerJid);
+          estadoCivil = `Casado/a con @${partnerNumber} 💍`;
+          mentions.push(partnerJid);
+        }
+      }
+
+      // ====================
       // MENSAJE
       // ====================
 
@@ -124,6 +139,7 @@ module.exports = {
 👤 *Nombre:* ${name}
 🎖️ *Cargo:* ${userRole}
 🎂 *Edad:* ${age}
+💍 *Estado Civil:* ${estadoCivil}
 
 📅 *Registrado hace:* ${tiempo}
 ⚡ *Comandos usados:* ${commandsUsed}
@@ -138,7 +154,7 @@ module.exports = {
       await socket.sendMessage(remoteJid, {
         image: { url: profilePicUrl },
         caption: mensagem,
-        mentions: [targetJid],
+        mentions: mentions,
       });
 
     } catch (error) {
@@ -147,3 +163,4 @@ module.exports = {
     }
   },
 };
+

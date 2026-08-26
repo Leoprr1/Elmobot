@@ -1,85 +1,15 @@
-/*
- * Este archivo index.js es el mismo que existe en "src/index.js", solo está aquí
- * para facilitar la ejecución del bot en algunas hosts.
- *
- * Si hiciste clic aquí, es porque probablemente ya usaste un bot de "case" y con un "index.js" de 20 mil líneas...
- * ¡Lo sé, te entiendo!
- * ¿Qué es mejor? ¿Que te dé un error en tu "play", vayas al archivo "play.js" y lo corrijas
- * o que vayas a la línea 71023 de "index.js" y lo corrijas?
- *
- * Imagina si pegas tu "case" mal y olvidas cerrar
- * o abrir un paréntesis, una llave...
- * Pones el bot a funcionar, te da varios errores y no sabes cómo resolverlos...
- * ¿Adivina qué haces?
- * Vuelves a la "index.js" que tenías antes, ¿verdad?
- *
- * ¡Eso es lo que no queremos! ¡Queremos un código limpio, legible y de fácil mantenimiento!
- * Creamos código para humanos, no para máquinas, así que, ¡cuanto más simple, mejor!
- *
- * A partir de ahora, vamos a cambiar la palabra "case" por "comando", ¿ok? ¡Vamos allá!
- *
- * ---------------- 🤖 ¿DÓNDE ESTÁN LOS COMANDOS? 🤖 ----------------
- *
- * Encontrarás los comandos dentro de la carpeta "src/commands"
- * ¿No lo entiendes? ¡Vamos a ver!
- *
- * Abre la carpeta "src"
- * Luego, abre la carpeta "commands"
- *
- * Observa que dentro de ella hay 3 carpetas:
- *
- * - 📁 admin
- * - 📁 member
- * - 📁 owner
- *
- * Dentro de la carpeta "admin" hay comandos administrativos.
- * Dentro de la carpeta "member" hay comandos para miembros.
- * Dentro de la carpeta "owner" hay comandos a los que solo puede acceder el dueño del bot/grupo.
- *
- * Sencillo, ¿verdad? Ah, un detalle: no necesitas poner un "if" para saber si el comando es de admin o de dueño.
- * ¡El bot ya lo hace por ti! ¡Solo necesitas colocar el comando en la carpeta correspondiente!
- *
- * ---------------- 🤖 ¿DÓNDE MODIFICO EL MENÚ? 🤖 ----------------
- *
- * Abre la carpeta "src"
- * Ve al archivo "messages.js" y ¡edita el menú!
- * Solo recuerda, haz todo dentro de las comillas (`), ya que es un template string.
- *
- * ¿No lo entiendes?
- * Mira:
- *
- * `¡Hola, qué tal!` - Esto es CORRECTO ✅
- *
- * Hola `¿qué tal?` - Esto es INCORRECTO (observa que "Hola" está fuera de las comillas) ❌
- *
- * ---------------- 🤖 ¿CÓMO CAMBIO LA FOTO DEL BOT? 🤖 ----------------
- *
- * Abre la carpeta "assets"
- * Luego, abre la carpeta "images"
- * ¡Sustituye la imagen "takeshi-bot.png" por otra de tu preferencia!
- * Solo no olvides mantener el nombre "takeshi-bot.png"
- *
- * ---------------- 🚀 IMPORTANTE 🚀 ----------------
- *
- * Lee el tutorial completo en: https://github.com/guiireal/takeshi-bot-espanol
- *
- * ¡No saltes pasos! Léelo completo, ¡ya que es muy importante para que entiendas cómo funciona el bot!
- *
- * Por: Dev Gui
- *
- * ¡No modifiques nada a continuación, a menos que sepas lo que estás haciendo!
- */
 const { connect } = require("./connection");
-const { load } = require("./loader");
 const { badMacHandler } = require("./utils/badMacHandler");
 const {
-  successLog,
   errorLog,
   warningLog,
   bannerLog,
   infoLog,
 } = require("./utils/logger");
 
+// ----------------------------
+// MANEJO GLOBAL DE ERRORES
+// ----------------------------
 process.on("uncaughtException", (error) => {
   if (badMacHandler.handleError(error, "uncaughtException")) {
     return;
@@ -96,7 +26,7 @@ process.on("uncaughtException", (error) => {
   }
 });
 
-process.on("unhandledRejection", (reason, promise) => {
+process.on("unhandledRejection", (reason) => {
   if (badMacHandler.handleError(reason, "unhandledRejection")) {
     return;
   }
@@ -104,13 +34,16 @@ process.on("unhandledRejection", (reason, promise) => {
   errorLog(`Promesa rechazada no manejada:`, reason);
 });
 
+// ----------------------------
+// INICIO MANUAL DE CONSOLA (npm start)
+// ----------------------------
 async function startBot() {
   try {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     process.setMaxListeners(1500);
 
     bannerLog();
-    infoLog("Iniciando mis componentes internos...");
+    infoLog("Iniciando bot en modo consola (src/index.js)...");
 
     const stats = badMacHandler.getStats();
     if (stats.errorCount > 0) {
@@ -119,12 +52,10 @@ async function startBot() {
       );
     }
 
-    const socket = await connect();
+    // `connect()` se encarga de crear el socket y llamar a load(socket) automáticamente al abrir la conexión
+    await connect();
 
-    load(socket);
-
-    successLog("✅ ¡Bot iniciado con éxito!");
-
+    // Monitor periódico de BadMac
     setInterval(() => {
       const currentStats = badMacHandler.getStats();
       if (currentStats.errorCount > 0) {
@@ -133,10 +64,11 @@ async function startBot() {
         );
       }
     }, 300_000);
+
   } catch (error) {
     if (badMacHandler.handleError(error, "bot-startup")) {
       warningLog(
-        "Error de Bad MAC durante la inicialización, intentando nuevamente..."
+        "Error de Bad MAC durante la inicialización, reintentando en 5s..."
       );
 
       setTimeout(() => {
@@ -152,3 +84,5 @@ async function startBot() {
 }
 
 startBot();
+
+
