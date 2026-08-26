@@ -2,6 +2,7 @@ console.log("✅ Sistema RPG cargado correctamente");
 const fs = require("fs");
 const { connect } = require("http2");
 const path = require("path");
+const { onlyNumbers } = require(`${BASE_DIR}/utils`);
 const { PREFIX } = require(`${BASE_DIR}/config`);
 const { getDB } = require(`${BASE_DIR}/utils/jsoncache`);
 const DB_FILE = path.join(BASE_DIR,"database", "rpg.json");
@@ -4433,7 +4434,8 @@ if (cmd === "ranking" || cmd === "leaderboard") {
 
   top.forEach((p, index) => {
     const jugador = getUser(p.id);
-    const displayName = jugador?.nick || p.id.split("@")[0];
+    const numOnly = onlyNumbers(p.id);
+    const displayName = jugador?.nick || numOnly;
 
     // Emoji para el puesto
     let puestoEmoji;
@@ -4471,7 +4473,7 @@ if (cmd === "ranking" || cmd === "leaderboard") {
       dungeonBar += i < dungeonFilled ? "🟥" : "⬜";
     }
 
-    txt += `${puestoEmoji} *${displayName}*\n`;
+    txt += `${puestoEmoji} *${displayName}* (@${numOnly})\n`;
     txt += `Nivel: ${lvlBar} ⭐ ${p.nivel}\n`;
     txt += `XP: ${xpBar} (${p.xp} XP)\n`;
     txt += `💰 Monedas: $${fmt(p.monedas)}\n`;
@@ -4480,7 +4482,8 @@ if (cmd === "ranking" || cmd === "leaderboard") {
     mentionsList.push(p.id);
   });
 
-  return sendReply(txt, { mentions: mentionsList });
+  // Pasamos directo el array de menciones como segundo argumento
+  return sendReply(txt, mentionsList);
 }
 
 // Subcomando no reconocido
@@ -4492,3 +4495,4 @@ return sendErrorReply("Subcomando inválido.\n\n" + helpText());
 }
 },
 };
+
