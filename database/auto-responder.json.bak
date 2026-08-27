@@ -488,7 +488,8 @@
       "Cómo estás linda",
       "el virgo",
       "T amo pesada",
-      "Puto  cállate"
+      "Puto  cállate",
+      "Todos"
     ]
   },
   {
@@ -298525,6 +298526,24 @@
     "match": "es un juego re de mierda el fre igual",
     "answers": [
       "Ahora está hecho una mrd, cn las habilidades y los ratas"
+    ]
+  },
+  {
+    "match": "Así no eraa",
+    "answers": [
+      "Quien dice"
+    ]
+  },
+  {
+    "match": "Xiomara",
+    "answers": [
+      "Donde"
+    ]
+  },
+  {
+    "match": "Esa me debe plata",
+    "answers": [
+      "Ño"
     ]
   }
 ]
