@@ -751,7 +751,7 @@
       "Y yo que tengo 1 año",
       "holaa",
       "La racha",
-      "no",
+      "No",
       "si chau",
       "Morite",
       "Gracias",
@@ -924,7 +924,8 @@
   {
     "match": "estoy aburrido",
     "answers": [
-      "¿Querés que te cuente un chiste o te ayude con algo?"
+      "¿Querés que te cuente un chiste o te ayude con algo?",
+      "anda a ver la novela"
     ]
   },
   {
@@ -1042,7 +1043,8 @@
     "answers": [
       "La belleza está en el interior... y en mi código también.",
       "ok",
-      "fea vos"
+      "fea vos",
+      "IA cerra el orto"
     ]
   },
   {
@@ -2473,7 +2475,7 @@
   {
     "match": "no",
     "answers": [
-      "SI",
+      "si",
       "JAJAJAJAJA",
       "Parece delito ya esl en este grupo",
       "Matate",
@@ -2826,7 +2828,8 @@
       "Queres ser muteado?",
       "Te amo",
       "dale una oportunidad",
-      "Ah ok 👍"
+      "Ah ok 👍",
+      "Ti gracias"
     ]
   },
   {
@@ -3864,7 +3867,8 @@
       "JAJAJAJAJAJAJAJAJJAJAJAJAJAJAJAJJAJAJ",
       "Queres q le diga q te mutee?🥰",
       "Hay 2 tobis",
-      "no te llamas asi?"
+      "no te llamas asi?",
+      "porque te prometen que no te van a dejar sola y al final lo hacen"
     ]
   },
   {
@@ -6620,7 +6624,8 @@
       "Las gordas son good",
       "se me rompio",
       "pero otra",
-      "na"
+      "na",
+      "yo aca x llorwr qsy"
     ]
   },
   {
@@ -9393,7 +9398,8 @@
       "Al bot",
       "a kien ma",
       "ana",
-      "A vos y a tanque"
+      "A vos y a tanque",
+      "al amigo"
     ]
   },
   {
@@ -20919,7 +20925,8 @@
       "sisi",
       "River",
       "Q te me ases la loca",
-      "JAJAJAJ lpm"
+      "JAJAJAJ lpm",
+      "pero no m enoje tarada"
     ]
   },
   {
@@ -42250,7 +42257,7 @@
   {
     "match": "Sos",
     "answers": [
-      "Si.",
+      "Si",
       "Te falta chispistriskis"
     ]
   },
@@ -43013,7 +43020,8 @@
       "buena foto bro",
       "holaaaaaa",
       "Holaaa",
-      "Todo bien"
+      "Todo bien",
+      "qhaces"
     ]
   },
   {
@@ -52078,7 +52086,8 @@
       "Cargame crédito entonces",
       "Q flashas vos",
       "jsjajs",
-      "Q decís Naomi anda a lavar platos"
+      "Q decís Naomi anda a lavar platos",
+      "Vos también SOS enana no enano"
     ]
   },
   {
@@ -97819,7 +97828,8 @@
   {
     "match": "Holi alma",
     "answers": [
-      "Holi"
+      "Holi",
+      "Holap"
     ]
   },
   {
@@ -119897,7 +119907,8 @@
     "answers": [
       "Era bormita",
       "no le des cabida",
-      "No"
+      "No",
+      "???"
     ]
   },
   {
@@ -186757,7 +186768,8 @@
   {
     "match": "las dos",
     "answers": [
-      "Eso estoy haciendo yo"
+      "Eso estoy haciendo yo",
+      "Fua no ven donde se sientan"
     ]
   },
   {
@@ -216655,7 +216667,8 @@
       "Hola",
       "Recién termino de comer y vos?",
       "acstado hombre",
-      "Nda acostado"
+      "Nda acostado",
+      "estoy viendo si le consigo novia a mi amigo"
     ]
   },
   {
@@ -276324,7 +276337,8 @@
     "match": "Q decis",
     "answers": [
       "Algo",
-      "Trava"
+      "Trava",
+      "Vos sos enana no enano"
     ]
   },
   {
@@ -296275,7 +296289,8 @@
   {
     "match": "Me callo",
     "answers": [
-      "piyo"
+      "piyo",
+      "te amo"
     ]
   },
   {
@@ -315638,7 +315653,8 @@
   {
     "match": "Queres ser muteado?",
     "answers": [
-      "Bue"
+      "Bue",
+      "No Gracias"
     ]
   },
   {
@@ -320183,6 +320199,324 @@
     "match": "y las dejo así",
     "answers": [
       "JAJAJAJAJAJAJA"
+    ]
+  },
+  {
+    "match": "@179758037995711 m estrese",
+    "answers": [
+      "Yo tmb"
+    ]
+  },
+  {
+    "match": "no necesitamos d nadie",
+    "answers": [
+      "Claro"
+    ]
+  },
+  {
+    "match": "Corte re feministas jajajaja",
+    "answers": [
+      "sh",
+      "Callte"
+    ]
+  },
+  {
+    "match": "Ya se donde",
+    "answers": [
+      "Estás mirando porno"
+    ]
+  },
+  {
+    "match": "Estás mirando porno",
+    "answers": [
+      "Estan"
+    ]
+  },
+  {
+    "match": "bardeandome con gordas en wsp",
+    "answers": [
+      "Jajajajaja"
+    ]
+  },
+  {
+    "match": "Y nuestros amigos dónde están?",
+    "answers": [
+      "amigos?"
+    ]
+  },
+  {
+    "match": "medio pelotudo al final",
+    "answers": [
+      "Yo nunca dejo las cosas a medio"
+    ]
+  },
+  {
+    "match": "Un poco de tontas",
+    "answers": [
+      "me tantas fotos que mandé ni idea de cuál es JAJAJA"
+    ]
+  },
+  {
+    "match": "me tantas fotos que mandé ni idea de cuál es JAJAJA",
+    "answers": [
+      "No las vi"
+    ]
+  },
+  {
+    "match": "Yo nunca dejo las cosas a medio",
+    "answers": [
+      "JAJAJAJAJSJJS"
+    ]
+  },
+  {
+    "match": "Mándalas devuelta",
+    "answers": [
+      "ño"
+    ]
+  },
+  {
+    "match": "yo no tengo amigos",
+    "answers": [
+      "Aaaaa listo listo"
+    ]
+  },
+  {
+    "match": "por qué los hombres serán tan pelotudos?",
+    "answers": [
+      "ñose los odio",
+      "Yo no se los demas pueden saber",
+      "Yo me cai"
+    ]
+  },
+  {
+    "match": "que carajos",
+    "answers": [
+      "Llego Asi"
+    ]
+  },
+  {
+    "match": "Enanos faloperos",
+    "answers": [
+      "Q decis",
+      "virgo"
+    ]
+  },
+  {
+    "match": "Vos sos enana no enano",
+    "answers": [
+      "Ah"
+    ]
+  },
+  {
+    "match": "wacho los odio solo me hacen llorar",
+    "answers": [
+      "JAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJA",
+      "el embarazo te tiene así 🥹"
+    ]
+  },
+  {
+    "match": "el embarazo te tiene así 🥹",
+    "answers": [
+      "Esta embarazada esa",
+      "JQJAJAJA"
+    ]
+  },
+  {
+    "match": "Esta embarazada esa",
+    "answers": [
+      "las dos",
+      "que tal vo",
+      "del espíritu Santo"
+    ]
+  },
+  {
+    "match": "si una patada le doy",
+    "answers": [
+      "hola leti",
+      "A quien?"
+    ]
+  },
+  {
+    "match": "extraño a mi mejor amigo q se elejo por la novia pipi",
+    "answers": [
+      ".."
+    ]
+  },
+  {
+    "match": "Yorando",
+    "answers": [
+      "porr"
+    ]
+  },
+  {
+    "match": "Cosas del amorío",
+    "answers": [
+      "uh alma"
+    ]
+  },
+  {
+    "match": "Fua no ven donde se sientan",
+    "answers": [
+      "en una silla"
+    ]
+  },
+  {
+    "match": "Deja voy a llorar tmb",
+    "answers": [
+      "Por q"
+    ]
+  },
+  {
+    "match": "Xq te enojas ahoras",
+    "answers": [
+      "a kn ke decis"
+    ]
+  },
+  {
+    "match": "donde más",
+    "answers": [
+      "En la mesa"
+    ]
+  },
+  {
+    "match": "yo esa",
+    "answers": [
+      "Literal"
+    ]
+  },
+  {
+    "match": "a kn ke decis",
+    "answers": [
+      "A vos"
+    ]
+  },
+  {
+    "match": "porque te prometen que no te van a dejar sola y al final lo hacen",
+    "answers": [
+      "Bueno eh dejen sus traumas"
+    ]
+  },
+  {
+    "match": "sentada o acostada",
+    "answers": [
+      "ah sos un bobooo"
+    ]
+  },
+  {
+    "match": "En la mesa",
+    "answers": [
+      "en la mesa?",
+      "No?"
+    ]
+  },
+  {
+    "match": "Bueno eh dejen sus traumas",
+    "answers": [
+      "Literal, bien q después piden verga d los hombres...",
+      "esque odio más cuando prometen algo lptm"
+    ]
+  },
+  {
+    "match": "estoy viendo si le consigo novia a mi amigo",
+    "answers": [
+      "dificil"
+    ]
+  },
+  {
+    "match": "dificil",
+    "answers": [
+      "pero no imposible"
+    ]
+  },
+  {
+    "match": "q linda la lluvia está para dormir con un gordo",
+    "answers": [
+      "Veni ma"
+    ]
+  },
+  {
+    "match": "esque odio más cuando prometen algo lptm",
+    "answers": [
+      "Vos confia en par de años JAJAJA"
+    ]
+  },
+  {
+    "match": "Ni uno q se la juegue x la q ama",
+    "answers": [
+      "a mi no m ama nadie"
+    ]
+  },
+  {
+    "match": "Literal, bien q después piden verga d los hombres...",
+    "answers": [
+      "la verdad que amo a su amigo nomás ya su mente no"
+    ]
+  },
+  {
+    "match": "que tetassssss",
+    "answers": [
+      "Gracias"
+    ]
+  },
+  {
+    "match": "a mi no m ama nadie",
+    "answers": [
+      "A mi me boludean"
+    ]
+  },
+  {
+    "match": "Oaaaaa jsjsjsjs",
+    "answers": [
+      "Te sirve con tu nombre"
+    ]
+  },
+  {
+    "match": "Te sirve con tu nombre",
+    "answers": [
+      "Sisiiss"
+    ]
+  },
+  {
+    "match": "Para cojerme me quieren nomas",
+    "answers": [
+      "lom"
+    ]
+  },
+  {
+    "match": "no podés JAJAJAJA",
+    "answers": [
+      "Que?"
+    ]
+  },
+  {
+    "match": "lujuria",
+    "answers": [
+      "Nunca con ojos de amor siempre con lujuria"
+    ]
+  },
+  {
+    "match": "Yo le depilo con la boca",
+    "answers": [
+      "Que asco",
+      "Esos fetiches"
+    ]
+  },
+  {
+    "match": "Feo y esas tetas horribles",
+    "answers": [
+      "Te encantan mis tetas"
+    ]
+  },
+  {
+    "match": "Vos confia en par de años JAJAJA",
+    "answers": [
+      "ni en mi familia confío pero soy sensible"
+    ]
+  },
+  {
+    "match": "Pense wue eras lindo",
+    "answers": [
+      "No me digas así 😢"
     ]
   }
 ]
