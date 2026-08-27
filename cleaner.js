@@ -1,4 +1,4 @@
-// cleaner.js - Optimizado posta (sin romper CPU)
+// cleaner.js - Optimizado y adaptado a límites de RAM (sin romper sesión)
 
 const { infoLog, warningLog } = require("./src/utils/logger");
 
@@ -6,9 +6,13 @@ const NORMAL_INTERVAL = 60_000;
 const RECONNECT_INTERVAL = 15_000;
 const DEEP_CLEAN_INTERVAL = 5 * 60 * 1000;
 
-// 🔥 SUBIDO A 200MB COMO PEDISTE
-const MEMORY_THRESHOLD_MB = 200;
-const MEMORY_CRITICAL_MB = 400;
+// 🎯 Detección de límite asignado a Node.js (--max-old-space-size)
+const v8 = require("v8");
+const heapLimitMB = Math.round(v8.getHeapStatistics().heap_size_limit / 1024 / 1024);
+
+// Umbrales calculados proporcionalmente (o fallback seguro)
+const MEMORY_THRESHOLD_MB = Math.round(heapLimitMB * 0.4) || 500; 
+const MEMORY_CRITICAL_MB = Math.round(heapLimitMB * 0.75) || 900;
 
 let lastGC = 0;
 
@@ -17,20 +21,20 @@ module.exports = function (bot, queues = {}) {
   const { IDROPS, TEMP_QUEUE, EVENT_QUEUE, LOGS } = queues;
 
   // -----------------------------
-  // GC CONTROLADO (SOLO SI > 200MB)
+  // GC CONTROLADO
   // -----------------------------
-  function runGC() {
+  function runGC(force = false) {
     if (!global.gc) return;
 
     const memUsageMB = process.memoryUsage().heapUsed / 1024 / 1024;
 
-    // 🔥 SOLO SI SUPERA 200MB
-    if (memUsageMB < MEMORY_THRESHOLD_MB) return;
+    // Solo ejecuta GC si supera el umbral (o si se fuerza por estado crítico)
+    if (!force && memUsageMB < MEMORY_THRESHOLD_MB) return;
 
     const now = Date.now();
 
-    // evitar spam de GC
-    if (now - lastGC < 30_000) return;
+    // Evitar spam de GC (salvo que sea forzado por memoria crítica)
+    if (!force && (now - lastGC < 30_000)) return;
 
     const before = process.memoryUsage().heapUsed;
     global.gc();
@@ -38,7 +42,7 @@ module.exports = function (bot, queues = {}) {
 
     lastGC = now;
 
-    console.log(`[CLEANER] GC | ${((before - after)/1024/1024).toFixed(2)} MB liberados | RAM: ${(after/1024/1024).toFixed(2)} MB`);
+    console.log(`[CLEANER] GC | ${((before - after)/1024/1024).toFixed(2)} MB liberados | Heap: ${(after/1024/1024).toFixed(2)} MB / ${heapLimitMB} MB`);
   }
 
   // -----------------------------
@@ -73,7 +77,7 @@ module.exports = function (bot, queues = {}) {
       const memUsageMB = process.memoryUsage().heapUsed / 1024 / 1024;
 
       if (memUsageMB > MEMORY_THRESHOLD_MB) {
-        warningLog(`⚠️ RAM alta: ${memUsageMB.toFixed(2)} MB`);
+        warningLog(`⚠️ RAM alta: ${memUsageMB.toFixed(2)} MB (Límite: ${MEMORY_THRESHOLD_MB} MB)`);
       }
 
     } catch (err) {
@@ -95,7 +99,7 @@ module.exports = function (bot, queues = {}) {
         LOGS.splice(0, LOGS.length - 50);
       }
 
-      runGC();
+      runGC(true); // Fuerza GC en reconexión
 
       warningLog("⚡ Limpieza agresiva (reconexión)");
 
@@ -124,9 +128,9 @@ module.exports = function (bot, queues = {}) {
         LOGS.splice(0, LOGS.length - 100);
       }
 
-      runGC();
+      runGC(true);
 
-      infoLog("🧠 Deep clean");
+      infoLog("🧠 Deep clean completado");
 
     } catch (err) {
       warningLog("Error deep clean:", err.message);
@@ -151,7 +155,7 @@ module.exports = function (bot, queues = {}) {
 
         if (Array.isArray(LOGS)) LOGS.length = 0;
 
-        runGC();
+        runGC(true); // Fuerza GC sin esperar los 30s
       }
 
     } catch (err) {
@@ -196,8 +200,9 @@ module.exports = function (bot, queues = {}) {
   // -----------------------------
   setInterval(() => {
     const memUsageMB = process.memoryUsage().heapUsed / 1024 / 1024;
-    infoLog(`🧹 RAM: ${memUsageMB.toFixed(2)} MB`);
+    infoLog(`🧹 RAM Heap: ${memUsageMB.toFixed(2)} MB / ${heapLimitMB} MB`);
   }, 60_000);
 
-  infoLog("🚀 Cleaner optimizado iniciado");
+  infoLog(`🚀 Cleaner iniciado (Tope asignado: ${heapLimitMB} MB | Alerta: ${MEMORY_THRESHOLD_MB} MB)`);
 };
+

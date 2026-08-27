@@ -4,7 +4,7 @@
     "age": 23,
     "profilePic": "https://pps.whatsapp.net/v/t61.24694-24/620485926_1206638688260707_2153868945442048660_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa3wFsx_qZjifc35bhJRLTlYkWmLvkIF33aUmV_A_uu5qH2A&oe=69B559BF&_nc_sid=5e03e0&_nc_cat=107",
     "registeredAt": 1772594534960,
-    "commandsUsed": 14252
+    "commandsUsed": 14258
   },
   "148137834471521@lid": {
     "name": "cande",
@@ -354,7 +354,7 @@
     "age": 67,
     "profilePic": "https://pps.whatsapp.net/v/t61.24694-24/783897890_2199810780800753_1413407823605680709_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa5QFL_Tyss8xQMFQSK2osWrVowutI_71xyQoh73rTjHnm4w&oe=6A987C2C&_nc_sid=5e03e0&_nc_cat=109",
     "registeredAt": 1786569015479,
-    "commandsUsed": 740
+    "commandsUsed": 741
   },
   "65919745306692@lid": {
     "name": "frangay",
@@ -1047,7 +1047,7 @@
     "age": 21,
     "profilePic": null,
     "registeredAt": 1787421149464,
-    "commandsUsed": 1753
+    "commandsUsed": 1758
   },
   "33299200221204@lid": {
     "name": "Kreuz",
@@ -1187,7 +1187,7 @@
     "age": 85,
     "profilePic": "https://pps.whatsapp.net/v/t61.24694-24/652890081_1291363976187599_6379380925060757265_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa5QGqvta_R7mHls0G1bjvBpvJbQTN5Z5cyU30ezq2PQJfdA&oe=6A9A4596&_nc_sid=5e03e0&_nc_cat=111",
     "registeredAt": 1787642148881,
-    "commandsUsed": 5
+    "commandsUsed": 7
   },
   "171837933801726@lid": {
     "name": "Estrellita",
@@ -1201,7 +1201,7 @@
     "age": 101,
     "profilePic": "https://pps.whatsapp.net/v/t61.24694-24/720386560_27971543639132402_5686480770223144155_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa5QF5khZsicmvbLJH5mzw51vjfpHAe1QqdivH64yFsKwKug&oe=6A9CD731&_nc_sid=5e03e0&_nc_cat=101",
     "registeredAt": 1787642215297,
-    "commandsUsed": 44
+    "commandsUsed": 45
   },
   "70708751294578@lid": {
     "name": "Ani",
@@ -1321,5 +1321,12 @@
     "profilePic": null,
     "registeredAt": 1787801323874,
     "commandsUsed": 6
+  },
+  "191418488336551@lid": {
+    "name": "Ezequiel",
+    "age": 25,
+    "profilePic": "https://pps.whatsapp.net/v/t61.24694-24/544500686_34577671721878237_2376931931245611332_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa5QGWGVhbh9stEc7kyAVIh6DGAGXYyLqucdBP3_leN1XtrA&oe=6A9CEEEC&_nc_sid=5e03e0&_nc_cat=106",
+    "registeredAt": 1787809960031,
+    "commandsUsed": 1
   }
 }
