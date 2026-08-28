@@ -1,10 +1,11 @@
 console.log("✅ Sistema RPG cargado correctamente");
+const { PREFIX } = require(`${BASE_DIR}/config`);
+const { onlyNumbers } = require(`${BASE_DIR}/utils`);
+const { getDB } = require(`${BASE_DIR}/utils/jsoncache`);
 const fs = require("fs");
 const { connect } = require("http2");
 const path = require("path");
-const { onlyNumbers } = require(`${BASE_DIR}/utils`);
-const { PREFIX } = require(`${BASE_DIR}/config`);
-const { getDB } = require(`${BASE_DIR}/utils/jsoncache`);
+
 const DB_FILE = path.join(BASE_DIR,"database", "rpg.json");
 // 🔥 DB ahora viene del cache (RAM)
 let DB = getDB("rpg");

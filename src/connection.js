@@ -25,7 +25,8 @@ if (!fs.existsSync(TEMP_DIR)) {
 
 const logger = pino({ level: "silent" });
 
-const msgRetryCounterCache = new NodeCache();
+// Por esto (expira llaves a los 5 minutos y las borra de la RAM automáticamente):
+const msgRetryCounterCache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 const groupCache = new NodeCache({ stdTTL: 60 * 60 * 24 });
 
 let socketGlobal = null;
