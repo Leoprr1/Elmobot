@@ -8,7 +8,7 @@ const { getRandomName } = require(`${BASE_DIR}/utils`);
 const { addStickerMetadata } = require(`${BASE_DIR}/services/sticker`);
 const { InvalidParameterError } = require(`${BASE_DIR}/errors`);
 const { PREFIX, BOT_NAME, BOT_EMOJI } = require(`${BASE_DIR}/config`);
-const Ffmpeg = require(`${BASE_DIR}/services/ffmpeg`); // ✅ Importar el ffmpeg centralizado
+const Ffmpeg = require(`${BASE_DIR}/services/ffmpeg`);
 
 module.exports = {
   name: "sticker",
@@ -24,7 +24,8 @@ module.exports = {
     sendErrorReply,
     sendWaitReact,
     sendSuccessReact,
-    sendStickerFromFile,
+    remoteJid, // 👈 Inyectamos el JID del chat
+    socket, // 👈 O client / conn según cómo reciba el socket tu framework
     userJid,
   }) => {
     if (!isImage && !isVideo) {
@@ -88,9 +89,11 @@ module.exports = {
       await sendSuccessReact();
 
       // -------------------
-      // ENVIAR STICKER
+      // ENVIAR STICKER SIN CITA / SIN CONTORNO
       // -------------------
-      await sendStickerFromFile(stickerPath);
+      await socket.sendMessage(remoteJid, {
+        sticker: fs.readFileSync(stickerPath),
+      });
 
       // -------------------
       // LIMPIEZA
@@ -107,3 +110,5 @@ module.exports = {
     }
   },
 };
+
+

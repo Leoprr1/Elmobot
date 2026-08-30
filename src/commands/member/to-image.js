@@ -7,7 +7,7 @@ const Ffmpeg = require(`${BASE_DIR}/services/ffmpeg`);
 
 module.exports = {
   name: "toimage",
-  description: "Convierte stickers estáticos o animados a PNG o GIF",
+  description: "Convierte stickers estáticos o animados a PNG o Video MP4",
   commands: ["toimage", "toimg"],
   usage: `${PREFIX}toimage (responde a un sticker)`,
 
@@ -18,10 +18,11 @@ module.exports = {
     sendWaitReact,
     sendSuccessReact,
     sendImageFromFile,
+    sendVideoFromFile,
     sendErrorReply,
   }) => {
     if (!isSticker) {
-      throw new InvalidParameterError("¡Necesitas enviar un sticker!");
+      throw new InvalidParameterError("¡Necesitas responder a un sticker!");
     }
 
     await sendWaitReact();
@@ -29,51 +30,69 @@ module.exports = {
     const outputBase = getRandomName();
     const outputPath = path.resolve(TEMP_DIR, outputBase);
     let inputPath = null;
+    let finalOutput = null;
 
     try {
       // -------------------
-      // DESCARGAR STICKER
+      // DESCARGAR STICKER CON NOMBRE ÚNICO
       // -------------------
-      inputPath = await downloadSticker(webMessage, "input");
+      const uniqueInputName = `input_${getRandomName()}`;
+      inputPath = await downloadSticker(webMessage, uniqueInputName);
 
       if (!fs.existsSync(inputPath) || fs.statSync(inputPath).size === 0) {
         throw new Error("El sticker descargado está vacío o corrupto");
       }
 
       // -------------------
-      // DETECTAR SI ES ANIMADO (WebP animado = VP8 + ANIM chunk)
+      // DETECTAR SI ES ANIMADO
       // -------------------
-      const buffer = await fs.promises.readFile(inputPath);
-      const isAnimated = buffer.includes(Buffer.from("VP8L")) || buffer.includes(Buffer.from("VP8X"));
-
-      const finalOutput = isAnimated ? `${outputPath}.gif` : `${outputPath}.png`;
+      const isAnimated = await Ffmpeg.isWebpAnimated(inputPath);
 
       // -------------------
-      // CONVERTIR SEGÚN TIPO
+      // CONVERTIR Y ENVIAR SEGÚN TIPO
       // -------------------
       if (isAnimated) {
-        await Ffmpeg.convertWebpToGif(inputPath, finalOutput); // ahora maneja WebP animado correctamente
+        finalOutput = `${outputPath}.mp4`;
+        await Ffmpeg.convertWebpToGif(inputPath, finalOutput);
+
+        if (!fs.existsSync(finalOutput)) {
+          throw new Error("FFmpeg no creó el archivo MP4 de salida");
+        }
+
+        await sendSuccessReact();
+        
+        if (typeof sendVideoFromFile === "function") {
+          await sendVideoFromFile(finalOutput, true);
+        } else {
+          await sendImageFromFile(finalOutput);
+        }
       } else {
+        finalOutput = `${outputPath}.png`;
         await Ffmpeg.convertWebpToPng(inputPath, finalOutput);
-      }
 
-      if (!fs.existsSync(finalOutput)) {
-        throw new Error("FFmpeg no creó el archivo de salida");
-      }
+        if (!fs.existsSync(finalOutput)) {
+          throw new Error("FFmpeg no creó el archivo PNG de salida");
+        }
 
-      await sendSuccessReact();
-      await sendImageFromFile(finalOutput);
+        await sendSuccessReact();
+        await sendImageFromFile(finalOutput);
+      }
 
       // -------------------
       // LIMPIEZA
       // -------------------
       await Ffmpeg.cleanup(inputPath);
-      await Ffmpeg.cleanup(finalOutput);
+      if (finalOutput) await Ffmpeg.cleanup(finalOutput);
 
     } catch (err) {
       console.error("[TOIMAGE ERROR]", err);
       if (inputPath && fs.existsSync(inputPath)) await Ffmpeg.cleanup(inputPath);
+      if (finalOutput && fs.existsSync(finalOutput)) await Ffmpeg.cleanup(finalOutput);
       return sendErrorReply(`❌ Error al procesar el sticker: ${err.message}`);
     }
   },
 };
+
+
+
+

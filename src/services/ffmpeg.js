@@ -1,5 +1,5 @@
 /**
- * Servicios de procesamiento de media con solo ffmpeg.
+ * Servicios de procesamiento de media con ffmpeg + sharp.
  * Versión optimizada y estable para stickers (imagen + video).
  */
 
@@ -8,6 +8,7 @@ const path = require("node:path");
 const https = require("https");
 const http = require("http");
 const ffmpeg = require("fluent-ffmpeg");
+const sharp = require("sharp");
 const { exec } = require("node:child_process");
 
 // Binario centralizado
@@ -39,15 +40,17 @@ class FfmpegService {
   async downloadImage(url, outputPath) {
     return new Promise((resolve, reject) => {
       const client = url.startsWith("https") ? https : http;
-      client.get(url, (res) => {
-        if (res.statusCode !== 200)
-          return reject(new Error(`HTTP ${res.statusCode}`));
-        const file = fs.createWriteStream(outputPath);
-        res.pipe(file);
-        file.on("finish", () => {
-          file.close(resolve);
-        });
-      }).on("error", reject);
+      client
+        .get(url, (res) => {
+          if (res.statusCode !== 200)
+            return reject(new Error(`HTTP ${res.statusCode}`));
+          const file = fs.createWriteStream(outputPath);
+          res.pipe(file);
+          file.on("finish", () => {
+            file.close(resolve);
+          });
+        })
+        .on("error", reject);
     });
   }
 
@@ -94,52 +97,77 @@ class FfmpegService {
     const outputPath = await this._createTempFilePath();
     return this._runFfmpeg(inputPath, outputPath, [
       "-vf scale=iw/6:ih/6,scale=iw*6:ih*6:flags=neighbor",
-      
     ]);
   }
 
+  // -------------------
+  // DETECTAR SI WEBP ES ANIMADO
+  // -------------------
   async isWebpAnimated(inputPath) {
-  return new Promise((resolve) => {
-    ffmpeg(inputPath)
-      .ffprobe((err, data) => {
-        if (err) return resolve(false);
-        const streams = data.streams || [];
-        const videoStream = streams.find(s => s.codec_type === "video");
-        if (!videoStream) return resolve(false);
-        // Si tiene más de un frame, es animado
-        resolve(videoStream.nb_frames && parseInt(videoStream.nb_frames) > 1);
-      });
-  });
-}
-  // -------------------
-// CONVERTIR WEBP ANIMADO A GIF
-// -------------------
-async convertWebpToGif(inputPath, outputPath = null) {
-  if (!outputPath) outputPath = await this._createTempFilePath("gif");
-
-  const options = [
-    "-vf fps=15,scale=512:-1:flags=lanczos", // frames por segundo + redimension
-    "-loop 0" // loop infinito
-  ];
-
-  return this._runFfmpeg(inputPath, outputPath, options);
-}
+    try {
+      const metadata = await sharp(inputPath, { animated: true }).metadata();
+      return Boolean(metadata.pages && metadata.pages > 1);
+    } catch {
+      return false;
+    }
+  }
 
   // -------------------
-// CONVERTIR WEBP A PNG
-// -------------------
-async convertWebpToPng(inputPath, outputPath = null) {
-  if (!outputPath) outputPath = await this._createTempFilePath("png");
-  const options = ["-vcodec png"];
-  return this._runFfmpeg(inputPath, outputPath, options);
-}
+  // CONVERTIR WEBP ANIMADO A MP4 (COMPATIBLE CON WHATSAPP)
   // -------------------
-  // CONVERTIR A STICKER (PRO ESTABLE)
+  async convertWebpToGif(inputPath, outputPath = null) {
+    const tempGifPath = await this._createTempFilePath("gif");
+    if (!outputPath) outputPath = await this._createTempFilePath("mp4");
+
+    try {
+      // 1. Sharp genera el GIF temporal sin metadata de WhatsApp
+      await sharp(inputPath, { animated: true })
+        .gif({ loop: 0 })
+        .toFile(tempGifPath);
+
+      // 2. FFmpeg convierte el GIF a MP4 usando la estructura compatible con WhatsApp
+      const options = [
+        "-c:v libx264",
+        "-pix_fmt yuv420p",
+        "-vf scale=trunc(iw/2)*2:trunc(ih/2)*2", // Dimensiones pares requeridas por H.264
+        "-movflags +faststart",
+      ];
+
+      const result = await this._runFfmpeg(tempGifPath, outputPath, options);
+      this.cleanup(tempGifPath);
+      return result;
+
+    } catch (err) {
+      this.cleanup(tempGifPath);
+      throw err;
+    }
+  }
+
+  // -------------------
+  // CONVERTIR WEBP A PNG (ESTÁTICO)
+  // -------------------
+  async convertWebpToPng(inputPath, outputPath = null) {
+    if (!outputPath) outputPath = await this._createTempFilePath("png");
+
+    try {
+      await sharp(inputPath, { animated: false })
+        .png()
+        .toFile(outputPath);
+
+      return outputPath;
+    } catch {
+      return this._runFfmpeg(inputPath, outputPath, ["-vcodec png"]);
+    }
+  }
+
+  // -------------------
+  // CONVERTIR A STICKER (TRANSPARENTE PRO)
   // -------------------
   async convertToSticker(inputPath, outputPath = null, isImage = false) {
     if (!outputPath) outputPath = await this._createTempFilePath("webp");
 
     const scaleFilter =
+      "format=yuva420p," +
       "scale=512:512:force_original_aspect_ratio=decrease," +
       "pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000000";
 
@@ -147,6 +175,7 @@ async convertWebpToPng(inputPath, outputPath = null) {
       const options = [
         "-vcodec libwebp",
         `-vf ${scaleFilter}`,
+        "-pix_fmt yuva420p",
         "-lossless 0",
         "-compression_level 6",
         "-qscale 90",
@@ -156,6 +185,7 @@ async convertWebpToPng(inputPath, outputPath = null) {
       const options = [
         "-vcodec libwebp",
         `-vf ${scaleFilter},fps=12`,
+        "-pix_fmt yuva420p",
         "-loop 0",
         "-an",
         "-t 8",
@@ -163,10 +193,8 @@ async convertWebpToPng(inputPath, outputPath = null) {
         "-lossless 0",
         "-compression_level 6",
         "-qscale 60",
-        "-metadata",
-        "title=",
-        "-metadata",
-        "author=",
+        "-metadata title=",
+        "-metadata author=",
       ];
       return this._runFfmpeg(inputPath, outputPath, options);
     }
@@ -207,8 +235,16 @@ async convertWebpToPng(inputPath, outputPath = null) {
   // LIMPIEZA
   // -------------------
   async cleanup(filePath) {
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    if (filePath && fs.existsSync(filePath)) {
+      try {
+        fs.unlinkSync(filePath);
+      } catch {}
+    }
   }
 }
 
 module.exports = new FfmpegService();
+
+
+
+

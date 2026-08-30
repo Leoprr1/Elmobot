@@ -27,7 +27,6 @@ const logger = pino({ level: "silent" });
 
 // Por esto (expira llaves a los 5 minutos y las borra de la RAM automáticamente):
 const msgRetryCounterCache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
-const groupCache = new NodeCache({ stdTTL: 60 * 60 * 24 });
 
 let socketGlobal = null;
 let reconnecting = false;
@@ -127,10 +126,10 @@ async function handleReconnect(reason) {
     // Destruir socket viejo de forma limpia si aún existe
     if (socketGlobal) {
       try {
-        socketGlobal.ev.removeAllListeners("connection.update");
-        socketGlobal.ev.removeAllListeners("messages.upsert");
+        socketGlobal.ev.removeAllListeners();
         socketGlobal.ws?.close();
       } catch {}
+      socketGlobal = null;
     }
 
     await new Promise((r) => setTimeout(r, 3000)); // Espera 3s
@@ -161,6 +160,15 @@ async function connect() {
 
   const { state, saveCreds } = await useMultiFileAuthState(authPath);
   const { version, isLatest } = await fetchLatestBaileysVersion();
+
+  // Limpieza de seguridad si se llama directamente
+  if (socketGlobal) {
+    try {
+      socketGlobal.ev.removeAllListeners();
+      socketGlobal.ws?.close();
+    } catch {}
+    socketGlobal = null;
+  }
 
   const socket = makeWASocket({
     version,
@@ -258,6 +266,8 @@ async function connect() {
 }
 
 exports.connect = connect;
+
+
 
 
 

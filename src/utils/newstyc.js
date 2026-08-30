@@ -50,10 +50,14 @@ async function initBrowser() {
       "--disable-dev-shm-usage",
       "--disable-accelerated-2d-canvas",
       "--disable-gpu",
+      "--single-process", // ⚡ Evita la duplicación masiva de procesos en Windows/Linux
+      "--no-zygote", // ⚡ Impide la creación de procesos 'Zygote' auxiliares
     ],
   });
 
-  globalPage = await globalBrowser.newPage();
+  // Reutiliza la primera pestaña creada por Puppeteer para no generar páginas huérfanas
+  const pages = await globalBrowser.pages();
+  globalPage = pages.length > 0 ? pages[0] : await globalBrowser.newPage();
 
   // Bloqueo de recursos no esenciales para máxima velocidad y ahorro de memoria
   await globalPage.setRequestInterception(true);
@@ -310,6 +314,7 @@ async function startTyCSystem(sock) {
 }
 
 module.exports = { startTyCSystem };
+
 
 
 

@@ -63,7 +63,8 @@ exports.processStaticSticker = async (inputPath, metadata) => {
   return new Promise((resolve, reject) => {
     const tempOutputPath = path.resolve(TEMP_DIR, getRandomName("webp"));
 
-    const cmd = `ffmpeg -i "${inputPath}" -vf "scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2" -f webp -quality 90 "${tempOutputPath}"`;
+    // ⚡ color=0x00000000 y format=rgba garantizan el fondo transparente sin bordes negros
+    const cmd = `ffmpeg -i "${inputPath}" -vf "scale=512:512:force_original_aspect_ratio=decrease,format=rgba,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000000" -f webp -quality 90 "${tempOutputPath}"`;
 
     exec(cmd, async (error, _, stderr) => {
       try {
@@ -95,7 +96,8 @@ exports.processAnimatedSticker = async (inputPath, metadata) => {
   return new Promise((resolve, reject) => {
     const tempOutputPath = path.resolve(TEMP_DIR, getRandomName("webp"));
 
-    const cmd = `ffmpeg -i "${inputPath}" -t 8 -vf "scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2,fps=15" -c:v libwebp -quality 75 -compression_level 6 -loop 0 -preset default -an -f webp "${tempOutputPath}"`;
+    // ⚡ Se añade color=0x00000000 en el pad de stickers animados
+    const cmd = `ffmpeg -i "${inputPath}" -t 8 -vf "scale=512:512:force_original_aspect_ratio=decrease,format=rgba,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000000,fps=15" -c:v libwebp -quality 75 -compression_level 6 -loop 0 -preset default -an -f webp "${tempOutputPath}"`;
 
     exec(cmd, async (error, _, stderr) => {
       try {
@@ -122,3 +124,6 @@ exports.processAnimatedSticker = async (inputPath, metadata) => {
     });
   });
 };
+
+
+

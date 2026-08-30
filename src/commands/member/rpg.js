@@ -2152,7 +2152,7 @@ if (cmd === "academia" && !rest[0]) {
     { key: "magia", nombre: "✨ Magia", desc: "Aumenta daño mágico", costo: 6000 },
     { key: "curacion", nombre: "💖 Curación", desc: "Mejora regeneración de HP", costo: 5000 },
     { key: "controlEspada", nombre: "⚔️ ControlEspada", desc: "Aumenta precisión y crítico", costo: 5500 },
-    { key: "manaMax", nombre: "🔮 Mana máximo", desc: "Incrementa maná máximo", costo: 5000 }
+    { key: "manaMax", nombre: "🔮 manaMax", desc: "Incrementa maná máximo", costo: 5000 }
   ];
 
   const MAX_ENTRENOS = 3;
@@ -2190,13 +2190,13 @@ if (cmd === "academia" && !rest[0]) {
     texto += `${esp.nombre}: Nivel ${nivel}\n[${barra}]\n${esp.desc}\nEntrenos actuales: ${entrenos}/${MAX_ENTRENOS} ${bloqueCompleto ? "⏳" : ""}\n${cdText}\nCosto: ${esp.costo}💰\n\n`;
   });
 
-  texto += `Para entrenar una especialidad escribí:\n.rpg academia entrenar <especialidad>\nEjemplo: .rpg academia entrenar fuerza`;
+  texto += `Para entrenar una especialidad escribí:\n.rpg academia entrenar <especialidad>\n.rpg academia entrenarall <especialidad>\nEjemplo: .rpg academia entrenarall fuerza`;
 
   return sendReply(texto);
 }
 
 // -----------------------------
-// Entrenamiento de Academia
+// Entrenamiento de Academia (Individual)
 // -----------------------------
 if (cmd === "academia" && rest[0] === "entrenar") {
   const user = you;
@@ -2277,6 +2277,96 @@ if (cmd === "academia" && rest[0] === "entrenar") {
     `✅ Entrenaste *${key}*\n💰 Coste: ${costos[key]} monedas\n🎖️ Ganaste ${xpGana} XP\nNivel actual: ${user.academia.especialidades[key]}\nEntrenos en bloque: ${entrenosData.count}/${MAX_ENTRENOS}\n${recompensa}`
   );
 }
+
+// -----------------------------
+// NUEVO: Entrenamiento de Academia (ALL / Todo el bloque disponible)
+// -----------------------------
+if (cmd === "academia" && (rest[0] === "entrenarall" || rest[0] === "all")) {
+  const user = you;
+  if (!user.academia) user.academia = { especialidades: {}, entrenosHoy: {} };
+
+  const inputKey = rest[1];
+  const costos = {
+    fuerza: 5000,
+    agilidad: 4000,
+    defensa: 4500,
+    magia: 6000,
+    curacion: 5000,
+    controlEspada: 5500,
+    manaMax: 5000
+  };
+
+  const key = Object.keys(costos).find(k => k.toLowerCase() === (inputKey || "").toLowerCase());
+  if (!key) return sendReply("❌ Especialidad inválida. Ej: .rpg academia entrenarall fuerza");
+
+  if (!user.academia.especialidades[key]) user.academia.especialidades[key] = 0;
+  if (!user.academia.entrenosHoy[key]) user.academia.entrenosHoy[key] = { count: 0, last: 0 };
+
+  const MAX_ENTRENOS = 3;
+  const COOLDOWN = 60 * 60 * 1000;
+  const ahora = Date.now();
+  const entrenosData = user.academia.entrenosHoy[key];
+
+  if (entrenosData.count >= MAX_ENTRENOS) {
+    const tiempoPasado = ahora - entrenosData.last;
+    if (tiempoPasado < COOLDOWN) {
+      const restanteMs = COOLDOWN - tiempoPasado;
+      const min = Math.floor(restanteMs / 60000);
+      const sec = Math.floor((restanteMs % 60000) / 1000);
+      return sendReply(`❌ Ya completaste los 3 entrenamientos. Espera ${min}m ${sec}s para el siguiente bloque.`);
+    } else {
+      entrenosData.count = 0;
+    }
+  }
+
+  const faltantes = MAX_ENTRENOS - entrenosData.count;
+  const costoTotal = costos[key] * faltantes;
+
+  if ((user.monedas || 0) < costoTotal) {
+    return sendReply(`❌ No tienes suficientes monedas para entrenar ${faltantes} vez/veces. Necesitas ${costoTotal}💰`);
+  }
+
+  if (!user.fuerzaBonus) user.fuerzaBonus = 0;
+  if (!user.agilidadBonus) user.agilidadBonus = 0;
+  if (!user.defensaBonus) user.defensaBonus = 0;
+  if (!user.magiaBonus) user.magiaBonus = 0;
+  if (!user.curacionBonus) user.curacionBonus = 0;
+  if (!user.precisionBonus) user.precisionBonus = 0;
+  if (!user.manamax) user.manamax = 100;
+
+  user.monedas -= costoTotal;
+  user.academia.especialidades[key] += faltantes;
+  entrenosData.count += faltantes;
+  entrenosData.last = ahora;
+
+  switch(key) {
+    case "fuerza": user.fuerzaBonus += 2 * faltantes; break;
+    case "agilidad": user.agilidadBonus += 1.5 * faltantes; break;
+    case "defensa": user.defensaBonus += 1.8 * faltantes; break;
+    case "magia": user.magiaBonus += 2.2 * faltantes; break;
+    case "curacion": user.curacionBonus += 2 * faltantes; break;
+    case "controlEspada": user.precisionBonus += 1.5 * faltantes; break;
+    case "manaMax": user.manamax += 5 * faltantes; break;
+  }
+
+  let xpTotal = 0;
+  for (let i = 0; i < faltantes; i++) {
+    xpTotal += 500 + Math.floor(Math.random() * 15);
+  }
+  addXP(user, xpTotal);
+  saveDB();
+
+  let recompensa = "";
+  if (user.academia.especialidades[key] % 10 === 0) {
+    recompensa = `🎉 ¡Hito alcanzado! Bonus especial aplicado en ${key} 🎉\n`;
+  }
+
+  return sendReply(
+    `✅ Entrenaste *${key}* (${faltantes}x)\n💰 Coste total: ${costoTotal} monedas\n🎖️ Ganaste ${xpTotal} XP\nNivel actual: ${user.academia.especialidades[key]}\nEntrenos en bloque: ${entrenosData.count}/${MAX_ENTRENOS}\n${recompensa}`
+  );
+}
+
+
 
 
 

@@ -1,208 +1,186 @@
-// cleaner.js - Optimizado y adaptado a límites de RAM (sin romper sesión)
+// cleaner.js - Ultra Optimización de RAM + Limpieza de Archivos Temporales
 
-const { infoLog, warningLog } = require("./src/utils/logger");
-
-const NORMAL_INTERVAL = 60_000;
-const RECONNECT_INTERVAL = 15_000;
-const DEEP_CLEAN_INTERVAL = 5 * 60 * 1000;
-
-// 🎯 Detección de límite asignado a Node.js (--max-old-space-size)
+const fs = require("fs");
+const path = require("path");
 const v8 = require("v8");
-const heapLimitMB = Math.round(v8.getHeapStatistics().heap_size_limit / 1024 / 1024);
+const { infoLog, warningLog } = require("./src/utils/logger");
+const { TEMP_DIR } = require("./src/config"); // Asegúrate que la ruta sea correcta a tu config
 
-// Umbrales calculados proporcionalmente (o fallback seguro)
-const MEMORY_THRESHOLD_MB = Math.round(heapLimitMB * 0.4) || 500; 
-const MEMORY_CRITICAL_MB = Math.round(heapLimitMB * 0.75) || 900;
+const NORMAL_INTERVAL = 45_000;
+const DEEP_CLEAN_INTERVAL = 3 * 60 * 1000;
+
+// Detección de límite de memoria RAM
+const heapLimitMB = Math.round(v8.getHeapStatistics().heap_size_limit / 1024 / 1024);
+const MEMORY_THRESHOLD_MB = Math.round(heapLimitMB * 0.35) || 400; 
+const MEMORY_CRITICAL_MB = Math.round(heapLimitMB * 0.70) || 800;
 
 let lastGC = 0;
 
-module.exports = function (bot, queues = {}) {
-
+module.exports = function (botGlobal, queues = {}) {
   const { IDROPS, TEMP_QUEUE, EVENT_QUEUE, LOGS } = queues;
 
   // -----------------------------
-  // GC CONTROLADO
+  // 1. RECOLECTOR DE BASURA (GC)
   // -----------------------------
   function runGC(force = false) {
     if (!global.gc) return;
 
     const memUsageMB = process.memoryUsage().heapUsed / 1024 / 1024;
-
-    // Solo ejecuta GC si supera el umbral (o si se fuerza por estado crítico)
-    if (!force && memUsageMB < MEMORY_THRESHOLD_MB) return;
-
     const now = Date.now();
 
-    // Evitar spam de GC (salvo que sea forzado por memoria crítica)
-    if (!force && (now - lastGC < 30_000)) return;
+    if (!force && memUsageMB < MEMORY_THRESHOLD_MB) return;
+    if (!force && (now - lastGC < 20_000)) return;
 
     const before = process.memoryUsage().heapUsed;
     global.gc();
     const after = process.memoryUsage().heapUsed;
 
     lastGC = now;
-
-    console.log(`[CLEANER] GC | ${((before - after)/1024/1024).toFixed(2)} MB liberados | Heap: ${(after/1024/1024).toFixed(2)} MB / ${heapLimitMB} MB`);
+    const freed = ((before - after) / 1024 / 1024).toFixed(2);
+    if (parseFloat(freed) > 1.0) {
+      console.log(`[CLEANER] 🧹 GC ejecutado | ${freed} MB liberados | RAM Heap actual: ${(after / 1024 / 1024).toFixed(2)} MB`);
+    }
   }
 
   // -----------------------------
-  // Limpieza normal
+  // 2. LIMPIEZA DE CARPETA TEMP DISCO/RAM
+  // -----------------------------
+  function cleanTempFiles() {
+    try {
+      if (!TEMP_DIR || !fs.existsSync(TEMP_DIR)) return;
+
+      const files = fs.readdirSync(TEMP_DIR);
+      const now = Date.now();
+      let deletedCount = 0;
+
+      for (const file of files) {
+        // Ignora archivos ocultos o de sistema
+        if (file.startsWith(".")) continue;
+
+        const filePath = path.join(TEMP_DIR, file);
+        try {
+          const stats = fs.statSync(filePath);
+          // Si el archivo temporal tiene más de 2 minutos de creado, se elimina
+          if (now - stats.mtimeMs > 2 * 60 * 1000) {
+            fs.unlinkSync(filePath);
+            deletedCount++;
+          }
+        } catch {}
+      }
+
+      if (deletedCount > 0) {
+        infoLog(`[CLEANER] 🗑️ ${deletedCount} archivos temporales residuales borrados.`);
+      }
+    } catch (err) {
+      warningLog("Error al limpiar archivos temporales:", err.message);
+    }
+  }
+
+  // -----------------------------
+  // 3. LIMPIEZA DE CACHÉ INTERNA
+  // -----------------------------
+  function cleanCaches() {
+    try {
+      // Limpia caché interna de grupos si supera los 200 ítems
+      if (global.GROUP_CACHE && typeof global.GROUP_CACHE === "object") {
+        const keys = Object.keys(global.GROUP_CACHE);
+        if (keys.length > 200) {
+          // Conserva solo los últimos 100
+          keys.slice(0, keys.length - 100).forEach(key => delete global.GROUP_CACHE[key]);
+        }
+      }
+    } catch (err) {
+      warningLog("Error limpiando caché de grupos:", err.message);
+    }
+  }
+
+  // -----------------------------
+  // 4. LIMPIEZA REGULAR
   // -----------------------------
   function cleanMemory() {
     try {
       const now = Date.now();
 
+      // Limpia arreglos de colas
       if (Array.isArray(IDROPS) && IDROPS.length > 0) {
         for (let i = IDROPS.length - 1; i >= 0; i--) {
-          if (now - IDROPS[i].creado > 5000) {
+          if (now - (IDROPS[i].creado || now) > 3000) {
             IDROPS.splice(i, 1);
           }
         }
       }
 
-      if (Array.isArray(TEMP_QUEUE) && TEMP_QUEUE.length > 50) {
-        TEMP_QUEUE.length = 0;
-      }
+      if (Array.isArray(TEMP_QUEUE) && TEMP_QUEUE.length > 20) TEMP_QUEUE.length = 0;
+      if (Array.isArray(EVENT_QUEUE) && EVENT_QUEUE.length > 20) EVENT_QUEUE.length = 0;
+      if (Array.isArray(LOGS) && LOGS.length > 200) LOGS.splice(0, LOGS.length - 100);
 
-      if (Array.isArray(EVENT_QUEUE) && EVENT_QUEUE.length > 50) {
-        EVENT_QUEUE.length = 0;
-      }
-
-      if (Array.isArray(LOGS) && LOGS.length > 500) {
-        LOGS.splice(0, 400);
-      }
-
+      cleanCaches();
+      cleanTempFiles();
       runGC();
 
-      const memUsageMB = process.memoryUsage().heapUsed / 1024 / 1024;
-
-      if (memUsageMB > MEMORY_THRESHOLD_MB) {
-        warningLog(`⚠️ RAM alta: ${memUsageMB.toFixed(2)} MB (Límite: ${MEMORY_THRESHOLD_MB} MB)`);
-      }
-
     } catch (err) {
-      warningLog("Error limpieza normal:", err.message);
+      warningLog("Error en limpieza regular:", err.message);
     }
   }
 
   // -----------------------------
-  // Limpieza agresiva
-  // -----------------------------
-  function aggressiveClean() {
-    try {
-
-      if (Array.isArray(IDROPS)) IDROPS.length = 0;
-      if (Array.isArray(TEMP_QUEUE)) TEMP_QUEUE.length = 0;
-      if (Array.isArray(EVENT_QUEUE)) EVENT_QUEUE.length = 0;
-
-      if (Array.isArray(LOGS) && LOGS.length > 50) {
-        LOGS.splice(0, LOGS.length - 50);
-      }
-
-      runGC(true); // Fuerza GC en reconexión
-
-      warningLog("⚡ Limpieza agresiva (reconexión)");
-
-    } catch (err) {
-      warningLog("Error limpieza agresiva:", err.message);
-    }
-  }
-
-  // -----------------------------
-  // Deep clean
+  // 5. DEEP CLEAN & MEMORIA CRÍTICA
   // -----------------------------
   function deepClean() {
     try {
-
       if (Array.isArray(IDROPS)) IDROPS.length = 0;
+      if (Array.isArray(TEMP_QUEUE)) TEMP_QUEUE.length = 0;
+      if (Array.isArray(EVENT_QUEUE)) EVENT_QUEUE.length = 0;
+      if (Array.isArray(LOGS) && LOGS.length > 50) LOGS.splice(0, LOGS.length - 50);
 
-      if (Array.isArray(TEMP_QUEUE) && TEMP_QUEUE.length > 20) {
-        TEMP_QUEUE.length = 0;
-      }
-
-      if (Array.isArray(EVENT_QUEUE) && EVENT_QUEUE.length > 20) {
-        EVENT_QUEUE.length = 0;
-      }
-
-      if (Array.isArray(LOGS) && LOGS.length > 100) {
-        LOGS.splice(0, LOGS.length - 100);
-      }
-
-      runGC(true);
-
-      infoLog("🧠 Deep clean completado");
+      cleanCaches();
+      cleanTempFiles();
+      runGC(true); // Fuerza recolección profunda
 
     } catch (err) {
-      warningLog("Error deep clean:", err.message);
+      warningLog("Error en Deep Clean:", err.message);
     }
   }
 
-  // -----------------------------
-  // Memoria crítica
-  // -----------------------------
-  function memoryPressureClean() {
+  function checkMemoryPressure() {
     try {
-
       const memUsageMB = process.memoryUsage().heapUsed / 1024 / 1024;
 
       if (memUsageMB > MEMORY_CRITICAL_MB) {
-
-        warningLog(`🚨 RAM crítica (${memUsageMB.toFixed(2)} MB)`);
+        warningLog(`🚨 RAM Crítica detectada (${memUsageMB.toFixed(2)} MB / ${heapLimitMB} MB). Forzando vaciado...`);
 
         if (Array.isArray(IDROPS)) IDROPS.length = 0;
         if (Array.isArray(TEMP_QUEUE)) TEMP_QUEUE.length = 0;
         if (Array.isArray(EVENT_QUEUE)) EVENT_QUEUE.length = 0;
-
         if (Array.isArray(LOGS)) LOGS.length = 0;
 
-        runGC(true); // Fuerza GC sin esperar los 30s
-      }
+        if (global.GROUP_CACHE) global.GROUP_CACHE = {};
 
+        runGC(true);
+      }
     } catch (err) {
-      warningLog("Error memoria crítica:", err.message);
+      warningLog("Error chequeando presión de memoria:", err.message);
     }
   }
 
   // -----------------------------
-  // LOOP PRINCIPAL
+  // CRONOGRAMA Y TEMPORIZADORES
   // -----------------------------
   setInterval(() => {
-    try {
-      if (bot.reconnecting) {
-        aggressiveClean();
-      } else {
-        cleanMemory();
-      }
-
-      memoryPressureClean();
-
-    } catch (err) {
-      warningLog("Error loop principal:", err.message);
-    }
+    cleanMemory();
+    checkMemoryPressure();
   }, NORMAL_INTERVAL);
 
-  // -----------------------------
-  // LOOP RECONEXIÓN
-  // -----------------------------
-  setInterval(() => {
-    if (bot.reconnecting) {
-      aggressiveClean();
-    }
-  }, RECONNECT_INTERVAL);
-
-  // -----------------------------
-  // DEEP CLEAN
-  // -----------------------------
   setInterval(deepClean, DEEP_CLEAN_INTERVAL);
 
-  // -----------------------------
-  // LOG CONTROLADO
-  // -----------------------------
   setInterval(() => {
-    const memUsageMB = process.memoryUsage().heapUsed / 1024 / 1024;
-    infoLog(`🧹 RAM Heap: ${memUsageMB.toFixed(2)} MB / ${heapLimitMB} MB`);
-  }, 60_000);
+    const mem = process.memoryUsage();
+    const heapUsed = (mem.heapUsed / 1024 / 1024).toFixed(2);
+    const rss = (mem.rss / 1024 / 1024).toFixed(2);
+    infoLog(`🧹 [ESTADO RAM] Heap: ${heapUsed} MB | RSS Total: ${rss} MB / Límite: ${heapLimitMB} MB`);
+  }, 120_000);
 
-  infoLog(`🚀 Cleaner iniciado (Tope asignado: ${heapLimitMB} MB | Alerta: ${MEMORY_THRESHOLD_MB} MB)`);
+  infoLog(`🚀 Ultra Cleaner activado (Tope asignado: ${heapLimitMB} MB | Umbral Alerta: ${MEMORY_THRESHOLD_MB} MB)`);
 };
+
 

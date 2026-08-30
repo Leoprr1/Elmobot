@@ -62,6 +62,7 @@ async function startBot() {
 
     async function initSocket() {
       try {
+        // Llama a connect() y deja que connection.js tome el control de las reconexiones
         socketGlobal = await connect();
 
         setTimeout(() => startTyCSystem(socketGlobal), 10000);
@@ -70,7 +71,7 @@ async function startBot() {
 
         successLog("✅ Bot iniciado y listo.");
       } catch (err) {
-        errorError(`Error al inicializar socket: ${err.message}`);
+        errorLog(`Error al inicializar socket: ${err.message}`);
         setTimeout(initSocket, 5000);
       }
     }
@@ -99,5 +100,7 @@ async function startBot() {
 }
 
 startBot();
+
+
 
 
