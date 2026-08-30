@@ -6,13 +6,13 @@ const v8 = require("v8");
 const { infoLog, warningLog } = require("./src/utils/logger");
 const { TEMP_DIR } = require("./src/config"); // Asegúrate que la ruta sea correcta a tu config
 
-const NORMAL_INTERVAL = 45_000;
-const DEEP_CLEAN_INTERVAL = 3 * 60 * 1000;
+const NORMAL_INTERVAL = 15_000;
+const DEEP_CLEAN_INTERVAL = 1 * 60 * 1000;
 
 // Detección de límite de memoria RAM
 const heapLimitMB = Math.round(v8.getHeapStatistics().heap_size_limit / 1024 / 1024);
-const MEMORY_THRESHOLD_MB = Math.round(heapLimitMB * 0.35) || 400; 
-const MEMORY_CRITICAL_MB = Math.round(heapLimitMB * 0.70) || 800;
+const MEMORY_THRESHOLD_MB = Math.round(heapLimitMB * 0.20) || 400; 
+const MEMORY_CRITICAL_MB = Math.round(heapLimitMB * 0.50) || 800;
 
 let lastGC = 0;
 
@@ -29,7 +29,7 @@ module.exports = function (botGlobal, queues = {}) {
     const now = Date.now();
 
     if (!force && memUsageMB < MEMORY_THRESHOLD_MB) return;
-    if (!force && (now - lastGC < 20_000)) return;
+    if (!force && (now - lastGC < 10_000)) return;
 
     const before = process.memoryUsage().heapUsed;
     global.gc();
