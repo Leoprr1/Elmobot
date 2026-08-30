@@ -229,17 +229,27 @@ async function sendNewsToGroups(sock, newsItem, db) {
   const captionText = `📰 *Noticias TyC Sports*\n\n${newsItem.summary}\n\n🔗 ${newsItem.url}`;
 
   for (const group of db.groupsEnabled) {
-    try {
-      const msgOptions = newsItem.imageBuffer
-        ? { image: newsItem.imageBuffer, caption: captionText }
-        : { text: captionText };
+    let sent = false;
+    let attempts = 0;
+    const maxAttempts = 3;
 
-      await sock.sendMessage(group, msgOptions);
-      console.log("✅ Publicación enviada a:", group);
+    while (!sent && attempts < maxAttempts) {
+      attempts++;
+      try {
+        const msgOptions = newsItem.imageBuffer
+          ? { image: newsItem.imageBuffer, caption: captionText }
+          : { text: captionText };
 
-      await wait(1000);
-    } catch (err) {
-      console.error("Error enviando publicación al grupo", group, ":", err.message);
+        await sock.sendMessage(group, msgOptions);
+        console.log("✅ Publicación enviada a:", group);
+        sent = true;
+        await wait(1000);
+      } catch (err) {
+        console.error(`Error enviando publicación al grupo ${group} (Intento ${attempts}/${maxAttempts}):`, err.message);
+        if (attempts < maxAttempts) {
+          await wait(2500); // Pausa de recuperación antes de reintentar el envío
+        }
+      }
     }
   }
 }
@@ -314,6 +324,8 @@ async function startTyCSystem(sock) {
 }
 
 module.exports = { startTyCSystem };
+
+
 
 
 
