@@ -53,6 +53,12 @@ let saving = false;
 async function saveDB(data) {
   const dbData = data || DB;
 
+  // 🛡️ Validación de seguridad: Evita sobreescribir con un objeto vacío o nulo
+  if (!dbData || typeof dbData !== "object" || Object.keys(dbData).length === 0) {
+    console.error("[RPG] ⚠️ Intento de guardado abortado: Datos inválidos o vacíos.");
+    return;
+  }
+
   // 🔥 detectar cambios reales
   const currentSnapshot = JSON.stringify(dbData);
   if (currentSnapshot === global._lastDBSnapshot) return;
@@ -67,8 +73,14 @@ async function saveDB(data) {
   while (saveQueue.length > 0) {
     const dbToSave = saveQueue.shift();
     try {
-      // 🔥 sin indentación (menos CPU)
-      await fs.promises.writeFile(DB_FILE, JSON.stringify(dbToSave));
+      const tempFile = `${DB_FILE}.tmp`;
+      
+      // 1. Escribe en un archivo temporal primero
+      await fs.promises.writeFile(tempFile, JSON.stringify(dbToSave));
+      
+      // 2. Reemplazo atómico seguro (no deja el archivo en 0 bytes si se interrumpe)
+      await fs.promises.rename(tempFile, DB_FILE);
+      
       saveCount++;
     } catch (err) {
       console.error("[RPG] Error guardando DB:", err);
@@ -89,11 +101,11 @@ setInterval(() => {
     saveCount = 0;
   }
 
-  
-
 }, 30 * 1000);
 
 module.exports = { DB, loadDB, saveDB };
+
+
 
 
 // -----------------------------

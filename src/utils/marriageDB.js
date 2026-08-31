@@ -5,11 +5,33 @@ const DB_PATH = path.resolve(__dirname, "..", "database", "marriages.json");
 
 function readDB() {
   if (!fs.existsSync(DB_PATH)) return {};
-  return JSON.parse(fs.readFileSync(DB_PATH));
+  try {
+    const raw = fs.readFileSync(DB_PATH, "utf-8");
+    return raw.trim() ? JSON.parse(raw) : {};
+  } catch (err) {
+    console.error("[MARRIAGE DB] Error leyendo DB, resguardando datos:", err);
+    return {};
+  }
 }
 
 function writeDB(data) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+  // 🛡️ Validar que los datos existan y no sean vacíos/inválidos antes de escribir
+  if (!data || typeof data !== "object") {
+    console.error("[MARRIAGE DB] ⚠️ Intento de escritura abortado: Datos inválidos.");
+    return;
+  }
+
+  const tempPath = `${DB_PATH}.tmp`;
+
+  try {
+    // 1. Escribir primero en el archivo temporal
+    fs.writeFileSync(tempPath, JSON.stringify(data, null, 2));
+
+    // 2. Reemplazo atómico seguro a nivel OS (evita dejar el JSON en 0 bytes)
+    fs.renameSync(tempPath, DB_PATH);
+  } catch (err) {
+    console.error("[MARRIAGE DB] Error escribiendo en DB:", err);
+  }
 }
 
 function isMarried(user) {
@@ -56,3 +78,4 @@ module.exports = {
   marry,
   divorce
 };
+

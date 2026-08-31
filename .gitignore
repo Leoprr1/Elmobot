@@ -7,3 +7,17 @@ src/commands/cache/video/*
 
 # Ignorar cambios futuros en cookies.json para que no se suba con tus cookies reales
 src/commands/cache/cookies.json
+
+# Ignorar todos los backups .bak
+*.bak
+
+# Ignorar backups que contengan la palabra backup o marcas de fecha
+*backup*
+*backup*.json
+
+# Regla para la carpeta database: ignorar todos los JSON salvo los principales
+src/database/*.json
+!src/database/groupStats.json
+!src/database/marriages.json
+!src/database/rpg.json
+
