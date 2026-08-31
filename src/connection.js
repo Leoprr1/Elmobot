@@ -69,7 +69,7 @@ function startWatchdog() {
   disconnectTimer = setTimeout(() => {
     if (!isSocketAlive()) {
       warningLog("💀 Sigue desconectado tras 60s → reiniciando proceso...");
-      process.exit(1);
+      terminateProcess(1);
     }
   }, WATCHDOG_TIMEOUT);
 
@@ -113,6 +113,34 @@ async function cacheGroupMetadata(socket, jid) {
 }
 
 // ----------------------------
+// DESTRUCCIÓN DE SOCKET Y SUBPROCESOS
+// ----------------------------
+function destroyActiveSocket() {
+  if (socketGlobal) {
+    try {
+      socketGlobal.ev.removeAllListeners();
+      if (socketGlobal.ws) {
+        socketGlobal.ws.close();
+      }
+      if (typeof socketGlobal.end === "function") {
+        socketGlobal.end(new Error("Conexión finalizada manualmente"));
+      }
+    } catch {}
+    socketGlobal = null;
+  }
+}
+
+function terminateProcess(code = 0) {
+  clearWatchdog();
+  destroyActiveSocket();
+
+  // Da un margen de 200ms para liberar file descriptors y evitar procesos zombis antes de salir
+  setTimeout(() => {
+    process.exit(code);
+  }, 200);
+}
+
+// ----------------------------
 // Reconexión controlada
 // ----------------------------
 async function handleReconnect(reason) {
@@ -124,13 +152,7 @@ async function handleReconnect(reason) {
 
   try {
     // Destruir socket viejo de forma limpia si aún existe
-    if (socketGlobal) {
-      try {
-        socketGlobal.ev.removeAllListeners();
-        socketGlobal.ws?.close();
-      } catch {}
-      socketGlobal = null;
-    }
+    destroyActiveSocket();
 
     await new Promise((r) => setTimeout(r, 3000)); // Espera 3s
 
@@ -162,13 +184,7 @@ async function connect() {
   const { version, isLatest } = await fetchLatestBaileysVersion();
 
   // Limpieza de seguridad si se llama directamente
-  if (socketGlobal) {
-    try {
-      socketGlobal.ev.removeAllListeners();
-      socketGlobal.ws?.close();
-    } catch {}
-    socketGlobal = null;
-  }
+  destroyActiveSocket();
 
   const socket = makeWASocket({
     version,
@@ -249,7 +265,7 @@ async function connect() {
 
       if (reason === DisconnectReason.loggedOut) {
         errorLog("Sesión cerrada. Borra la carpeta auth y vuelve a escanear QR.");
-        process.exit(1);
+        terminateProcess(1);
       } else {
         handleReconnect(reason || connection);
       }
@@ -264,6 +280,10 @@ async function connect() {
 
   return socket;
 }
+
+// Intercepta las órdenes del sistema o de PM2 para garantizar el cierre total de sockets e hilos
+process.on("SIGINT", () => terminateProcess(0));
+process.on("SIGTERM", () => terminateProcess(0));
 
 exports.connect = connect;
 
