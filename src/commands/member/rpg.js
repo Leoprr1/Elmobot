@@ -59,26 +59,27 @@ async function saveDB(data) {
     return;
   }
 
-  // 🔥 detectar cambios reales
-  const currentSnapshot = JSON.stringify(dbData);
-  if (currentSnapshot === global._lastDBSnapshot) return;
+  // 🔥 Formatear en vertical con 2 espacios de sangría
+  const formattedJSON = JSON.stringify(dbData, null, 2);
 
-  global._lastDBSnapshot = currentSnapshot;
+  // 🔥 Detectar cambios reales comparando el resultado ya generado
+  if (formattedJSON === global._lastDBSnapshot) return;
+  global._lastDBSnapshot = formattedJSON;
 
-  saveQueue.push(dbData);
+  saveQueue.push(formattedJSON);
 
   if (saving) return;
   saving = true;
 
   while (saveQueue.length > 0) {
-    const dbToSave = saveQueue.shift();
+    const jsonToSave = saveQueue.shift();
     try {
       const tempFile = `${DB_FILE}.tmp`;
       
-      // 1. Escribe en un archivo temporal primero
-      await fs.promises.writeFile(tempFile, JSON.stringify(dbToSave));
+      // 1. Escribe en el archivo temporal formateado en vertical
+      await fs.promises.writeFile(tempFile, jsonToSave);
       
-      // 2. Reemplazo atómico seguro (no deja el archivo en 0 bytes si se interrumpe)
+      // 2. Reemplazo atómico seguro
       await fs.promises.rename(tempFile, DB_FILE);
       
       saveCount++;
