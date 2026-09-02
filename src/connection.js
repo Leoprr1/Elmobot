@@ -205,6 +205,8 @@ async function connect() {
   });
 
   socketGlobal = socket;
+  global.socketGlobal = socket; // ⚡ Hace accesible el socket reconectado para newtyc.js
+
 
   socket.ev.on("messages.upsert", async ({ messages, type }) => {
     if (type !== "notify" && type !== undefined) return;

@@ -1,7 +1,7 @@
 /**
  * newtyc.js — Sistema de noticias desde Instagram (TyC Sports)
  * Instancia persistente + Verificación de sesión inteligente.
- * Respeta el estado desactivado (enabled: false) sin tocar cookies ni abrir Puppeteer.
+ * Sincronización automática con global.socketGlobal ante reconexiones.
  */
 
 const puppeteer = require("puppeteer");
@@ -27,6 +27,19 @@ function generateHash(text) {
   return crypto.createHash("sha1").update(text).digest("hex");
 }
 
+// ⚡ Obtiene dinámicamente el socket activo desde la memoria global de Node.js
+function getActiveSocket(fallbackSock) {
+  // 1. Prioriza la instancia viva guardada globalmente por connection.js
+  if (global.socketGlobal && global.socketGlobal.ws && (global.socketGlobal.ws.readyState === 1 || global.socketGlobal.ws.isOpen)) {
+    return global.socketGlobal;
+  }
+  // 2. Si no existe global todavía, prueba con la instancia local enviada en el inicio
+  if (fallbackSock && fallbackSock.ws && (fallbackSock.ws.readyState === 1 || fallbackSock.ws.isOpen)) {
+    return fallbackSock;
+  }
+  return null;
+}
+
 // Cierra el navegador de forma limpia si se desactiva el sistema
 async function closeBrowser() {
   if (globalBrowser) {
@@ -50,16 +63,14 @@ async function initBrowser() {
       "--disable-dev-shm-usage",
       "--disable-accelerated-2d-canvas",
       "--disable-gpu",
-      "--single-process", // ⚡ Evita la duplicación masiva de procesos en Windows/Linux
-      "--no-zygote", // ⚡ Impide la creación de procesos 'Zygote' auxiliares
+      "--single-process",
+      "--no-zygote",
     ],
   });
 
-  // Reutiliza la primera pestaña creada por Puppeteer para no generar páginas huérfanas
   const pages = await globalBrowser.pages();
   globalPage = pages.length > 0 ? pages[0] : await globalBrowser.newPage();
 
-  // Bloqueo de recursos no esenciales para máxima velocidad y ahorro de memoria
   await globalPage.setRequestInterception(true);
   globalPage.on("request", (req) => {
     const resource = req.resourceType();
@@ -73,13 +84,12 @@ async function initBrowser() {
   await ensureActiveSession(globalPage);
 }
 
-// Verifica si la sesión está activa; si caducó, recién ahí aplica las cookies guardadas
 async function ensureActiveSession(page) {
   try {
     const currentUrl = page.url();
     if (currentUrl.includes("instagram.com") && !currentUrl.includes("/accounts/login")) {
       const isLoggedIn = await page.evaluate(() => !!document.querySelector("a[href*='/p/'], a[href*='/reel/'], nav, svg[aria-label*='Home']"));
-      if (isLoggedIn) return; // La sesión sigue perfecta en memoria, no hace nada.
+      if (isLoggedIn) return;
     }
 
     console.log("🔑 Verificando / Restaurando sesión de Instagram...");
@@ -231,23 +241,33 @@ async function sendNewsToGroups(sock, newsItem, db) {
   for (const group of db.groupsEnabled) {
     let sent = false;
     let attempts = 0;
-    const maxAttempts = 3;
+    const maxAttempts = 5;
 
     while (!sent && attempts < maxAttempts) {
       attempts++;
+
+      // ⚡ Busca el socket activo en global.socketGlobal en cada intento de envío
+      const activeSock = getActiveSocket(sock);
+
+      if (!activeSock) {
+        console.warn(`[TyC] Socket no disponible antes de enviar a ${group}. Esperando reconexión (Intento ${attempts}/${maxAttempts})...`);
+        await wait(5000);
+        continue;
+      }
+
       try {
         const msgOptions = newsItem.imageBuffer
           ? { image: newsItem.imageBuffer, caption: captionText }
           : { text: captionText };
 
-        await sock.sendMessage(group, msgOptions);
+        await activeSock.sendMessage(group, msgOptions);
         console.log("✅ Publicación enviada a:", group);
         sent = true;
         await wait(1000);
       } catch (err) {
         console.error(`Error enviando publicación al grupo ${group} (Intento ${attempts}/${maxAttempts}):`, err.message);
         if (attempts < maxAttempts) {
-          await wait(2500); // Pausa de recuperación antes de reintentar el envío
+          await wait(3000);
         }
       }
     }
@@ -268,7 +288,6 @@ async function checkNews(sock) {
     if (!Array.isArray(db.lastPosts)) db.lastPosts = [];
     if (!Array.isArray(db.groupsEnabled)) db.groupsEnabled = [];
 
-    // 🔥 FILTRO PREVIO: Si está desactivado o no hay grupos, cerramos navegador (si estaba abierto) y salimos sin tocar NADA de cookies ni red
     if (!db.enabled || !db.groupsEnabled.length) {
       if (globalBrowser) {
         await closeBrowser();
@@ -276,7 +295,6 @@ async function checkNews(sock) {
       return;
     }
 
-    // Recién acá, si está en ON y tiene grupos, se ejecuta el raspado
     const scraped = await getLatestNews(MAX_ARTICLES);
     if (!scraped.length) return;
 
@@ -312,8 +330,6 @@ async function startTyCSystem(sock) {
 
   console.log("📡 Sistema TyC Instagram activado (monitoreando estado...)");
 
-  // ❌ Se removió initBrowser() de acá. No abre Puppeteer en el arranque si está deshabilitado.
-
   setInterval(async () => {
     try {
       await checkNews(sock);
@@ -324,6 +340,7 @@ async function startTyCSystem(sock) {
 }
 
 module.exports = { startTyCSystem };
+
 
 
 
