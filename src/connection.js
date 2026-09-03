@@ -25,11 +25,12 @@ if (!fs.existsSync(TEMP_DIR)) {
 
 const logger = pino({ level: "silent" });
 
-// Por esto (expira llaves a los 5 minutos y las borra de la RAM automáticamente):
+// Expira llaves a los 5 minutos y las borra de la RAM automáticamente
 const msgRetryCounterCache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 
 let socketGlobal = null;
 let reconnecting = false;
+let isShuttingDown = false; // ⚡ Flag para prevenir reconexiones si se apaga el proceso
 
 // ----------------------------
 // 🔥 WATCHDOG GLOBAL
@@ -61,13 +62,13 @@ function clearWatchdog() {
 }
 
 function startWatchdog() {
-  if (disconnectTimer) return;
+  if (disconnectTimer || isShuttingDown) return;
 
   warningLog("⚠️ Bot desconectado, iniciando watchdog...");
   disconnectStartTime = Date.now();
 
   disconnectTimer = setTimeout(() => {
-    if (!isSocketAlive()) {
+    if (!isSocketAlive() && !isShuttingDown) {
       warningLog("💀 Sigue desconectado tras 60s → reiniciando proceso...");
       terminateProcess(1);
     }
@@ -79,6 +80,8 @@ function startWatchdog() {
       infoLog("🧠 Reconectado detectado → watchdog cancelado");
       return;
     }
+
+    if (isShuttingDown) return;
 
     const elapsed = Date.now() - disconnectStartTime;
     const remaining = Math.max(0, WATCHDOG_TIMEOUT - elapsed);
@@ -123,51 +126,59 @@ function destroyActiveSocket() {
         socketGlobal.ws.close();
       }
       if (typeof socketGlobal.end === "function") {
-        socketGlobal.end(new Error("Conexión finalizada manualmente"));
+        socketGlobal.end(new Error("Conexión finalizada"));
       }
     } catch {}
     socketGlobal = null;
+    global.socketGlobal = null;
   }
 }
 
 function terminateProcess(code = 0) {
+  if (isShuttingDown && code === 0) return;
+  isShuttingDown = true;
+
   clearWatchdog();
   destroyActiveSocket();
 
-  // Da un margen de 200ms para liberar file descriptors y evitar procesos zombis antes de salir
+  // Forzar la salida limpia e inmediata
   setTimeout(() => {
     process.exit(code);
-  }, 200);
+  }, 100);
 }
 
 // ----------------------------
 // Reconexión controlada
 // ----------------------------
 async function handleReconnect(reason) {
-  if (reconnecting) return;
+  if (reconnecting || isShuttingDown) return;
   reconnecting = true;
 
   startWatchdog();
   infoLog(`⚠️ Reconexión iniciada por: ${reason}`);
 
   try {
-    // Destruir socket viejo de forma limpia si aún existe
     destroyActiveSocket();
 
     await new Promise((r) => setTimeout(r, 3000)); // Espera 3s
 
-    await connect();
+    if (!isShuttingDown) {
+      await connect();
+    }
     reconnecting = false;
 
   } catch (err) {
     errorLog(`❌ Reconexión fallida: ${err.message}`);
     reconnecting = false;
-    // En cortes prolongados o microcortes repetidos, forzar reintento
-    setTimeout(() => handleReconnect("Reintento tras error de red"), 3000);
+    if (!isShuttingDown) {
+      setTimeout(() => handleReconnect("Reintento tras error de red"), 3000);
+    }
   }
 }
 
 async function connect() {
+  if (isShuttingDown) return null;
+
   const {
     default: makeWASocket,
     DisconnectReason,
@@ -183,7 +194,6 @@ async function connect() {
   const { state, saveCreds } = await useMultiFileAuthState(authPath);
   const { version, isLatest } = await fetchLatestBaileysVersion();
 
-  // Limpieza de seguridad si se llama directamente
   destroyActiveSocket();
 
   const socket = makeWASocket({
@@ -205,8 +215,7 @@ async function connect() {
   });
 
   socketGlobal = socket;
-  global.socketGlobal = socket; // ⚡ Hace accesible el socket reconectado para newtyc.js
-
+  global.socketGlobal = socket;
 
   socket.ev.on("messages.upsert", async ({ messages, type }) => {
     if (type !== "notify" && type !== undefined) return;
@@ -262,11 +271,18 @@ async function connect() {
     }
 
     if (connection === "close") {
+      // Si el apagado fue iniciado voluntariamente por PM2 / sistema, ignorar eventos de reconexión
+      if (isShuttingDown) return;
+
       const reason = lastDisconnect?.error?.output?.statusCode;
       warningLog("Conexión cerrada. Motivo: " + reason);
 
       if (reason === DisconnectReason.loggedOut) {
         errorLog("Sesión cerrada. Borra la carpeta auth y vuelve a escanear QR.");
+        terminateProcess(1);
+      } else if (reason === DisconnectReason.connectionReplaced || reason === 440) {
+        // Si la conexión fue reemplazada, forzar matado total del proceso para evitar colisión de sockets
+        errorLog("⚠️ Conexión duplicada (440). Reiniciando proceso completo...");
         terminateProcess(1);
       } else {
         handleReconnect(reason || connection);
@@ -283,11 +299,17 @@ async function connect() {
   return socket;
 }
 
-// Intercepta las órdenes del sistema o de PM2 para garantizar el cierre total de sockets e hilos
+// Intercepta las órdenes del sistema o PM2 para matar el proceso inmediatamente sin reintentos
 process.on("SIGINT", () => terminateProcess(0));
 process.on("SIGTERM", () => terminateProcess(0));
+process.on("uncaughtException", (err) => {
+  errorLog("Uncaught Exception:", err.message);
+  terminateProcess(1);
+});
 
 exports.connect = connect;
+
+
 
 
 
