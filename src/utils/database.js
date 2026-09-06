@@ -21,6 +21,7 @@ const RESTRICTED_MESSAGES_FILE = "restricted-messages";
 const WELCOME_GROUPS_FILE = "welcome-groups";
 const USERS_FILE = "users"; // 🔹 archivo JSON para usuarios
 const ABBREVIATIONS_FILE = "abbreviations.json";
+const NSFW_GROUPS_FILE = "nsfw-groups"; // 🔹 archivo JSON para grupos con NSFW activado
 
 // =====================
 // FUNCIONES BASE
@@ -168,7 +169,23 @@ exports.isOnlyAdminException = (groupId, userJid) => {
   return exceptions[groupId]?.includes(userJid) || false;
 };
 
+// =====================
+// CONTROL DE CARPETA / COMANDOS NSFW
+// =====================
+exports.activateNsfwGroup = (groupId) => {
+  const groups = readJSON(NSFW_GROUPS_FILE, []);
+  if (!groups.includes(groupId)) groups.push(groupId);
+  writeJSON(NSFW_GROUPS_FILE, groups);
+};
 
+exports.deactivateNsfwGroup = (groupId) => {
+  const groups = readJSON(NSFW_GROUPS_FILE, []);
+  const index = groups.indexOf(groupId);
+  if (index !== -1) groups.splice(index, 1);
+  writeJSON(NSFW_GROUPS_FILE, groups);
+};
+
+exports.isActiveNsfwGroup = (groupId) => readJSON(NSFW_GROUPS_FILE, []).includes(groupId);
 
 // =====================
 // ANTI LINK
@@ -273,3 +290,5 @@ exports.incrementCommandCount = incrementCommandCount;
 exports.readJSON = readJSON;
 exports.writeJSON = writeJSON;
 exports.normalizeText = normalizeText;
+
+

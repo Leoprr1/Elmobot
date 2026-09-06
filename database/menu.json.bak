@@ -93,6 +93,10 @@
       "desc": "activa el bot en el grupo"
     },
     {
+      "command": "nsfw (1/0)",
+      "desc": "activa o desactiva los comandos cochinos"
+    },
+    {
       "command": "only-admin (1/0)",
       "desc": "activa esto y solo los admins pueden usar el bot"
     },

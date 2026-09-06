@@ -5,10 +5,11 @@ const path = require("node:path");
 const { ASSETS_DIR } = require(`${BASE_DIR}/config`);
 
 module.exports = {
-  name: "pete",
-  description: "se la chupa a otro user",
-  commands: ["pete", "chupar", "mamar"],
-  usage: `${PREFIX}pete @usuario`,
+  name: "follar",
+  category: "nsfw",
+  description: "se folla a otro user",
+  commands: ["follar", "coger", "sexo"],
+  usage: `${PREFIX}follar @usuario`,
   /**
    * @param {CommandHandleProps} props
    * @returns {Promise<void>}
@@ -32,7 +33,7 @@ module.exports = {
     
     if (!targetJid) {
       await sendErrorReply(
-        "Debes mencionar a un usuario o responder a un mensaje para petear."
+        "Debes mencionar a un usuario o responder a un mensaje para follar."
       );
       return;
     }
@@ -41,8 +42,8 @@ module.exports = {
     const targetNumber = onlyNumbers(targetJid);
 
     await sendGifFromFile(
-      path.resolve(ASSETS_DIR, "images", "funny", "pete.mp4"),
-      `@${userNumber} obligó a @${targetNumber} a chuparsela!`,
+      path.resolve(ASSETS_DIR, "images", "funny", "follar.mp4"),
+      `@${userNumber} se folló fuertemente a @${targetNumber}!`,
       [userJid, targetJid]
     );
   },

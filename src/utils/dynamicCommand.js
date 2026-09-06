@@ -26,6 +26,7 @@ const {
   isActiveAntiLinkGroup,
   isActiveOnlyAdmins,
   isOnlyAdminException, 
+  isActiveNsfwGroup, // 🔞 Se importa la verificación de NSFW
   getPrefix,
   readUserProfiles,
   saveUserProfiles,
@@ -285,7 +286,7 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
       return;
     }
 
-     if (
+    if (
       isActiveOnlyAdmins(remoteJid) &&
       !(await isAdmin({ remoteJid, userJid, socket })) &&
       !isBotOwner({ userJid, isLid }) &&
@@ -293,6 +294,21 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
     ) {
       await sendWarningReply(
         "¡Solo los administradores pueden ejecutar comandos!"
+      );
+      return;
+    }
+
+    /* =========================================
+       🔞 CONTROL DE CARPETA/COMANDOS NSFW
+    ========================================= */
+    const isNsfwCommand =
+      command?.category === "nsfw" ||
+      command?.folder === "nsfw" ||
+      command?.filePath?.includes("nsfw");
+
+    if (isNsfwCommand && !isActiveNsfwGroup(remoteJid)) {
+      await sendWarningReply(
+        "🔞 Los comandos NSFW están desactivados en este grupo. Un administrador puede activarlos con .nsfw 1"
       );
       return;
     }
@@ -411,4 +427,5 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
     }
   }
 };
+
 

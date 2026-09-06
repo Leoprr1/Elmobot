@@ -6,6 +6,7 @@ const { ASSETS_DIR } = require(`${BASE_DIR}/config`);
 
 module.exports = {
   name: "cum",
+  category: "nsfw",
   description: "se viene dentro de otro user",
   commands: ["cum", "leche", "creampie"],
   usage: `${PREFIX}cum @usuario`,

@@ -37,6 +37,7 @@ function menuMessage(groupJid) {
     admins: "🛡️",
     rpg: "⭐",
     principal: "🎡",
+    nsfw: "🥵",
   };
 
   for (const [sectionName, sectionItems] of Object.entries(menu)) {
