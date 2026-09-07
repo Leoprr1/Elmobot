@@ -55,13 +55,24 @@ class FfmpegService {
   }
 
   // -------------------
-  // EJECUTAR FFmpeg
+  // EJECUTAR FFmpeg (SIN VENTANA DE CMD)
   // -------------------
   _runFfmpeg(inputPath, outputPath, options = []) {
     return new Promise((resolve, reject) => {
-      ffmpeg(inputPath)
+      const command = ffmpeg(inputPath)
         .outputOptions(options)
-        .save(outputPath)
+        .save(outputPath);
+
+      // ⚡ Ocultar ventana de CMD para fluidez en Windows
+      if (command._process) {
+        command._process.options = {
+          ...command._process.options,
+          windowsHide: true,
+          creationFlags: 0x08000000,
+        };
+      }
+
+      command
         .on("end", () => resolve(outputPath))
         .on("error", (err) => {
           errorLog("FFmpeg error:", err);
@@ -96,7 +107,7 @@ class FfmpegService {
   async applyPixelation(inputPath) {
     const outputPath = await this._createTempFilePath();
     return this._runFfmpeg(inputPath, outputPath, [
-      "-vf scale=iw/6:ih/6,scale=iw*6:ih*6:flags=neighbor",
+      "-vf scale=iw/6:ih/6,scale=iw*6:iw*6:flags=neighbor",
     ]);
   }
 
@@ -201,23 +212,27 @@ class FfmpegService {
   }
 
   // -------------------
-  // OBTENER DURACIÓN (FIX WINDOWS)
+  // OBTENER DURACIÓN (FIX WINDOWS OCULTO)
   // -------------------
   async getDuration(inputPath) {
     return new Promise((resolve) => {
-      exec(`"${ffmpegPath}" -i "${inputPath}" 2>&1`, (err, stdout, stderr) => {
-        const output = stderr || stdout;
-        if (!output) return resolve(0);
+      exec(
+        `"${ffmpegPath}" -i "${inputPath}" 2>&1`,
+        { windowsHide: true, creationFlags: 0x08000000 },
+        (err, stdout, stderr) => {
+          const output = stderr || stdout;
+          if (!output) return resolve(0);
 
-        const match = output.match(/Duration: (\d+):(\d+):([\d.]+)/);
-        if (!match) return resolve(0);
+          const match = output.match(/Duration: (\d+):(\d+):([\d.]+)/);
+          if (!match) return resolve(0);
 
-        const hours = parseInt(match[1], 10);
-        const minutes = parseInt(match[2], 10);
-        const seconds = parseFloat(match[3]);
+          const hours = parseInt(match[1], 10);
+          const minutes = parseInt(match[2], 10);
+          const seconds = parseFloat(match[3]);
 
-        resolve(hours * 3600 + minutes * 60 + seconds);
-      });
+          resolve(hours * 3600 + minutes * 60 + seconds);
+        }
+      );
     });
   }
 
@@ -244,6 +259,7 @@ class FfmpegService {
 }
 
 module.exports = new FfmpegService();
+
 
 
 

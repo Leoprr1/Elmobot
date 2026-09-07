@@ -444,9 +444,9 @@
       "command": "matar",
       "desc": ""
     }
-    
   ],
-  "nsfw": [{
+  "nsfw": [
+    {
       "command": "follar",
       "desc": ""
     },
@@ -457,5 +457,22 @@
     {
       "command": "cum",
       "desc": ""
-    }]
+    },
+    {
+      "command": "69",
+      "desc": ""
+    },
+    {
+      "command": "rusa",
+      "desc": ""
+    },
+    {
+      "command": "dominar",
+      "desc": ""
+    },
+    {
+      "command": "cavalgar",
+      "desc": ""
+    }
+  ]
 }
