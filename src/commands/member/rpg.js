@@ -121,7 +121,8 @@ const START = {
   manamax: 100,
   monedas: 100,
   arma: null,      // { code, nombre, dano }
-  armadura: null,  // { code, nombre, defensa }
+  armadura: null,
+  itemBoxEquipado: null,  // { code, nombre, defensa }
   inventario: [],  // [{ code, nombre, tipo, ... }]
   
   // Academia
@@ -183,6 +184,15 @@ const MASCOTAS = [
       { code: "T04", nombre: "Lobo Espiritual", emoji: "🐺", atkBuff: 35, defBuff: 20, hpBuff: 40, precio: 130000  },
       { code: "T05", nombre: "Ser de Luz", emoji: "✨", atkBuff: 40, defBuff: 15, hpBuff: 55, precio: 200000 },
     ];
+
+    const ITEM_BOXES = [
+  { code: "IB1", nombre: "Item Box Común", tipo: "itemBox", extraCap: 20, precio: 1000000 },
+  { code: "IB2", nombre: "Item Box Raro", tipo: "itemBox", extraCap: 30, precio: 10000000 },
+  { code: "IB3", nombre: "Item Box Legendario", tipo: "itemBox", extraCap: 40, precio: 100000000 },
+  { code: "IB4", nombre: "Item Box Fantástico", tipo: "itemBox", extraCap: 50, precio: 1000000000 },
+  { code: "IB5", nombre: "Item Box Mítico", tipo: "itemBox", extraCap: 60, precio: 10000000000 },
+  { code: "IB6", nombre: "Item Box Ancestral", tipo: "itemBox", extraCap: 70, precio: 100000000000 },
+];
 
 const ARMAS = [
   { code: "A1", nombre: "Daga Oxidada", dano: 6, precio: 600 },
@@ -375,7 +385,6 @@ function normalizeId(id) {
   if (/^\d+$/.test(id)) return `${id}@lid`;
   // caso por si viene con otros sufijos (por seguridad)
   if (/@/.test(id)) {
-    // probar convertir dominios conocidos a @lid
     return id.replace(/@.*$/, "@lid");
   }
   return null;
@@ -451,7 +460,7 @@ function getUser(id) {
       } else {
         user.limitBreaker.lastTick = now;
       }
-       saveDB(); // opcional, si querés guardar cada drenaje
+      saveDB();
     }
   }
 
@@ -483,15 +492,14 @@ setInterval(() => {
     if (ticks > MAX_TICKS) ticks = MAX_TICKS;
 
     const homeMultiplier = u.enCasa ? 4 : 1;
-    const L = u.limitBreaker ||{};
+    const L = u.limitBreaker || {};
     const aca = u.academia?.especialidades || {};
     const baseHP = (u.hpMax || 0)
-  + (aca.curacion || 0) * 5
-  + (u.golem?.hpBuff || 0)
-  + (u.mascotaEquipada?.hpBuff || 0);
+      + (aca.curacion || 0) * 5
+      + (u.golem?.hpBuff || 0)
+      + (u.mascotaEquipada?.hpBuff || 0);
 
-const totalHP = baseHP * (L.active ? 2 : 1);
-
+    const totalHP = baseHP * (L.active ? 2 : 1);
 
     const totalMana =
       (u.manamax || 0) +
@@ -506,7 +514,6 @@ const totalHP = baseHP * (L.active ? 2 : 1);
     u.hp = Math.min(totalHP, curHP + addHP);
     u.mana = Math.min(totalMana, curMana + addMana);
 
-    // ✅ Actualizamos lastRegen solo con los ticks aplicados
     u.lastRegen += ticks * regenTime;
 
     if (addHP > 0 || addMana > 0) updated = true;
@@ -517,8 +524,7 @@ const totalHP = baseHP * (L.active ? 2 : 1);
   }
 
   if (updated) saveDB();
-}, 60 * 1000); // chequea cada minuto si toca tick
-
+}, 60 * 1000);
 
 function now() {
   return Date.now();
@@ -538,53 +544,61 @@ function timeLeft(ms) {
   const rm = m % 60;
   return `${h}h ${rm}m`;
 }
+
 function xpForNextLevel(nivel) {
-  // escalado suave
   return 100 + (nivel - 1) * 80;
 }
+
 function addXP(user, amount) {
   user.xp += amount;
-  // subir nivel si corresponde
   let needed = xpForNextLevel(user.nivel);
   let subidas = 0;
   while (user.xp >= needed) {
     user.xp -= needed;
     user.nivel++;
     subidas++;
-    // subir vida max y curar un poco
+    // Subir vida max y curar
     user.hpMax += 20;
     user.hp = Math.min(user.hpMax, user.hp + 30);
-    needed = xpForNextLevel(user.nivel);
-    // subir mana max y curar un poco
+    // Subir mana max y curar
     user.manamax += 10;
-user.mana = Math.min(user.manamax, user.mana + 30);
+    user.mana = Math.min(user.manamax, user.mana + 30);
+    
     needed = xpForNextLevel(user.nivel);
   }
   return subidas;
 }
+
 // -----------------------------
 // FUNCIONES DE INVENTARIO
 // -----------------------------
 
-// Buscar item por código o UID
+// Obtener la capacidad máxima del inventario según el itemBox equipado
+function getMaxInvCapacity(user) {
+  const base = 10;
+  const extra = user.itemBox?.extraCap || 0;
+  return base + extra;
+}
+
 function findItemByCode(code, user) {
   code = String(code || "").toUpperCase();
 
   if (user) {
-    // Primero busca en inventario del usuario
+    // Primero busca en el inventario del usuario
     const item = user.inventario?.find(i => {
-      if (i.tipo === "mascota") return i.uid === code || i.code === code; // Mascotas: code o uid
-      return i.code === code; // Otros items: solo code
+      if (i.tipo === "mascota") return i.uid === code || i.code === code;
+      return i.code === code;
     });
     if (item) return item;
   }
 
-  // Luego busca en listas globales
+  // Luego busca en las listas globales
   return (
     ARMAS.find(x => x.code.toUpperCase() === code) ||
     ARMADURAS.find(x => x.code.toUpperCase() === code) ||
     POCIONES.find(x => x.code.toUpperCase() === code) ||
-    MASCOTAS.find(x => x.code.toUpperCase() === code)
+    MASCOTAS.find(x => x.code.toUpperCase() === code) ||
+    ITEM_BOXES.find(x => x.code.toUpperCase() === code)
   );
 }
 
@@ -611,12 +625,13 @@ function pushInv(user, item, sendReply) {
   // Limpiar inventario
   user.inventario = user.inventario.filter(i => i && i.code);
 
-  if (user.inventario.length >= 10) {
-    if (sendReply) sendReply("👜 Tu inventario está lleno (10/10). Debes usar o vender algún ítem antes de agregar más.");
+  const maxCap = getMaxInvCapacity(user);
+  if (user.inventario.length >= maxCap) {
+    if (sendReply) sendReply(`👜 Tu inventario está lleno (${user.inventario.length}/${maxCap}). Debes usar o vender algún ítem antes de agregar más.`);
     return false;
   }
 
-  // Asignar UID y precio para mascotas si no existen
+  // Asignar UID y precio si no existen
   if (!item.uid) item.uid = Date.now().toString(36) + Math.floor(Math.random() * 1000);
   if (item.tipo === "mascota" && !item.precio) {
     item.precio = (item.atkBuff + item.defBuff + item.hpBuff) * 1000;
@@ -627,17 +642,20 @@ function pushInv(user, item, sendReply) {
   return true;
 }
 
-// Sacar item del inventario (⚠️ NO lo elimina)
+// Sacar item del inventario (Extrae y remueve el ítem)
 function takeFromInv(user, identifier) {
   identifier = String(identifier || "").toUpperCase();
 
-  // Buscar item
-  const it = user.inventario.find(i => {
-    if (i.tipo === "mascota") return i.uid === identifier || i.code === identifier; // Mascotas: code o uid
-    return i.code === identifier; // Otros: solo code
+  const idx = user.inventario.findIndex(i => {
+    if (i.tipo === "mascota") return i.uid === identifier || i.code === identifier;
+    return i.code === identifier;
   });
 
-  return it || null;
+  if (idx !== -1) {
+    return user.inventario.splice(idx, 1)[0]; // Remueve de la lista y lo retorna
+  }
+
+  return null;
 }
 
 
@@ -759,7 +777,7 @@ function helpText() {
 ▢ • \`${p}rpg buy <código>\` <-- *para comprar un item en la shop*
 ▢ • \`${p}rpg equip <código>\` <-- *para equiparte items*
 ▢ • \`${p}rpg equip mascota <código>\` <-- *para equipar la mascota*
-▢ • \`${p}rpg unequip arma/armadura/mascota\` <-- *para quitarte objetos equipados*
+▢ • \`${p}rpg unequip arma/armadura/mascota/itembox\` <-- *para quitarte objetos equipados*
 ▢ • \`${p}rpg use <código> (solo pociones)\` <-- *para tomar posiones*
 ▢ • \`${p}rpg magia curar\` <-- *para curarte a vos mismo*
 ▢ • \`${p}rpg magia curar @otrouser\` <-- *para curar a otro usuario*
@@ -776,73 +794,417 @@ function helpText() {
   );
 }
 
-// -----------------------------
-// Handler principal
-// -----------------------------
+// =============================================================
+// REGISTRO GLOBAL Y CONFIGURACIÓN DE DROPS (NIVEL DE ARCHIVO)
+// =============================================================
+if (!global.ACTIVE_RPG_GROUPS) {
+  global.ACTIVE_RPG_GROUPS = new Map();
+}
+if (!global.IDROPS) {
+  global.IDROPS = [];
+}
+
+// Cargar grupos desde la base de datos local al iniciar
+function obtenerGruposRegistrados() {
+  const gruposDB = global.db?.data?.rpg_groups || global.db?.data?.chats || {};
+  const listaDB = Array.isArray(gruposDB) ? gruposDB : Object.keys(gruposDB);
+  
+  // Unir grupos guardados en JSON con los activos en memoria
+  const gruposMemoria = Array.from(global.ACTIVE_RPG_GROUPS.keys());
+  const conjunto = new Set([...listaDB, ...gruposMemoria]);
+  
+  // Filtrar solo los JIDs válidos de grupo (@g.us)
+  return Array.from(conjunto).filter(jid => jid && jid.endsWith("@g.us"));
+}
+
+// =============================================================
+// POOL DE DROPS CONFIGURADA CON TU LISTA EXACTA DE ITEMS
+// =============================================================
+if (!global.IDROP_POOL) {
+  global.IDROP_POOL = [
+    // --- RECOMPENSAS BÁSICAS ---
+    { 
+      tipo: "monedas", 
+      min: 1000, 
+      max: 50000, 
+      prob: 0.30 // 30%
+    },
+    { 
+      tipo: "xp", 
+      min: 500, 
+      max: 2000, 
+      prob: 0.25 // 25%
+    },
+
+    // --- ÍTEMS COMUNES (A1-A3, C01-C10, R1-R3, C11-C20, Pociones P1-P2/MP1-MP2) ---
+    { 
+      tipo: "item_comun", 
+      lista: [
+        "A1", "A2", "A3", "C01", "C02", "C03", "C04", "C05", "C06", "C07", "C08", "C09", "C10",
+        "R1", "R2", "R3", "C11", "C12", "C13", "C14", "C15", "C16", "C17", "C18", "C19", "C20",
+        "P1", "P2", "MP1", "MP2"
+      ], 
+      prob: 0.22 // 22%
+    },
+
+    // --- ÍTEMS RAROS (A4-A6, Z01-Z10, R4-R6, Z11-Z20, Pociones P3-P4/MP3-MP4) ---
+    { 
+      tipo: "item_raro", 
+      lista: [
+        "A4", "A5", "A6", "Z01", "Z02", "Z03", "Z04", "Z05", "Z06", "Z07", "Z08", "Z09", "Z10",
+        "R4", "R5", "R6", "Z11", "Z12", "Z13", "Z14", "Z15", "Z16", "Z17", "Z18", "Z19", "Z20",
+        "P3", "P4", "MP3", "MP4"
+      ], 
+      prob: 0.12 // 12%
+    },
+
+    // --- ÍTEMS LEGENDARIOS (A7-A12, L01-L10, R7-R10, L11-L20, Pociones P5-P6/MP5-MP6) ---
+    { 
+      tipo: "item_legendario", 
+      lista: [
+        "A7", "A8", "A9", "A10", "A11", "A12", "L01", "L02", "L03", "L04", "L05", "L06", "L07", "L08", "L09", "L10",
+        "R7", "R8", "R9", "R10", "L11", "L12", "L13", "L14", "L15", "L16", "L17", "L18", "L19", "L20",
+        "P5", "P6", "MP5", "MP6"
+      ], 
+      prob: 0.06 // 6%
+    },
+
+    // --- ÍTEMS FANTÁSTICOS (F01-F05, F06-F10) ---
+    { 
+      tipo: "item_fantastico", 
+      lista: ["F01", "F02", "F03", "F04", "F05", "F06", "F07", "F08", "F09", "F10"], 
+      prob: 0.03 // 3%
+    },
+
+    // --- ÍTEMS MÍTICOS (H01-H05, H06-H10) ---
+    { 
+      tipo: "item_mitico", 
+      lista: ["H01", "H02", "H03", "H04", "H05", "H06", "H07", "H08", "H09", "H10"], 
+      prob: 0.015 // 1.5%
+    },
+
+    // --- ÍTEMS ANCESTRALES (X01-X05, X06-X10) ---
+    { 
+      tipo: "item_ancestral", 
+      lista: ["X01", "X02", "X03", "X04", "X05", "X06", "X07", "X08", "X09", "X10"], 
+      prob: 0.005 // 0.5%
+    }
+  ];
+}
+
+const emojiMap = {
+  monedas: "💰",
+  xp: "✨",
+  item_comun: "⚪",
+  item_raro: "🔵",
+  item_legendario: "🟣",
+  item_fantastico: "🔶",
+  item_mitico: "🐲",
+  item_ancestral: "🟥"
+};
+
+// Función auxiliar para normalizar JIDs de chat
+function sanitizeJid(jid) {
+  if (!jid) return "";
+  return jid.split(":")[0].split("/")[0];
+}
+
+// ----------------- Función: generar drop -----------------
+async function generarDrop() {
+  console.log("🎲 [RPG DROPS] Evaluando generación de nuevo drop...");
+
+  const grupos = obtenerGruposRegistrados();
+  if (grupos.length === 0) {
+    console.log("⚠️ [RPG DROPS] Cancelado: Ningún grupo registrado en la base de datos o memoria.");
+    return;
+  }
+
+  if (global.IDROPS.length >= 5) {
+    console.log("⚠️ [RPG DROPS] Cancelado: Se alcanzó el límite máximo de 5 drops activos simultáneos.");
+    return;
+  }
+
+  // Elegir un grupo aleatorio entre los persistidos
+  const grupoDestino = grupos[Math.floor(Math.random() * grupos.length)];
+  const lastGroupData = global.ACTIVE_RPG_GROUPS.get(grupoDestino);
+
+  // Obtener la conexión activa (priorizando socket global fresco)
+  let botConn = global.conn || global.sock || lastGroupData?.conn;
+  if (!botConn || typeof botConn.sendMessage !== "function") {
+    console.error(`❌ [RPG DROPS] Error: No hay un objeto 'socket/conn' activo para enviar a ${grupoDestino}`);
+    return;
+  }
+
+  // Pool de Drops
+  const pool = global.IDROP_POOL || (typeof IDROP_POOL !== "undefined" ? IDROP_POOL : []);
+  if (!pool || pool.length === 0) {
+    console.error("❌ [RPG DROPS] Error: La pool de drops (IDROP_POOL) está vacía o indefinida.");
+    return;
+  }
+
+  const roll = Math.random();
+  let acumulado = 0;
+  let recompensa = null;
+
+  for (let i of pool) {
+    acumulado += i.prob;
+    if (roll <= acumulado) {
+      recompensa = i;
+      break;
+    }
+  }
+  if (!recompensa) return;
+
+  // ID simple (U1...U5)
+  const usedIds = global.IDROPS.map(d => d.simpleId);
+  let simpleId;
+  for (let i = 1; i <= 5; i++) {
+    if (!usedIds.includes("U" + i)) { simpleId = "U" + i; break; }
+  }
+  if (!simpleId) return;
+
+  // RECOMPENSAS SIEMPRE PRESENTES: Monedas y XP con rangos aleatorios
+  const monedasGanadas = Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
+  const xpGanada = Math.floor(Math.random() * (1000 - 200 + 1)) + 200;
+
+  // Determinar ítem según el tiro en la Pool
+  let itemCode = null;
+  let tipoItem = recompensa.tipo;
+
+  if (recompensa.tipo.startsWith("item_") && recompensa.lista && recompensa.lista.length > 0) {
+    itemCode = recompensa.lista[Math.floor(Math.random() * recompensa.lista.length)];
+  } else {
+    const comunPool = pool.find(p => p.tipo === "item_comun");
+    if (comunPool && comunPool.lista) {
+      itemCode = comunPool.lista[Math.floor(Math.random() * comunPool.lista.length)];
+      tipoItem = "item_comun";
+    }
+  }
+
+  let drop = { 
+    id: Date.now(), 
+    creado: Date.now(), 
+    monedas: monedasGanadas,
+    xp: xpGanada,
+    itemCode,
+    tipo: tipoItem,
+    grupo: grupoDestino,
+    simpleId 
+  };
+
+  global.IDROPS.push(drop);
+
+  const rarezaText = drop.tipo.replace("item_", "").toUpperCase();
+  const emoji = emojiMap[drop.tipo] || "📦";
+
+  // Intentar enviar mensaje al grupo con fallback de reconexión
+  try {
+    console.log(`🚀 [RPG DROPS] Enviando Drop ${drop.simpleId} (${rarezaText}) al grupo: ${drop.grupo}`);
+    
+    const txt = `💥 ¡Drop *${rarezaText}* ha aparecido en el grupo! ${emoji}\n\n` +
+                `Usá *${PREFIX}rpg agarrar ${drop.simpleId}* para reclamarlo antes de que desaparezca.`;
+    
+    const activeSocket = global.conn || global.sock || botConn;
+    await activeSocket.sendMessage(drop.grupo, { text: txt });
+    console.log(`✅ [RPG DROPS] ¡Drop ${drop.simpleId} enviado exitosamente a ${drop.grupo}!`);
+  } catch (err) {
+    console.error(`❌ [RPG DROPS] Error al enviar drop a ${drop.grupo}:`, err.message || err);
+  }
+
+  // --- CONTROL DE EXPIRACIÓN DEL ÚLTIMO DROP CREADO ---
+  const TIEMPO_EXPIRACION = 4 * 60 * 1000; // 4 minutos
+
+  setTimeout(async () => {
+    // Buscar el drop específico en el arreglo global usando su ID y grupo guardados
+    const idx = global.IDROPS.findIndex(d => d.simpleId === drop.simpleId && d.grupo === drop.grupo);
+    
+    if (idx !== -1) {
+      // Removerlo de los drops activos porque no fue agarrado a tiempo
+      const dropExpirado = global.IDROPS.splice(idx, 1)[0];
+      
+      // Conexión activa al momento de expirar
+      const connActual = global.conn || global.sock || global.ACTIVE_RPG_GROUPS.get(dropExpirado.grupo)?.conn;
+
+      if (connActual && typeof connActual.sendMessage === "function") {
+        try {
+          const rarezaExp = dropExpirado.tipo.replace("item_", "").toUpperCase();
+          console.log(`⌛ [RPG DROPS] El drop ${dropExpirado.simpleId} en ${dropExpirado.grupo} ha expirado tras ${TIEMPO_EXPIRACION / 1000}s.`);
+          
+          await connActual.sendMessage(dropExpirado.grupo, { 
+            text: `⌛ El drop *${dropExpirado.simpleId}* (${rarezaExp}) ha desaparecido...` 
+          });
+        } catch (err) {
+          console.error(`❌ [RPG DROPS] Error al enviar mensaje de caducidad a ${dropExpirado.grupo}:`, err.message || err);
+        }
+      } else {
+        console.error(`❌ [RPG DROPS] No se encontró socket activo para notificar expiración en ${dropExpirado.grupo}`);
+      }
+    }
+  }, TIEMPO_EXPIRACION);
+}
+
+// ----------------- Ultra drops automáticos -----------------
+function startUltraDrops() {
+  console.log("⚙️ [RPG DROPS] Iniciando bucle automático de Ultra Drops...");
+  
+  async function loop() {
+    await generarDrop();
+
+    // Próximo drop entre 5 min y 30 min
+    const min = 5 * 60 * 1000;
+    const max = 30 * 60 * 1000;
+    const delay = Math.floor(Math.random() * (max - min + 1)) + min;
+
+    console.log(`⏱️ [RPG DROPS] Próximo intento programado en ${Math.round(delay / 1000)} segundos.`);
+    setTimeout(loop, delay);
+  }
+
+  loop();
+}
+
+// Iniciar el loop una sola vez al cargar el módulo
+if (!global.ULTRA_DROPS_STARTED) {
+  global.ULTRA_DROPS_STARTED = true;
+  startUltraDrops();
+}
+
+// =============================================================
+// HANDLER PRINCIPAL DEL COMANDO RPG
+// =============================================================
 module.exports = {
   name: "rpg",
   description: "Sistema RPG con stats, tienda, equipo, pociones, farmeo y duelos.",
   commands: ["rpg", "aventura"],
   usage: `${PREFIX}rpg <subcomando>`,
+  
   /**
    * @param {CommandHandleProps} props
-   * Esperado: { args, userJid, sendReply, sendSuccessReact, sendErrorReply, mentions }
    */
   handle: async ({
-  args,
-  userJid,
-  sendReply,
-  sendSuccessReact,
-  sendErrorReply,
-  mentionedJid,
-}) => {
-  try {
-    // Unimos los args y limpiamos espacios extras
-    const text = args.join(" ").trim();
-    // Dividimos en subcomando y resto de argumentos
-    const [sub, ...rest] = text.split(/\s+/);
-    const cmd = (sub || "").toLowerCase();
+    args,
+    userJid,
+    chatJid,
+    sendReply,
+    sendSuccessReact,
+    sendErrorReply,
+    m,
+    conn,
+    sock
+  }) => {
+    try {
+      const currentChat = sanitizeJid(chatJid || m?.chat);
 
-    // Normalizamos el userJid antes de usarlo
-    const normalizedUserId = normalizeId(userJid);
-    if (!normalizedUserId) {
-      return sendErrorReply("❌ Error: no se pudo identificar tu usuario (userJid inválido).");
-    }
-    const you = getUser(normalizedUserId);
-    if (!you) {
-      return sendErrorReply("❌ Error: no se pudo cargar tu perfil RPG.");
-    }
+      // 🟢 REGISTRAR GRUPO ACTIVO EN MEMORIA Y EN LA BASE DE DATOS JSON
+      if (currentChat && currentChat.endsWith("@g.us")) {
+        const activeConn = conn || sock || global.conn || global.sock;
+        global.ACTIVE_RPG_GROUPS.set(currentChat, { conn: activeConn, sendReply });
 
-    // -------- SETNAME --------
-    if (cmd === "setname") {
-      const nuevoNombre = rest.join(" ").trim();
-      if (!nuevoNombre)
-        return sendErrorReply(`❌ ¡Error! Uso: *.rpg setname <tu_nombre>*`);
-      you.nick = nuevoNombre;
-      saveDB();
-      await sendSuccessReact();
-      return sendReply(`✅ Tu nombre RPG se cambió a *${nuevoNombre}*`);
-    }
+        // Guardado persistente en el JSON del bot
+        if (global.db && global.db.data) {
+          if (!global.db.data.rpg_groups) global.db.data.rpg_groups = [];
+          if (!global.db.data.rpg_groups.includes(currentChat)) {
+            global.db.data.rpg_groups.push(currentChat);
+            if (typeof saveDB === "function") saveDB();
+          }
+        }
+      }
 
-    // -------- HELP --------
-    if (!cmd || cmd === "help" || cmd === "ayuda") {
-      return sendReply(helpText());
-    }
+      const text = args.join(" ").trim();
+      const [sub, ...rest] = text.split(/\s+/);
+      const cmd = (sub || "").toLowerCase();
 
+      // Normalizamos el userJid
+      const normalizedUserId = normalizeId(userJid);
+      if (!normalizedUserId) {
+        return sendErrorReply("❌ Error: no se pudo identificar tu usuario (userJid inválido).");
+      }
+      const you = getUser(normalizedUserId);
+      if (!you) {
+        return sendErrorReply("❌ Error: no se pudo cargar tu perfil RPG.");
+      }
+
+      // -------- AGARRAR DROP --------
+      if (cmd === "agarrar") {
+        const rawDropId = rest[0];
+        if (!rawDropId) return sendErrorReply(`Uso: *${PREFIX}rpg agarrar <id_drop>* (ej: U1)`);
+
+        const dropId = rawDropId.trim().toUpperCase();
+        console.log(`🔍 [RPG AGARRAR] Intentando reclamar ID: '${dropId}' en chat: '${currentChat}'`);
+        console.log(`📦 [RPG AGARRAR] Drops activos actualmente:`, global.IDROPS.map(d => ({ simpleId: d.simpleId, grupo: d.grupo })));
+
+        const idx = global.IDROPS.findIndex(d => d.simpleId.toUpperCase() === dropId);
+        if (idx === -1) {
+          return sendErrorReply("❌ Ese drop no existe o ya fue reclamado.");
+        }
+
+        const drop = global.IDROPS[idx];
+
+        if (currentChat && drop.grupo !== currentChat) {
+          console.warn(`⚠️ [RPG AGARRAR] Intento de agarre desde otro grupo. Drop en: ${drop.grupo}, Intento en: ${currentChat}`);
+          return sendErrorReply("❌ Ese drop no cayó en este grupo.");
+        }
+
+        // Buscar el ítem en el sistema
+        const item = findItemByCode(drop.itemCode);
+        if (!item) return sendErrorReply("❌ Error, el ítem del drop no fue encontrado.");
+
+        // Intentar agregar ítem al inventario
+        const agregado = pushInv(you, item, sendReply);
+        if (!agregado) {
+          return; // Inventario lleno
+        }
+
+        // Remover drop de la lista global si se pudo tomar el ítem
+        global.IDROPS.splice(idx, 1);
+
+        // Sumar siempre Monedas y XP
+        you.monedas += drop.monedas;
+        addXP(you, drop.xp);
+
+        const emojiItem = emojiMap[drop.tipo] || "📦";
+        const msg = `🎉 ¡Agarraste el drop *${drop.simpleId}*!\n\n` +
+                    `💰 **+$${fmt(drop.monedas)}** monedas\n` +
+                    `✨ **+${fmt(drop.xp)}** XP\n` +
+                    `📦 **Ítem:** ${emojiItem} *${item.nombre}*`;
+
+        saveDB();
+        await sendSuccessReact();
+        return sendReply(msg);
+      }
+   
+
+      // -------- SETNAME --------
+      if (cmd === "setname") {
+        const nuevoNombre = rest.join(" ").trim();
+        if (!nuevoNombre)
+          return sendErrorReply(`❌ ¡Error! Uso: *.rpg setname <tu_nombre>*`);
+        you.nick = nuevoNombre;
+        saveDB();
+        await sendSuccessReact();
+        return sendReply(`✅ Tu nombre RPG se cambió a *${nuevoNombre}*`);
+      }
+
+      // -------- HELP --------
+      if (!cmd || cmd === "help" || cmd === "ayuda") {
+        return sendReply(helpText());
+      }
+
+    
+    
 
 // -------- STATS SIN BOTONES --------
 if (cmd === "stats") {
 
   // --- Función para obtener rango según nivel ---
   function getRangoAventurero(nivel) {
-    if (nivel >= 176) return { rango: "SSS", emoji: "🟣", medalla: "🏆" };
-    if (nivel >= 151) return { rango: "SS", emoji: "🔴", medalla: "🎖️" };
-    if (nivel >= 131) return { rango: "S", emoji: "🟠", medalla: "🎖️" };
-    if (nivel >= 101) return { rango: "A", emoji: "🟡", medalla: "🏅" };
-    if (nivel >= 71) return { rango: "B", emoji: "🟢", medalla: "🏅" };
-    if (nivel >= 41) return { rango: "C", emoji: "🔵", medalla: "🥈" };
-    if (nivel >= 21) return { rango: "D", emoji: "🟣", medalla: "🥉" };
-    if (nivel >= 11) return { rango: "E", emoji: "⚪", medalla: "⚪" };
+    if (nivel >= 2000) return { rango: "SSS", emoji: "🟣", medalla: "🏆" };
+    if (nivel >= 1000) return { rango: "SS", emoji: "🔴", medalla: "🎖️" };
+    if (nivel >= 500) return { rango: "S", emoji: "🟠", medalla: "🎖️" };
+    if (nivel >= 300) return { rango: "A", emoji: "🟡", medalla: "🏅" };
+    if (nivel >= 150) return { rango: "B", emoji: "🟢", medalla: "🏅" };
+    if (nivel >= 100) return { rango: "C", emoji: "🔵", medalla: "🥈" };
+    if (nivel >= 50) return { rango: "D", emoji: "🟣", medalla: "🥉" };
+    if (nivel >= 30) return { rango: "E", emoji: "⚪", medalla: "⚪" };
     return { rango: "F", emoji: "⚫", medalla: "⚫" };
   }
 
@@ -891,7 +1253,9 @@ if (cmd === "stats") {
 
   const armaTxt = you.arma ? `🗡️ ${you.arma.nombre} (+${you.arma.dano || 0} ATQ) | 💰 ${you.arma.precio?.toLocaleString("es-AR") || 0} | Usar: ${PREFIX}rpg equip ${you.arma.code}` : "Ninguna";
   const armTxt = you.armadura ? `🛡️ ${you.armadura.nombre} (+${you.armadura.defensa || 0} DEF) | 💰 ${you.armadura.precio?.toLocaleString("es-AR") || 0} | Usar: ${PREFIX}rpg equip ${you.armadura.code}` : "Ninguna";
+  const boxTxt = you.itemBox ? `📦 ${you.itemBox.nombre} (+${you.itemBox.extraCap} Espacios) | 💰 ${you.itemBox.precio?.toLocaleString("es-AR") || 0} | Usar: ${PREFIX}rpg equip ${you.itemBox.code}` : "Ninguno";
 
+  const maxCap = getMaxInvCapacity(you);
   const invTxt = (you.inventario && you.inventario.length)
     ? you.inventario.filter(i => i && i.nombre).map(i => `📦 ${i.code || "Desconocido"}`).join(", ")
     : "Vacío";
@@ -970,7 +1334,8 @@ const totalHP = baseHP * (you.limitBreaker?.active ? 2 : 1);
     `🛡️ Defensa total: ${totalDef}\n` +
     `⚔️ Arma: ${armaTxt}\n` +
     `🛡️ Armadura: ${armTxt}\n` +
-    `🎒 Inventario: ${invTxt}\n` +
+    `📦 Item Box: ${boxTxt}\n` +
+    `🎒 Inventario (${you.inventario?.length || 0}/${maxCap}): ${invTxt}\n` +
     `🐾 Mascotas:\n${mascotaTxt}\n` +
     `🏠 Casa: ${casaText}\n` +
     `🏡 Dentro de casa: ${enCasaText}\n` +
@@ -1252,8 +1617,10 @@ if (cmd === "inventory" || cmd === "inv") {
   you.inventario = you.inventario.filter(item => item && item.code);
   you.homeChest = you.homeChest?.filter(item => item && item.code) || [];
 
+  const maxCap = getMaxInvCapacity(you);
+
   // --- Inventario ---
-  let invTxt = `👜 *Inventario* (${you.inventario.length}/10)\n\n`;
+  let invTxt = `👜 *Inventario* (${you.inventario.length}/${maxCap})\n\n`;
   let invTotal = 0;
 
   if (!you.inventario.length) invTxt += "Vacío\n";
@@ -1265,6 +1632,8 @@ if (cmd === "inventory" || cmd === "inv") {
         invTxt += `🗡️ ${item.code} - ${item.nombre} (ATQ +${item.dano}) | 💰 ${precio} | Usar: ${PREFIX}rpg equip ${item.code}\n`;
       } else if (ARMADURAS.some(a => a.code === item.code)) {
         invTxt += `🛡️ ${item.code} - ${item.nombre} (DEF +${item.defensa}) | 💰 ${precio} | Usar: ${PREFIX}rpg equip ${item.code}\n`;
+      } else if (ITEM_BOXES.some(b => b.code === item.code)) {
+        invTxt += `📦 ${item.code} - ${item.nombre} (+${item.extraCap} Capacidad) | 💰 ${precio} | Usar: ${PREFIX}rpg equip ${item.code}\n`;
       } else if (POCIONES.some(p => p.code === item.code)) {
         invTxt += `🧪 ${item.code} - ${item.nombre} (Poción) | 💰 ${precio} | Usar: ${PREFIX}rpg use ${item.code}\n`;
       } else if (item.tipo === "mascota") {
@@ -1291,15 +1660,18 @@ if (cmd === "inventory" || cmd === "inv") {
       const isEquipped = item.tipo === "mascota" && you.mascotaEquipada?.uid === item.uid ? " (Equipada)" : "";
 
       if (ARMAS.some(a => a.code === item.code)) {
-        cofreTxt += `🗡️ ${item.code} - ${item.nombre} (ATQ +${item.dano}) | 💰 ${precio}\n`;
+        invTxt += `🗡️ ${item.code} - ${item.nombre} (ATQ +${item.dano}) | 💰 ${precio} | Usar: ${PREFIX}rpg equip ${item.code}\n`;
       } else if (ARMADURAS.some(a => a.code === item.code)) {
-        cofreTxt += `🛡️ ${item.code} - ${item.nombre} (DEF +${item.defensa}) | 💰 ${precio}\n`;
+        invTxt += `🛡️ ${item.code} - ${item.nombre} (DEF +${item.defensa}) | 💰 ${precio} | Usar: ${PREFIX}rpg equip ${item.code}\n`;
+      } else if (ITEM_BOXES.some(b => b.code === item.code)) {
+        invTxt += `📦 ${item.code} - ${item.nombre} (+${item.extraCap} Capacidad) | 💰 ${precio} | Usar: ${PREFIX}rpg equip ${item.code}\n`;
       } else if (POCIONES.some(p => p.code === item.code)) {
-        cofreTxt += `🧪 ${item.code} - ${item.nombre} (Poción) | 💰 ${precio}\n`;
+        invTxt += `🧪 ${item.code} - ${item.nombre} (Poción) | 💰 ${precio} | Usar: ${PREFIX}rpg use ${item.code}\n`;
       } else if (item.tipo === "mascota") {
-        cofreTxt += `🐾 ${item.code} - ${item.nombre}${isEquipped} | ATQ +${item.atkBuff || 0} | DEF +${item.defBuff || 0} | HP +${item.hpBuff || 0} | 💰 ${precio}\n`;
+        const isEquipped = you.mascotaEquipada?.uid === item.uid ? " (Equipada)" : "";
+        invTxt += `🐾 ${item.code} - ${item.nombre}${isEquipped} | ATQ +${item.atkBuff || 0} | DEF +${item.defBuff || 0} | HP +${item.hpBuff || 0} | 💰 ${precio} | Usar: ${PREFIX}rpg equip ${item.code} / ${PREFIX}rpg equip ${item.uid}\n`;
       } else {
-        cofreTxt += `📦 ${item.code} - ${item.nombre} | 💰 ${precio}\n`;
+        invTxt += `📦 ${item.code} - ${item.nombre} | 💰 ${precio}\n`;
       }
 
       cofreTotal += item.precio || 0;
@@ -1559,12 +1931,17 @@ if (cmd === "shop") {
   ARMADURAS.filter(a => !["C","Z","L","H","F","X"].includes(a.code[0]))
             .forEach(a => txt += `• ${a.code} - ${a.nombre} | DEF +${a.defensa} | $${fmt(a.precio)}\n`);
 
+  // Item Boxes
+  txt += "\n*Item Boxes*\n";
+  ITEM_BOXES.forEach(b => txt += `• ${b.code} - ${b.nombre} | Capacidad +${b.extraCap} | $${fmt(b.precio)}\n`);
+
   // Pociones
   txt += "\n*Pociones*\n";
   POCIONES.forEach(p => txt += `• ${p.code} - ${p.nombre} | $${fmt(p.precio)}\n`);
 
   txt += `\nCompra con: *${PREFIX}rpg buy <código>* (ej: ${PREFIX}rpg buy A2)\n\n`;
 
+ 
 
   return sendReply(txt);
 }
@@ -1831,7 +2208,8 @@ if (cmd === "buy") {
   const item =
     ARMAS.find((x) => x.code === code) ||
     ARMADURAS.find((x) => x.code === code) ||
-    POCIONES.find((x) => x.code === code);
+    POCIONES.find((x) => x.code === code) ||
+    ITEM_BOXES.find((x) => x.code === code);
 
   if (!item) return sendErrorReply("Código inválido.");
 
@@ -1858,7 +2236,26 @@ if (cmd === "buy") {
 // -------- UNEQUIP <tipo> --------
 if (cmd === "unequip" || cmd === "desequipar") {
   const type = rest[0]?.toLowerCase();
-  if (!type) return sendErrorReply(`Uso: *${PREFIX}rpg unequip <arma|armadura|mascota>*`);
+  if (!type) return sendErrorReply(`Uso: *${PREFIX}rpg unequip <arma|armadura|mascota|itembox>*`);
+
+  // -----------------------------
+  // DESQUIPEAR ITEM BOX
+  // -----------------------------
+  if (type === "box" || type === "itembox") {
+    if (!you.itemBox) return sendErrorReply("No tenés ningún Item Box equipado.");
+
+    // Validar si al quitar el box, los ítems actuales sobrepasan la capacidad base (10)
+    if (you.inventario.length > 10) {
+      return sendErrorReply(`❌ No podés desequipar el Item Box porque tenés ${you.inventario.length} ítems y la capacidad base es 10. Vende o guarda ítems en tu cofre primero.`);
+    }
+
+    pushInv(you, you.itemBox);
+    const removed = you.itemBox;
+    you.itemBox = null;
+    saveDB();
+    await sendSuccessReact();
+    return sendReply(`📦 Quitaste *${removed.nombre}* y volvió a tu inventario.`);
+  }
 
   // -----------------------------
   // DESQUIPEAR ARMA
@@ -1916,6 +2313,18 @@ if (cmd === "unequip" || cmd === "desequipar") {
 if (cmd === "equip" || cmd === "equipar") {
   const code = rest.join(" ").toUpperCase().trim();
   if (!code) return sendErrorReply(`Uso: *${PREFIX}rpg equip <código>*`);
+
+  // Item Boxes
+  if (ITEM_BOXES.some(b => b.code === code)) {
+    const idx = you.inventario.findIndex(i => i.code.toUpperCase() === code);
+    if (idx === -1) return sendErrorReply("No tenés ese Item Box en tu inventario.");
+    const it = you.inventario.splice(idx, 1)[0]; // eliminar del inventario
+    if (you.itemBox) pushInv(you, you.itemBox); // devolver anterior
+    you.itemBox = it;
+    saveDB();
+    await sendSuccessReact();
+    return sendReply(`📦 Equipaste *${it.nombre}* (Capacidad máxima actual: ${getMaxInvCapacity(you)}).`);
+  }
 
   // Armas
   if (ARMAS.some(a => a.code === code)) {
@@ -2401,26 +2810,26 @@ if (cmd === "gremio") {
 
   const MISIONES = [
     { comando: "flores", rango: "F", nivelMin: 1, descripcion: "Recolectar flores", recompensa: { monedas: 250, xp: 100 } },
-    { comando: "lobos", rango: "E", nivelMin: 11, descripcion: "Cazar lobos salvajes", recompensa: { monedas: 600, xp: 200 } },
-    { comando: "ruinas", rango: "D", nivelMin: 21, descripcion: "Explorar Ruinas Antiguas", recompensa: { monedas: 1000, xp: 300 } },
-    { comando: "ogro", rango: "C", nivelMin: 41, descripcion: "Derrotar al Ogro de la Montaña", recompensa: { monedas: 1500, xp: 1000 }, boss: { nombre: "Ogro de la Montaña", hp: 5000, atk: 200, skills: [
+    { comando: "lobos", rango: "E", nivelMin: 30, descripcion: "Cazar lobos salvajes", recompensa: { monedas: 2000, xp: 500 } },
+    { comando: "ruinas", rango: "D", nivelMin: 50, descripcion: "Explorar Ruinas Antiguas", recompensa: { monedas: 5000, xp: 1000 } },
+    { comando: "ogro", rango: "C", nivelMin: 100, descripcion: "Derrotar al Ogro de la Montaña", recompensa: { monedas: 10000, xp: 2000 }, boss: { nombre: "Ogro de la Montaña", hp: 5000, atk: 200, skills: [
         { name: "Golpe aplastante", dmg: 250, type: "físico" },
         { name: "Rugido", effect: { type: "stun", dur: 1 } }
     ] } },
-    { comando: "principe", rango: "B", nivelMin: 71, descripcion: "Rescatar al príncipe secuestrado", recompensa: { monedas: 4000, xp: 3000 } },
-    { comando: "mago", rango: "A", nivelMin: 101, descripcion: "Derrotar al Mago Negro", recompensa: { monedas: 10000, xp: 5000 }, boss: { nombre: "Mago Negro", hp: 8000, atk: 350, skills: [
+    { comando: "principe", rango: "B", nivelMin: 150, descripcion: "Rescatar al príncipe secuestrado", recompensa: { monedas: 50000, xp: 5000 } },
+    { comando: "mago", rango: "A", nivelMin: 300, descripcion: "Derrotar al Mago Negro", recompensa: { monedas: 100000, xp: 7000 }, boss: { nombre: "Mago Negro", hp: 8000, atk: 350, skills: [
         { name: "Bola de fuego", dmg: 300, type: "fuego", mana: 10 },
         { name: "Curación", heal: 200, mana: 15 }
     ] } },
-    { comando: "dragon", rango: "S", nivelMin: 131, descripcion: "Invadir la Fortaleza del Dragón", recompensa: { monedas: 20000, xp: 10000 }, boss: { nombre: "Dragón", hp: 12000, atk: 500, skills: [
+    { comando: "dragon", rango: "S", nivelMin: 500, descripcion: "Invadir la Fortaleza del Dragón", recompensa: { monedas: 500000, xp: 15000 }, boss: { nombre: "Dragón", hp: 12000, atk: 500, skills: [
         { name: "Llamarada", dmg: 400, type: "fuego" },
         { name: "Aliento de hielo", dmg: 250, type: "hielo", effect: { type: "slow", dur: 2 } }
     ] } },
-    { comando: "rey-demonio", rango: "SS", nivelMin: 151, descripcion: "Derrotar al Rey Demonio", recompensa: { monedas: 50000, xp: 20000 }, boss: { nombre: "Rey Demonio", hp: 20000, atk: 700, skills: [
+    { comando: "rey-demonio", rango: "SS", nivelMin: 1000, descripcion: "Derrotar al Rey Demonio", recompensa: { monedas: 1500000, xp: 100000 }, boss: { nombre: "Rey Demonio", hp: 20000, atk: 700, skills: [
         { name: "Puño demoníaco", dmg: 600, type: "físico" },
         { name: "Maldición", effect: { type: "debuff", stat: "atk", value: -50, dur: 2 } }
     ] } },
-    { comando: "salvar-mundo", rango: "SSS", nivelMin: 176, descripcion: "Salvar el mundo de la catástrofe", recompensa: { monedas: 100000, xp: 50000 } }
+    { comando: "salvar-mundo", rango: "SSS", nivelMin: 2000, descripcion: "Salvar el mundo de la catástrofe", recompensa: { monedas: 500000000, xp: 500000 } }
   ];
 
   const ahora = Date.now();
@@ -2567,8 +2976,7 @@ if (cmd === "gremio") {
     `.rpg gremio unirse - Unirte al gremio de aventureros\n` +
     `.rpg gremio misiones - Ver misiones disponibles según tu nivel\n` +
     `.rpg gremio tomar <misión> - Tomar una misión disponible\n` +
-    `.rpg gremio completar <misión> - Completar una misión que estás realizando\n` +
-    `.rpg gremio atacar <espada|fuego|curar> - Atacar al boss si la misión lo tiene`
+    `.rpg gremio completar <misión> - Completar una misión que estás realizando\n`
   );
 }
 
@@ -2762,168 +3170,6 @@ async function startSlots(rest, you, sendReply, sendErrorReply, userKey, display
 }
 
 
-// ----------------- iDrops Ultra Dinámicos Adaptados -----------------
-if (!global.IDROPS) global.IDROPS = [];
-if (!global.LAST_RPG_GROUP) global.LAST_RPG_GROUP = null;
-
-// Inicializar stats de usuario si faltan
-if (you.monedas === undefined) you.monedas = 0;
-if (!you.inventario) you.inventario = [];
-
-// Guardar último grupo RPG donde el usuario ejecutó un comando
-if (userJid.endsWith("@g.us")) {
-  global.LAST_RPG_GROUP = userJid;
-}
-
-// Pool de recompensas
-const IDROP_POOL = [
-  { tipo: "monedas", min: 5000, max: 10000, prob: 0.3 },
-  { tipo: "xp", min: 500, max: 1000, prob: 0.3 },
-  { tipo: "item_comun", lista: ["MP1","MP2","P1","P2","C01","C02","C03","C04","C05","C06","C07","C08","C09","C10"], prob: 0.2 },
-  { tipo: "item_raro", lista: ["MP3","MP4","P3","P4","Z01","Z02","Z03","Z04","Z05"], prob: 0.1 },
-  { tipo: "item_legendario", lista: ["MP5","MP6","P5","P6","L01","L02","L03"], prob: 0.09 },
-  { tipo: "item_fantastico", lista: ["F01","F02","F03","F04","F05"], prob: 0.01 },
-  { tipo: "item_mitico", lista: ["H01","H02","H03","H04","H05"], prob: 0.001 }
-];
-
-// Mapa de emojis
-const emojiMap = {
-  item_comun: "⚪",
-  item_raro: "🔵",
-  item_legendario: "🟣",
-  item_fantastico: "🟠",
-  item_mitico: "🔥",
-  monedas: "💰",
-  xp: "✨"
-};
-
-// ----------------- Función: generar drop -----------------
-function generarDrop(sendMessage, grupo = global.LAST_RPG_GROUP) {
-  if (!grupo) return; // si no hay grupo, no hace nada
-  if (global.IDROPS.length >= 5) return; // máximo 5 simultáneos
-
-  const roll = Math.random();
-  let acumulado = 0;
-  let recompensa = null;
-
-  for (let i of IDROP_POOL) {
-    acumulado += i.prob;
-    if (roll <= acumulado) {
-      recompensa = i;
-      break;
-    }
-  }
-  if (!recompensa) return;
-
-  // ID simple tipo U1...U5
-  const usedIds = global.IDROPS.map(d => d.simpleId);
-  let simpleId;
-  for (let i = 1; i <= 5; i++) {
-    if (!usedIds.includes("U" + i)) { simpleId = "U" + i; break; }
-  }
-  if (!simpleId) return;
-
-  let drop = { 
-    id: Date.now(), 
-    creado: Date.now(), 
-    tipo: recompensa.tipo,
-    simpleId 
-  };
-
-  switch (recompensa.tipo) {
-    case "monedas":
-    case "xp":
-      drop.cantidad = Math.floor(Math.random() * (recompensa.max - recompensa.min + 1)) + recompensa.min;
-      break;
-    default:
-      drop.itemCode = recompensa.lista[Math.floor(Math.random() * recompensa.lista.length)];
-      break;
-  }
-
-  global.IDROPS.push(drop);
-
-  const rarezaText = drop.tipo.replace("item_", "").toUpperCase();
-  const emoji = emojiMap[drop.tipo] || "💥";
-
-  // Enviar mensaje directo al grupo (sin reply)
-  sendMessage(grupo, `💥 ¡Drop ${rarezaText} ha aparecido! ${emoji}\nUsá *${PREFIX}rpg agarrar ${drop.simpleId}* para reclamarlo antes de que desaparezca.`);
-
-  // Expiración automática
-  setTimeout(() => {
-    const idx = global.IDROPS.findIndex(d => d.simpleId === drop.simpleId);
-    if (idx !== -1) {
-      global.IDROPS.splice(idx, 1);
-      sendMessage(grupo, `⌛ El drop ${drop.simpleId} (${rarezaText}) ha desaparecido...`);
-    }
-  }, 60 * 1000);
-}
-
-// ----------------- Ultra drops automáticos -----------------
-let lastDropTime = 0;
-function startUltraDrops(sendMessage) {
-  async function loop() {
-    const nowTime = Date.now();
-
-    if (global.LAST_RPG_GROUP && (nowTime - lastDropTime >= 5 * 60 * 1000)) { // al menos 5 min
-      generarDrop(sendMessage);
-      lastDropTime = nowTime;
-    }
-
-    // Próximo drop entre 5 min y 2h
-    const min = 5 * 60 * 1000;
-    const max = 2 * 60 * 60 * 1000;
-    const delay = Math.floor(Math.random() * (max - min + 1)) + min;
-
-    setTimeout(loop, delay);
-  }
-
-  loop();
-}
-
-// ⚠️ Llamar solo una vez al iniciar el bot
-if (!global.ULTRA_DROPS_STARTED) {
-  global.ULTRA_DROPS_STARTED = true;
-  startUltraDrops((grupo, msg) => {
-    // Esta función envía mensajes normales al grupo
-    sendReply(grupo, msg);
-  });
-}
-
-// ----------------- Comando: agarrar -----------------
-if (cmd === "agarrar") {
-  const dropId = rest[0];
-  if (!dropId) return sendErrorReply(`Uso: *${PREFIX}rpg agarrar <id_drop>* (ej: U1)`);
-
-  const idx = global.IDROPS.findIndex(d => d.simpleId.toUpperCase() === dropId.toUpperCase());
-  if (idx === -1) return sendErrorReply("❌ Ese drop no existe o ya fue reclamado.");
-
-  const drop = global.IDROPS[idx];
-  global.IDROPS.splice(idx, 1); // eliminar del array global
-
-  let msg = "";
-
-  switch (drop.tipo) {
-    case "monedas":
-      you.monedas += drop.cantidad;
-      msg = `💰 Agarraste $${fmt(drop.cantidad)} monedas del drop.`;
-      break;
-    case "xp":
-      addXP(you, drop.cantidad);
-      msg = `✨ Agarraste +${drop.cantidad} XP del drop.`;
-      break;
-    default:
-      const item = findItemByCode(drop.itemCode);
-      if (!item) return sendErrorReply("❌ Error, item no encontrado.");
-      pushInv(you, item);
-      const emojiItem = emojiMap[drop.tipo] || "💥";
-      msg = `🎉 Agarraste un item del drop: ${emojiItem} *${item.nombre}*`;
-      break;
-  }
-
-  saveDB();
-  await sendSuccessReact();
-  return sendReply(msg);
-}
 
 
 
@@ -3389,6 +3635,7 @@ while (player.hp > 0 && enemies.some(e => e.hp > 0)) {
 
 const MAX_FLOOR = 1000
 const ENTRADA_COSTO = 50000000
+const NIVEL_REQUERIDO = 700
 
 const ENEMIGOS_ANCESTRAL = [
   "Goblin Ancestral","Orco Guerrero","Espectro Perdido","Guardián de Piedra",
@@ -3426,6 +3673,9 @@ if (!you.ancestral) {
 // PAGAR ENTRADA
 // --------------------------------------
 if (cmd === "pagar" && rest[0] === "entrada") {
+  if (you.nivel < NIVEL_REQUERIDO)
+    return sendErrorReply(`❌ Necesitas ser *Nivel ${NIVEL_REQUERIDO}* o superior para comprar la entrada. Tu nivel actual es: ${you.nivel}.`)
+
   if (you.ancestral.paid)
     return sendReply("✅ Ya pagaste la entrada a la Dungeon Ancestral.")
 
@@ -3508,6 +3758,7 @@ Una torre con *${MAX_FLOOR} pisos*.
 💀 Boss secreto cada 50
 🐉 Boss final en piso 1000
 
+🎖️ Requisito: Nivel ${NIVEL_REQUERIDO}
 💰 Entrada única: $${fmt(ENTRADA_COSTO)}
 
 📍 Tu progreso: Piso ${you.ancestral.floor}
@@ -4299,7 +4550,7 @@ if (cmd === "farm") {
   } else if (A.hp > B.hp) {
     result = "asesinaste al rival";
     coins = 10000;
-    xpA = 100000;
+    xpA = 1000000;
     xpB = 100;
     you.monedas += coins;
     addXP(you, xpA);

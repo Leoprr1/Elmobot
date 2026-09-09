@@ -12,17 +12,18 @@ function normalizeJid(jid) {
 }
 
 // rango aventurero (igual que tu rpg.js)
-function getRangoAventurero(nivel) {
-  if (nivel >= 176) return { rango: "SSS", emoji: "🟣" };
-  if (nivel >= 151) return { rango: "SS", emoji: "🔴" };
-  if (nivel >= 131) return { rango: "S", emoji: "🟠" };
-  if (nivel >= 101) return { rango: "A", emoji: "🟡" };
-  if (nivel >= 71) return { rango: "B", emoji: "🟢" };
-  if (nivel >= 41) return { rango: "C", emoji: "🔵" };
-  if (nivel >= 21) return { rango: "D", emoji: "🟣" };
-  if (nivel >= 11) return { rango: "E", emoji: "⚪" };
-  return { rango: "F", emoji: "⚫" };
-}
+ function getRangoAventurero(nivel) {
+    if (nivel >= 2000) return { rango: "SSS", emoji: "🟣", medalla: "🏆" };
+    if (nivel >= 1000) return { rango: "SS", emoji: "🔴", medalla: "🎖️" };
+    if (nivel >= 500) return { rango: "S", emoji: "🟠", medalla: "🎖️" };
+    if (nivel >= 300) return { rango: "A", emoji: "🟡", medalla: "🏅" };
+    if (nivel >= 150) return { rango: "B", emoji: "🟢", medalla: "🏅" };
+    if (nivel >= 100) return { rango: "C", emoji: "🔵", medalla: "🥈" };
+    if (nivel >= 50) return { rango: "D", emoji: "🟣", medalla: "🥉" };
+    if (nivel >= 30) return { rango: "E", emoji: "⚪", medalla: "⚪" };
+    return { rango: "F", emoji: "⚫", medalla: "⚫" };
+  }
+
 
 // tiempo desde registro
 function tiempoRegistro(timestamp) {

@@ -129,7 +129,6 @@ function incrementCommandCount(userJid) {
  */
 
 exports.dynamicCommand = async (paramsHandler, startProcess) => {
-
   const {
     commandName,
     fullMessage,
@@ -140,13 +139,50 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
     sendReact,
     sendReply,
     sendWarningReply,
-    socket,
+    socket, // Conexión activa de Baileys
     userJid,
     webMessage,
   } = paramsHandler;
 
+  /* =====================================================
+     🟢 REGISTRO GLOBAL DE CONEXIÓN Y GRUPOS ACTIVOS (RPG DROPS)
+  ===================================================== */
+  // Siempre actualizamos la referencia global del socket activo
+  if (socket) {
+    global.conn = socket;
+    global.sock = socket;
+  }
+
+  if (!global.ACTIVE_RPG_GROUPS) {
+    global.ACTIVE_RPG_GROUPS = new Map();
+  }
+
+  if (remoteJid && remoteJid.endsWith("@g.us")) {
+    global.ACTIVE_RPG_GROUPS.set(remoteJid, {
+      conn: socket,
+      lastMsg: webMessage,
+      sendReply
+    });
+  }
+
+  // Función global para enviar mensajes de sistema directos (sin requerir cita/quoted)
+  if (!global.enviarMensajeGrupo) {
+    global.enviarMensajeGrupo = async (jidGrupo, texto) => {
+      const activeSocket = global.conn || global.sock || socket;
+      if (!activeSocket || typeof activeSocket.sendMessage !== "function") {
+        throw new Error("No hay socket activo en global.conn");
+      }
+      return await activeSocket.sendMessage(jidGrupo, { text: texto });
+    };
+  }
+  /* ===================================================== */
+
   const message = (fullMessage || "").trim();
   const activeGroup = isActiveGroup(remoteJid);
+  
+  // Continuación de tu dynamicCommand...
+
+  // ... (a partir de aquí continúa el resto de tu código sin cambios)
 
 
   /* =========================================

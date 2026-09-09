@@ -315,7 +315,7 @@
       "desc": "equipar la mascota"
     },
     {
-      "command": "rpg unequip arma/armadura/mascota",
+      "command": "rpg unequip arma/armadura/mascota/itembox",
       "desc": "quitar objetos equipados"
     },
     {
