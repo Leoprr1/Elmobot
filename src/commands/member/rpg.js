@@ -800,8 +800,41 @@ function helpText() {
 if (!global.ACTIVE_RPG_GROUPS) {
   global.ACTIVE_RPG_GROUPS = new Map();
 }
-if (!global.IDROPS) {
-  global.IDROPS = [];
+
+// Vinculación directa con la DB local para evitar que se borren los drops al recargar JSON
+if (!global.db) global.db = { data: {} };
+if (!global.db.data) global.db.data = {};
+if (!global.db.data.idrops || !Array.isArray(global.db.data.idrops)) {
+  global.db.data.idrops = [];
+}
+
+// Reemplazamos global.IDROPS mediante un Getter/Setter para que apunte siempre a global.db.data.idrops
+Object.defineProperty(global, 'IDROPS', {
+  get: () => {
+    if (!global.db?.data?.idrops) {
+      if (!global.db) global.db = { data: {} };
+      if (!global.db.data) global.db.data = {};
+      global.db.data.idrops = [];
+    }
+    return global.db.data.idrops;
+  },
+  set: (val) => {
+    if (!global.db) global.db = { data: {} };
+    if (!global.db.data) global.db.data = {};
+    global.db.data.idrops = val;
+  },
+  configurable: true,
+  enumerable: true
+});
+
+// Función auxiliar para normalizar JIDs manteniendo el dominio (@g.us o @s.whatsapp.net)
+function sanitizeJid(jid) {
+  if (!jid) return "";
+  let base = jid.split(":")[0].split("/")[0].trim();
+  if (!base.includes("@")) {
+    base += "@g.us";
+  }
+  return base;
 }
 
 // Cargar grupos desde la base de datos local al iniciar
@@ -813,8 +846,10 @@ function obtenerGruposRegistrados() {
   const gruposMemoria = Array.from(global.ACTIVE_RPG_GROUPS.keys());
   const conjunto = new Set([...listaDB, ...gruposMemoria]);
   
-  // Filtrar solo los JIDs válidos de grupo (@g.us)
-  return Array.from(conjunto).filter(jid => jid && jid.endsWith("@g.us"));
+  // Normalizar y filtrar solo los JIDs válidos de grupo (@g.us)
+  return Array.from(conjunto)
+    .map(j => sanitizeJid(j))
+    .filter(jid => jid && jid.endsWith("@g.us"));
 }
 
 // =============================================================
@@ -903,12 +938,6 @@ const emojiMap = {
   item_ancestral: "🟥"
 };
 
-// Función auxiliar para normalizar JIDs de chat
-function sanitizeJid(jid) {
-  if (!jid) return "";
-  return jid.split(":")[0].split("/")[0];
-}
-
 // ----------------- Función: generar drop -----------------
 async function generarDrop() {
   console.log("🎲 [RPG DROPS] Evaluando generación de nuevo drop...");
@@ -925,10 +954,10 @@ async function generarDrop() {
   }
 
   // Elegir un grupo aleatorio entre los persistidos
-  const grupoDestino = grupos[Math.floor(Math.random() * grupos.length)];
+  const grupoDestino = sanitizeJid(grupos[Math.floor(Math.random() * grupos.length)]);
   const lastGroupData = global.ACTIVE_RPG_GROUPS.get(grupoDestino);
 
-  // Obtener la conexión activa (priorizando socket global fresco)
+  // Obtener la conexión activa
   let botConn = global.conn || global.sock || lastGroupData?.conn;
   if (!botConn || typeof botConn.sendMessage !== "function") {
     console.error(`❌ [RPG DROPS] Error: No hay un objeto 'socket/conn' activo para enviar a ${grupoDestino}`);
@@ -963,11 +992,11 @@ async function generarDrop() {
   }
   if (!simpleId) return;
 
-  // RECOMPENSAS SIEMPRE PRESENTES: Monedas y XP con rangos aleatorios
+  // RECOMPENSAS SIEMPRE PRESENTES
   const monedasGanadas = Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
   const xpGanada = Math.floor(Math.random() * (1000 - 200 + 1)) + 200;
 
-  // Determinar ítem según el tiro en la Pool
+  // Determinar ítem según la pool
   let itemCode = null;
   let tipoItem = recompensa.tipo;
 
@@ -981,8 +1010,10 @@ async function generarDrop() {
     }
   }
 
+  const idUnico = Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+
   let drop = { 
-    id: Date.now(), 
+    id: idUnico, 
     creado: Date.now(), 
     monedas: monedasGanadas,
     xp: xpGanada,
@@ -993,18 +1024,17 @@ async function generarDrop() {
   };
 
   global.IDROPS.push(drop);
+  if (typeof saveDB === "function") saveDB(); // Guardar cambios en el JSON
 
   const rarezaText = drop.tipo.replace("item_", "").toUpperCase();
   const emoji = emojiMap[drop.tipo] || "📦";
 
-  // Intentar enviar mensaje al grupo con fallback de reconexión
   try {
     console.log(`🚀 [RPG DROPS] Enviando Drop ${drop.simpleId} (${rarezaText}) al grupo: ${drop.grupo}`);
     
     const txt = `💥 ¡Drop *${rarezaText}* ha aparecido en el grupo! ${emoji}\n\n` +
                 `Usá *${PREFIX}rpg agarrar ${drop.simpleId}* para reclamarlo antes de que desaparezca.`;
     
-    // Intento con fallback directo al socket global
     const activeSocket = global.conn || global.sock || botConn;
     await activeSocket.sendMessage(drop.grupo, { text: txt });
     console.log(`✅ [RPG DROPS] ¡Drop ${drop.simpleId} enviado exitosamente a ${drop.grupo}!`);
@@ -1014,9 +1044,10 @@ async function generarDrop() {
 
   // Expiración a los 5 min
   setTimeout(async () => {
-    const idx = global.IDROPS.findIndex(d => d.simpleId === drop.simpleId);
+    const idx = global.IDROPS.findIndex(d => d.id === drop.id);
     if (idx !== -1) {
       global.IDROPS.splice(idx, 1);
+      if (typeof saveDB === "function") saveDB(); // Guardar borrado en el JSON
       
       const currentConn = global.conn || global.sock || global.ACTIVE_RPG_GROUPS.get(drop.grupo)?.conn;
 
@@ -1034,7 +1065,7 @@ async function generarDrop() {
         console.error(`❌ [RPG DROPS] Error al enviar expiración:`, err.message || err);
       }
     }
-  }, 4 * 60 * 1000);
+  }, 5 * 60 * 1000);
 }
 
 // ----------------- Ultra drops automáticos -----------------
@@ -1044,7 +1075,6 @@ function startUltraDrops() {
   async function loop() {
     await generarDrop();
 
-    // Próximo drop entre 5 min y 30 min
     const min = 5 * 60 * 1000;
     const max = 30 * 60 * 1000;
     const delay = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -1056,7 +1086,6 @@ function startUltraDrops() {
   loop();
 }
 
-// Iniciar el loop una sola vez al cargar el módulo
 if (!global.ULTRA_DROPS_STARTED) {
   global.ULTRA_DROPS_STARTED = true;
   startUltraDrops();
@@ -1087,14 +1116,15 @@ module.exports = {
     sock
   }) => {
     try {
-      const currentChat = sanitizeJid(chatJid || m?.chat);
+      // Búsqueda exhaustiva del JID del chat para evitar cadenas vacías
+      const rawChat = chatJid || m?.chat || m?.key?.remoteJid || m?.from;
+      const currentChat = sanitizeJid(rawChat);
 
       // 🟢 REGISTRAR GRUPO ACTIVO EN MEMORIA Y EN LA BASE DE DATOS JSON
       if (currentChat && currentChat.endsWith("@g.us")) {
         const activeConn = conn || sock || global.conn || global.sock;
         global.ACTIVE_RPG_GROUPS.set(currentChat, { conn: activeConn, sendReply });
 
-        // Guardado persistente en el JSON del bot
         if (global.db && global.db.data) {
           if (!global.db.data.rpg_groups) global.db.data.rpg_groups = [];
           if (!global.db.data.rpg_groups.includes(currentChat)) {
@@ -1127,17 +1157,20 @@ module.exports = {
         console.log(`🔍 [RPG AGARRAR] Intentando reclamar ID: '${dropId}' en chat: '${currentChat}'`);
         console.log(`📦 [RPG AGARRAR] Drops activos actualmente:`, global.IDROPS.map(d => ({ simpleId: d.simpleId, grupo: d.grupo })));
 
-        const idx = global.IDROPS.findIndex(d => d.simpleId.toUpperCase() === dropId);
+        // Buscar el drop comparando el ID simple Y el grupo sanitizado
+        const idx = global.IDROPS.findIndex(d => 
+          d.simpleId.toUpperCase() === dropId && sanitizeJid(d.grupo) === currentChat
+        );
+
         if (idx === -1) {
+          const existeEnOtroGrupo = global.IDROPS.some(d => d.simpleId.toUpperCase() === dropId);
+          if (existeEnOtroGrupo) {
+            return sendErrorReply("❌ Ese drop no cayó en este grupo.");
+          }
           return sendErrorReply("❌ Ese drop no existe o ya fue reclamado.");
         }
 
         const drop = global.IDROPS[idx];
-
-        if (currentChat && drop.grupo !== currentChat) {
-          console.warn(`⚠️ [RPG AGARRAR] Intento de agarre desde otro grupo. Drop en: ${drop.grupo}, Intento en: ${currentChat}`);
-          return sendErrorReply("❌ Ese drop no cayó en este grupo.");
-        }
 
         // Buscar el ítem en el sistema
         const item = findItemByCode(drop.itemCode);
@@ -1162,10 +1195,12 @@ module.exports = {
                     `✨ **+${fmt(drop.xp)}** XP\n` +
                     `📦 **Ítem:** ${emojiItem} *${item.nombre}*`;
 
-        saveDB();
+        if (typeof saveDB === "function") saveDB();
         await sendSuccessReact();
         return sendReply(msg);
       }
+
+    
 
       // -------- SETNAME --------
       if (cmd === "setname") {
