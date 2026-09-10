@@ -29949,7 +29949,8 @@
       "Te parece normal de la nada hablarle a un menor que no conoces y no te conoce?",
       "Y ns no contesta tobi",
       "nada",
-      "Elegi"
+      "Elegi",
+      "Tdvia no me contesto"
     ]
   },
   {
@@ -45393,7 +45394,8 @@
       "si te fijas en el .aventura podes jugar utilizando todos los comandos que ves ahi, podes conseguirte items y asi",
       "Es vicio no bro?",
       "pero atacame weon 😂",
-      "tenes nivel 30, podes hacer dungeon D2"
+      "tenes nivel 30, podes hacer dungeon D2",
+      "le dijiste?"
     ]
   },
   {
@@ -404099,6 +404101,42 @@
     "match": "Como hace 3 años no hablas pense que te habias olvidado",
     "answers": [
       "dale tarado"
+    ]
+  },
+  {
+    "match": "manda drop",
+    "answers": [
+      "aparecen entre 5 a 30 minutos"
+    ]
+  },
+  {
+    "match": "👜 *Inventario* (1/80)\n\n🛡️ L11 - Escudo de los Dioses (DEF +500) | 💰 100.000 | Usar: .rpg equip L11\n\n──────────────\n💎 *Valor total del inventario:* 100.000\n\n🐾 T02 - Fénix (Fantástica) | ATQ +432 | DEF +400 | HP +800 | 💰 600.000 | Usar: .rpg equip T02 / .rpg equip mfciizw2gv1whm\n🛡️ X06 - 🛡️👑 Armadura del Emperador del Vacío 🌌⚡ (DEF +10000) | 💰 100.000.000 | Usar: .rpg equip X06\n🛡️ X08 - ❄️🌑 Placas del Coloso del Abismo 🧊👑 (DEF +10000) | 💰 100.000.000 | Usar: .rpg equip X08\n🐾 T03 - Golem de Piedra (Fantástica) | ATQ +400 | DEF +640 | HP +1600 | 💰 750.000 | Usar: .rpg equip T03 / .rpg equip msschlgmdvc1ww\n🗡️ X02 - ☄️🩸 Guadaña del Colapso Estelar 🔥🌠 (ATQ +10000) | 💰 100.000.000 | Usar: .rpg equip X02\n🛡️ X09 - 🌌🛡️ Armadura de la Singularidad Suprema ⚡🕳️ (DEF +10000) | 💰 100.000.000 | Usar: .rpg equip X09\n🛡️ X10 - ⚡👑 Manto del Dios del Trueno Primordial 🌩️🌪️ (DEF +10000) | 💰 100.000.000 | Usar: .rpg equip X10\n🛡️ X09 - 🌌🛡️ Armadura de la Singularidad Suprema ⚡🕳️ (DEF +10000) | 💰 100.000.000 | Usar: .rpg equip X09\n🗡️ X05 - 🕳️⚔️ Espada del Fin de los Tiempos ⏳💀 (ATQ +10000) | 💰 100.000.000 | Usar: .rpg equip X05\n🛡️ X07 - 🔥🛡️ Coraza del Sol Eterno ☀️♨️ (DEF +10000) | 💰 100.000.000 | Usar: .rpg equip X07\n🛡️ X08 - ❄️🌑 Placas del Coloso del Abismo 🧊👑 (DEF +10000) | 💰 100.000.000 | Usar: .rpg equip X08\n🛡️ X10 - ⚡👑 Manto del Dios del Trueno Primordial 🌩️🌪️ (DEF +10000) | 💰 100.000.000 | Usar: .rpg equip X10\n🗡️ X05 - 🕳️⚔️ Espada del Fin de los Tiempos ⏳💀 (ATQ +10000) | 💰 100.000.000 | Usar: .rpg equip X05\n🛡️ X07 - 🔥🛡️ Coraza del Sol Eterno ☀️♨️ (DEF +10000) | 💰 100.000.000 | Usar: .rpg equip X07\n🗡️ X03 - 🐲🔥 Lanza del Dragón Ancestral del Vacío 🌌⚡ (ATQ +10000) | 💰 100.000.000 | Usar: .rpg equip X03\n🛡️ X09 - 🌌🛡️ Armadura de la Singularidad Suprema ⚡🕳️ (DEF +10000) | 💰 100.000.000 | Usar: .rpg equip X09\n🛡️ X06 - 🛡️👑 Armadura del Emperador del Vacío 🌌⚡ (DEF +10000) | 💰 100.000.000 | Usar: .rpg equip X06\n🛡️ X07 - 🔥🛡️ Coraza del Sol Eterno ☀️♨️ (DEF +10000) | 💰 100.000.000 | Usar: .rpg equip X07\n🗡️ X04 - 🌪️🏹 Arco del Devorador de Universos ⚡🌑 (ATQ +10000) | 💰 100.000.000 | Usar: .rpg equip X04\n🗡️ X04 - 🌪️🏹 Arco del Devorador de Universos ⚡🌑 (ATQ +10000) | 💰 100.000.000 | Usar: .rpg equip X04\n🗡️ X04 - 🌪️🏹 Arco del Devorador de Universos ⚡🌑 (ATQ +10000) | 💰 100.000.000 | Usar: .rpg equip X04\n🗡️ X05 - 🕳️⚔️ Espada del Fin de los Tiempos ⏳💀 (ATQ +10000) | 💰 100.000.000 | Usar: .rpg equip X05\n🪙 *Cofre de tu casa* (Total de ítems: 22)\n\n\n──────────────\n💎 *Valor total del cofre:* 2.001.350.000",
+    "answers": [
+      "Foa"
+    ]
+  },
+  {
+    "match": "le dijiste?",
+    "answers": [
+      "Para comer?"
+    ]
+  },
+  {
+    "match": "Cierren el culo",
+    "answers": [
+      "callate desconocido"
+    ]
+  },
+  {
+    "match": "callate desconocido",
+    "answers": [
+      "🆗"
+    ]
+  },
+  {
+    "match": "🆗",
+    "answers": [
+      "👍🏻"
     ]
   }
 ]
