@@ -1004,6 +1004,7 @@ async function generarDrop() {
     const txt = `💥 ¡Drop *${rarezaText}* ha aparecido en el grupo! ${emoji}\n\n` +
                 `Usá *${PREFIX}rpg agarrar ${drop.simpleId}* para reclamarlo antes de que desaparezca.`;
     
+    // Intento con fallback directo al socket global
     const activeSocket = global.conn || global.sock || botConn;
     await activeSocket.sendMessage(drop.grupo, { text: txt });
     console.log(`✅ [RPG DROPS] ¡Drop ${drop.simpleId} enviado exitosamente a ${drop.grupo}!`);
@@ -1011,36 +1012,29 @@ async function generarDrop() {
     console.error(`❌ [RPG DROPS] Error al enviar drop a ${drop.grupo}:`, err.message || err);
   }
 
-  // --- CONTROL DE EXPIRACIÓN DEL ÚLTIMO DROP CREADO ---
-  const TIEMPO_EXPIRACION = 4 * 60 * 1000; // 4 minutos
-
+  // Expiración a los 5 min
   setTimeout(async () => {
-    // Buscar el drop específico en el arreglo global usando su ID y grupo guardados
-    const idx = global.IDROPS.findIndex(d => d.simpleId === drop.simpleId && d.grupo === drop.grupo);
-    
+    const idx = global.IDROPS.findIndex(d => d.simpleId === drop.simpleId);
     if (idx !== -1) {
-      // Removerlo de los drops activos porque no fue agarrado a tiempo
-      const dropExpirado = global.IDROPS.splice(idx, 1)[0];
+      global.IDROPS.splice(idx, 1);
       
-      // Conexión activa al momento de expirar
-      const connActual = global.conn || global.sock || global.ACTIVE_RPG_GROUPS.get(dropExpirado.grupo)?.conn;
+      const currentConn = global.conn || global.sock || global.ACTIVE_RPG_GROUPS.get(drop.grupo)?.conn;
 
-      if (connActual && typeof connActual.sendMessage === "function") {
-        try {
-          const rarezaExp = dropExpirado.tipo.replace("item_", "").toUpperCase();
-          console.log(`⌛ [RPG DROPS] El drop ${dropExpirado.simpleId} en ${dropExpirado.grupo} ha expirado tras ${TIEMPO_EXPIRACION / 1000}s.`);
-          
-          await connActual.sendMessage(dropExpirado.grupo, { 
-            text: `⌛ El drop *${dropExpirado.simpleId}* (${rarezaExp}) ha desaparecido...` 
-          });
-        } catch (err) {
-          console.error(`❌ [RPG DROPS] Error al enviar mensaje de caducidad a ${dropExpirado.grupo}:`, err.message || err);
-        }
-      } else {
-        console.error(`❌ [RPG DROPS] No se encontró socket activo para notificar expiración en ${dropExpirado.grupo}`);
+      if (!currentConn || typeof currentConn.sendMessage !== "function") {
+        console.error(`❌ [RPG DROPS] No hay conexión activa para notificar la expiración en ${drop.grupo}`);
+        return;
+      }
+
+      try {
+        console.log(`⌛ [RPG DROPS] Expired: Borrando drop ${drop.simpleId} en grupo ${drop.grupo}`);
+        await currentConn.sendMessage(drop.grupo, { 
+          text: `⌛ El drop *${drop.simpleId}* (${rarezaText}) ha desaparecido...` 
+        });
+      } catch (err) {
+        console.error(`❌ [RPG DROPS] Error al enviar expiración:`, err.message || err);
       }
     }
-  }, TIEMPO_EXPIRACION);
+  }, 4 * 60 * 1000);
 }
 
 // ----------------- Ultra drops automáticos -----------------
@@ -1087,6 +1081,7 @@ module.exports = {
     sendReply,
     sendSuccessReact,
     sendErrorReply,
+    mentionedJid,
     m,
     conn,
     sock
@@ -1171,7 +1166,6 @@ module.exports = {
         await sendSuccessReact();
         return sendReply(msg);
       }
-   
 
       // -------- SETNAME --------
       if (cmd === "setname") {
