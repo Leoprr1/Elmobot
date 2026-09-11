@@ -72,7 +72,7 @@
     },
     {
       "command": "reg2",
-      "desc": "para restablecer tu perfil"
+      "desc": "para actualizar tu perfil"
     },
     {
       "command": "profile",
@@ -243,6 +243,10 @@
       "desc": "ver tus estadísticas"
     },
     {
+      "command": "rpg clan info",
+      "desc": "para ver los comandos de clan"
+    },
+    {
       "command": "rpg cooldowns",
       "desc": "para ver los tiempos de espera activos de las actividades"
     },
@@ -272,15 +276,15 @@
     },
     {
       "command": "rpg dungeon D1/D2/D3",
-      "desc": "da xp, dinero y objetos"
+      "desc": "da xp, dinero y objetos -- la D1 desde nivel 0, D2 desde nivel 20, D3 desde nivel 40"
     },
     {
       "command": "rpg isla corrupta I1/I2/I3",
-      "desc": "da xp, dinero y objetos"
+      "desc": "da xp, dinero y objetos -- la I1 desde nivel 60, I2 desde nivel 80, I3 desde nivel 100"
     },
     {
       "command": "rpg mazmorra legendaria L1/L2/L3",
-      "desc": "da xp, dinero y objetos"
+      "desc": "da xp, dinero y objetos -- la L1 desde nivel 150, L2 desde nivel 200, L3 desde nivel 250"
     },
     {
       "command": "rpg evento-mascota",

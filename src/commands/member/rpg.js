@@ -124,7 +124,7 @@ const START = {
   armadura: null,
   itemBoxEquipado: null,  // { code, nombre, defensa }
   inventario: [],  // [{ code, nombre, tipo, ... }]
-  
+  lastClanExit: 0,
   // Academia
   academia: {
     especialidades: {
@@ -759,6 +759,7 @@ function helpText() {
 ▢
 ▢ • \`${p}rpg setname\` <-- *para ponerte nombre en el juego*
 ▢ • \`${p}rpg stats\` <-- *para ver tus estadisticas*
+▢ • \`${p}rpg clan info\` <-- *para ver los comandos de clan*
 ▢ • \`${p}rpg cooldowns\` <-- *para ver los tiempos de espera activos de las actividades*
 ▢ • \`${p}rpg inventory\` <-- *para ver tu inventario*
 ▢ • \`${p}rpg daily\` <-- *reclama la recompensa diaria*
@@ -1224,6 +1225,24 @@ module.exports = {
 // -------- STATS SIN BOTONES --------
 if (cmd === "stats") {
 
+ // --- BUSCAR CLAN DEL USUARIO EN STATS ---
+if (!DB.clanes) DB.clanes = {};
+const userClanObj = Object.values(DB.clanes).find(c => 
+  c.lider === normalizedUserId || c.coolideres.includes(normalizedUserId) || c.miembros.includes(normalizedUserId)
+);
+
+  let clanTxt = "Ninguno";
+  if (userClanObj) {
+    let rol = "👤 Miembro";
+    if (userClanObj.lider === normalizedUserId) {
+      rol = "👑 Líder";
+    } else if (userClanObj.coolideres.includes(normalizedUserId)) {
+      rol = "⚔️ Co-Líder";
+    }
+
+    clanTxt = `🏰 ${userClanObj.nombre} (${rol})`;
+  }
+
   // --- Función para obtener rango según nivel ---
   function getRangoAventurero(nivel) {
     if (nivel >= 2000) return { rango: "SSS", emoji: "🟣", medalla: "🏆" };
@@ -1327,12 +1346,12 @@ if (cmd === "stats") {
     acaText += `${emoji} ${key}: Nivel ${nivel}\n[${barra}]\n`;
   });
 
- const baseHP = (you.hpMax || 0)
-             + (aca.curacion || 0) * 5
-             + (you.golem?.hpBuff || 0)
-             + (you.mascotaEquipada?.hpBuff || 0);
+  const baseHP = (you.hpMax || 0)
+               + (aca.curacion || 0) * 5
+               + (you.golem?.hpBuff || 0)
+               + (you.mascotaEquipada?.hpBuff || 0);
 
-const totalHP = baseHP * (you.limitBreaker?.active ? 2 : 1);
+  const totalHP = baseHP * (you.limitBreaker?.active ? 2 : 1);
   const totalMana = (you.manamax || 0) + ((aca.manaMax || 0) * 10);
   const totalAtk = getAttack(you);
   const totalDef = getDefense(you);
@@ -1351,6 +1370,7 @@ const totalHP = baseHP * (you.limitBreaker?.active ? 2 : 1);
     `✨🏹 *Tus Stats* 🏹✨\n\n` +
     `${limitText}` +
     `${rankingText}\n` +
+    `🏰 Clan: ${clanTxt}\n` +
     `💠 Rango Aventurero: ${rangoInfo.emoji} *${rangoInfo.rango}* ${rangoInfo.medalla}\n` +
     `🏅 Misiones de Gremio: ${insigniaText}\n` +
     `🏰 Piso Dungeon Ancestral superado: ${pisoDungeon}\n` +
@@ -1373,6 +1393,467 @@ const totalHP = baseHP * (you.limitBreaker?.active ? 2 : 1);
     acaText;
 
   return sendReply(txt);
+}
+
+
+
+// -----------------------------
+// SISTEMA DE CLANES (PERSISTENTE EN DB)
+// -----------------------------
+if (cmd === "clan") {
+  // Asegurar que la tabla de clanes exista en la DB persistente
+  if (!DB.clanes) DB.clanes = {};
+
+  const subClan = rest[0]?.toLowerCase();
+  const argClan = rest.slice(1).join(" ").trim();
+  const CREATION_COST = 1000000;
+  const CREATION_LEVEL = 500;
+  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+
+  // Helper seguro para buscar el clan al que pertenece el usuario
+  const getUserClan = (uid) => {
+    return Object.values(DB.clanes).find(c => {
+      if (!c) return false;
+      const coolideres = c.coolideres || [];
+      const miembros = c.miembros || [];
+      return c.lider === uid || coolideres.includes(uid) || miembros.includes(uid);
+    });
+  };
+
+  // Helper para formatear usuario al estilo ranking: *Nick* (@número)
+  const formatUserTag = (uid) => {
+    const numOnly = onlyNumbers(uid);
+    const u = getUser(uid);
+    const displayName = u?.nick || numOnly;
+    return {
+      text: `*${displayName}* (@${numOnly})`,
+      jid: uid
+    };
+  };
+
+  const myClan = getUserClan(normalizedUserId);
+
+  // Normalizar los arrays de myClan por si vienen undefined de la DB
+  if (myClan) {
+    if (!myClan.coolideres) myClan.coolideres = [];
+    if (!myClan.miembros) myClan.miembros = [];
+    if (!myClan.espera) myClan.espera = [];
+  }
+
+  // ------------------------------------------------
+  // MENÚ DE AYUDA / INFO Y ESTADO DE TU CLAN
+  // ------------------------------------------------
+  if (subClan === "ayuda" || subClan === "info") {
+    return sendReply(
+      `🏰 *SISTEMA DE CLANES*\n\n` +
+      `📌 *Comandos disponibles:*\n` +
+      `• \`${PREFIX}rpg clan crear <Nombre>\` (Req: Lvl ${CREATION_LEVEL} + $${fmt(CREATION_COST)})\n` +
+      `• \`${PREFIX}rpg clan unirse\` (Postularte al clan de este grupo)\n` +
+      `• \`${PREFIX}rpg clan ver\` (Ver clan de este grupo)\n` +
+      `• \`${PREFIX}rpg clan mi\` (Ver la información de tu clan actual)\n` +
+      `• \`${PREFIX}rpg clan accept\` (Para aceptar una invitación recibida)\n` +
+      `• \`${PREFIX}rpg clan rechazar\` (Para rechazar una invitación recibida)\n` +
+      `• \`${PREFIX}rpg clan salir\` (para salir del clan - 3 días de cooldown)\n\n` +
+      `📌 *Comandos líder/co-líder:*\n` +
+      `• \`${PREFIX}rpg clan espera\` (para ver la lista de postulados)\n` +
+      `• \`${PREFIX}rpg clan aceptar @usuario\` (acepta a un postulado de la lista)\n` +
+      `• \`${PREFIX}rpg clan invitar @usuario\` (invita a un usuario al clan)\n` +
+      `• \`${PREFIX}rpg clan expulsar @usuario\` (expulsa a un integrante)\n` +
+      `• \`${PREFIX}rpg clan promover @usuario\` (asciende a Co-Líder - Solo Líder)\n` +
+      `• \`${PREFIX}rpg clan degradar @usuario\` (degrada a Miembro - Solo Líder)\n` +
+      `• \`${PREFIX}rpg clan disolver\` (elimina el clan - Solo Líder)`
+    );
+  }
+
+  // Si ejecuta solo `.rpg clan` o `.rpg clan mi`
+  if (!subClan || subClan === "mi") {
+    if (!myClan) {
+      return sendErrorReply(`❌ No pertenecés a ningún clan. Usá \`${PREFIX}rpg clan ayuda\` para ver los comandos.`);
+    }
+
+    const mentionsList = [];
+
+    // Formatear Líder
+    const liderTag = formatUserTag(myClan.lider);
+    mentionsList.push(liderTag.jid);
+
+    // Formatear Co-Líderes
+    const coolideresNicks = myClan.coolideres.length > 0 
+      ? myClan.coolideres.map(c => {
+          const tag = formatUserTag(c);
+          mentionsList.push(tag.jid);
+          return tag.text;
+        }).join(", ")
+      : "Ninguno";
+
+    // Formatear Integrantes
+    const miembrosNicks = myClan.miembros.map(m => {
+      const tag = formatUserTag(m);
+      const u = getUser(m);
+      mentionsList.push(tag.jid);
+      return `• ${tag.text} (Lvl ${u?.nivel || 1})`;
+    }).join("\n");
+
+    const txt = 
+      `🏰 *CLAN: ${myClan.nombre}*\n` +
+      `👑 *Líder:* ${liderTag.text}\n` +
+      `⚔️ *Co-Líderes (${myClan.coolideres.length}/5):* ${coolideresNicks}\n` +
+      `👥 *Integrantes (${myClan.miembros.length}/20):*\n${miembrosNicks}\n\n` +
+      `📜 *Solicitudes pendientes:* ${myClan.espera.length}`;
+
+    return sendReply(txt, mentionsList);
+  }
+
+  // ------------------------------------------------
+  // VER CLAN DEL GRUPO ACTUAL
+  // ------------------------------------------------
+  if (subClan === "ver") {
+    const groupClan = DB.clanes[currentChat];
+    if (!groupClan) return sendErrorReply("❌ En este grupo aún no se ha creado ningún clan.");
+
+    const miembros = groupClan.miembros || [];
+    const espera = groupClan.espera || [];
+    const mentionsList = [];
+
+    const liderTag = formatUserTag(groupClan.lider);
+    mentionsList.push(liderTag.jid);
+
+    const txt = 
+      `🏰 *CLAN DEL GRUPO: ${groupClan.nombre}*\n` +
+      `👑 *Líder:* ${liderTag.text}\n` +
+      `👥 *Miembros:* ${miembros.length}/20\n` +
+      `⏳ *En espera:* ${espera.length} postulantes`;
+
+    return sendReply(txt, mentionsList);
+  }
+
+  // ------------------------------------------------
+  // CREAR CLAN
+  // ------------------------------------------------
+  if (subClan === "crear") {
+    if (DB.clanes[currentChat]) {
+      return sendErrorReply("❌ Ya existe un clan registrado en este grupo.");
+    }
+    if (myClan) {
+      return sendErrorReply("❌ Ya pertenecés a un clan. Debes salir primero.");
+    }
+    if ((you.lastClanExit || 0) + THREE_DAYS_MS > Date.now()) {
+      return sendErrorReply(`⏳ Tenés que esperar cooldown para crear o unirte a un clan.`);
+    }
+    if ((you.nivel || 1) < CREATION_LEVEL) {
+      return sendErrorReply(`❌ Requerís nivel ${CREATION_LEVEL} para fundar un clan.`);
+    }
+    if ((you.monedas || 0) < CREATION_COST) {
+      return sendErrorReply(`❌ Requerís $${fmt(CREATION_COST)} monedas.`);
+    }
+    if (!argClan) {
+      return sendErrorReply(`Uso: *${PREFIX}rpg clan crear <Nombre del Clan>*`);
+    }
+
+    you.monedas -= CREATION_COST;
+
+    DB.clanes[currentChat] = {
+      idGrupo: currentChat,
+      grupoTag: currentChat.split("@")[0],
+      nombre: argClan,
+      lider: normalizedUserId,
+      coolideres: [],
+      miembros: [normalizedUserId],
+      espera: []
+    };
+
+    saveDB();
+    await sendSuccessReact();
+    return sendReply(`🎉 ¡Has fundado el clan *${argClan}* con éxito!\n👑 Sos el Líder Supremo.`);
+  }
+
+  // ------------------------------------------------
+  // UNIRSE / POSTULARSE
+  // ------------------------------------------------
+  if (subClan === "unirse") {
+    const groupClan = DB.clanes[currentChat];
+    if (!groupClan) return sendErrorReply("❌ No hay ningún clan creado en este grupo.");
+    if (myClan) return sendErrorReply("❌ Ya pertenecés a un clan.");
+    if ((you.lastClanExit || 0) + THREE_DAYS_MS > Date.now()) {
+      return sendErrorReply(`⏳ Tenés un cooldown activo por haber salido o disuelto un clan.`);
+    }
+
+    if (!groupClan.miembros) groupClan.miembros = [];
+    if (!groupClan.espera) groupClan.espera = [];
+
+    if (groupClan.miembros.length >= 20) return sendErrorReply("❌ El clan ya alcanzó el límite de 20 integrantes.");
+    if (groupClan.espera.includes(normalizedUserId)) return sendErrorReply("⚠️ Ya estás en la lista de espera.");
+
+    groupClan.espera.push(normalizedUserId);
+    groupClan.espera.sort((a, b) => (DB[b]?.nivel || 0) - (DB[a]?.nivel || 0));
+
+    saveDB();
+    await sendSuccessReact();
+    return sendReply(`📝 Te has postulado para ingresar a *${groupClan.nombre}*. Esperá la aprobación.`);
+  }
+
+  // ------------------------------------------------
+  // SOLICITUDES EN ESPERA
+  // ------------------------------------------------
+  if (subClan === "espera" || subClan === "solicitudes") {
+    if (!myClan) return sendErrorReply("❌ No pertenecés a ningún clan.");
+    const esLider = myClan.lider === normalizedUserId;
+    const esCoLider = myClan.coolideres.includes(normalizedUserId);
+    if (!esLider && !esCoLider) return sendErrorReply("❌ Solo el líder o co-líderes pueden ver las solicitudes.");
+
+    if (myClan.espera.length === 0) return sendReply("📜 No hay solicitudes pendientes.");
+
+    const mentionsList = [];
+    let listTxt = `📜 *SOLICITUDES DE INGRESO (${myClan.nombre})*\n\n`;
+
+    myClan.espera.forEach((uid, idx) => {
+      const tag = formatUserTag(uid);
+      const u = getUser(uid);
+      mentionsList.push(tag.jid);
+      listTxt += `${idx + 1}. ${tag.text} - Nivel: ${u?.nivel || 1}\n`;
+    });
+
+    return sendReply(listTxt, mentionsList);
+  }
+
+  // ------------------------------------------------
+  // ACEPTAR POSTULANTE DE LA LISTA DE ESPERA (.rpg clan aceptar @usuario)
+  // ------------------------------------------------
+  if (subClan === "aceptar") {
+    if (!myClan) return sendErrorReply("❌ No pertenecés a ningún clan.");
+    const esLider = myClan.lider === normalizedUserId;
+    const esCoLider = myClan.coolideres.includes(normalizedUserId);
+    if (!esLider && !esCoLider) return sendErrorReply("❌ Solo el líder o co-líderes pueden aceptar postulantes.");
+
+    const rawMention = rest[1]?.replace(/\D/g, "");
+    if (!rawMention) return sendErrorReply(`Uso: *${PREFIX}rpg clan aceptar @usuario*`);
+
+    const normalizedTargetId = normalizeId(rawMention + "@s.whatsapp.net");
+
+    if (!myClan.espera.includes(normalizedTargetId)) return sendErrorReply("❌ Ese usuario no está en la lista de espera.");
+    if (myClan.miembros.length >= 20) return sendErrorReply("❌ El clan está lleno (20/20).");
+
+    myClan.espera = myClan.espera.filter(u => u !== normalizedTargetId);
+    myClan.miembros.push(normalizedTargetId);
+
+    saveDB();
+    await sendSuccessReact();
+
+    const targetTag = formatUserTag(normalizedTargetId);
+    return sendReply(`✅ Usuario ${targetTag.text} aceptado en el clan.`, [targetTag.jid]);
+  }
+
+  // ------------------------------------------------
+  // INVITAR A UN USUARIO (ENVÍA INVITACIÓN)
+  // ------------------------------------------------
+  if (subClan === "invitar") {
+    if (!myClan) return sendErrorReply("❌ No pertenecés a ningún clan.");
+    const esLider = myClan.lider === normalizedUserId;
+    const esCoLider = myClan.coolideres.includes(normalizedUserId);
+    if (!esLider && !esCoLider) return sendErrorReply("❌ Solo el líder o co-líderes pueden invitar.");
+
+    const rawMention = rest[1]?.replace(/\D/g, "");
+    if (!rawMention) return sendErrorReply(`Uso: *${PREFIX}rpg clan invitar @usuario*`);
+
+    const normalizedTargetId = normalizeId(rawMention + "@s.whatsapp.net");
+    const targetUser = getUser(normalizedTargetId);
+
+    if (!targetUser) return sendErrorReply("❌ El usuario no tiene perfil RPG.");
+    if (getUserClan(normalizedTargetId)) return sendErrorReply("❌ El usuario ya pertenece a un clan.");
+    if (myClan.miembros.length >= 20) return sendErrorReply("❌ Tu clan ya alcanzó el límite de 20 integrantes.");
+
+    targetUser.invitacionClan = {
+      idGrupo: myClan.idGrupo,
+      nombreClan: myClan.nombre,
+      invitador: normalizedUserId,
+      fecha: Date.now()
+    };
+
+    saveDB();
+    await sendSuccessReact();
+
+    const targetTag = formatUserTag(normalizedTargetId);
+    return sendReply(
+      `📩 ¡Invitación enviada a ${targetTag.text}!\n\n` +
+      `El usuario debe usar:\n` +
+      `• *${PREFIX}rpg clan accept* para unirse\n` +
+      `• *${PREFIX}rpg clan rechazar* para denegar`,
+      [targetTag.jid]
+    );
+  }
+
+  // ------------------------------------------------
+  // ACEPTAR INVITACIÓN DIRECTA (.rpg clan accept)
+  // ------------------------------------------------
+  if (subClan === "accept") {
+    if (!you.invitacionClan) {
+      return sendErrorReply("❌ No tenés ninguna invitación de clan pendiente.");
+    }
+
+    if (myClan) {
+      delete you.invitacionClan;
+      saveDB();
+      return sendErrorReply("❌ Ya pertenecés a un clan. Se canceló la invitación.");
+    }
+
+    const targetClan = DB.clanes[you.invitacionClan.idGrupo];
+    if (!targetClan) {
+      delete you.invitacionClan;
+      saveDB();
+      return sendErrorReply("❌ El clan que te invitó ya no existe.");
+    }
+
+    if (!targetClan.miembros) targetClan.miembros = [];
+    if (targetClan.miembros.length >= 20) {
+      delete you.invitacionClan;
+      saveDB();
+      return sendErrorReply("❌ El clan ya se encuentra lleno.");
+    }
+
+    targetClan.miembros.push(normalizedUserId);
+    
+    if (targetClan.espera) {
+      targetClan.espera = targetClan.espera.filter(u => u !== normalizedUserId);
+    }
+
+    delete you.invitacionClan;
+
+    saveDB();
+    await sendSuccessReact();
+    return sendReply(`🎉 ¡Aceptaste la invitación! Te has unido al clan *${targetClan.nombre}*.`);
+  }
+
+  // ------------------------------------------------
+  // RECHAZAR INVITACIÓN
+  // ------------------------------------------------
+  if (subClan === "rechazar" || subClan === "denegar") {
+    if (!you.invitacionClan) {
+      return sendErrorReply("❌ No tenés ninguna invitación de clan pendiente.");
+    }
+
+    const nombreClan = you.invitacionClan.nombreClan;
+    delete you.invitacionClan;
+
+    saveDB();
+    await sendSuccessReact();
+    return sendReply(`❌ Rechazaste la invitación para unirte al clan *${nombreClan}*.`);
+  }
+
+  // ------------------------------------------------
+  // PROMOVER A CO-LÍDER
+  // ------------------------------------------------
+  if (subClan === "promover" || subClan === "ascender") {
+    if (!myClan) return sendErrorReply("❌ No pertenecés a ningún clan.");
+    if (myClan.lider !== normalizedUserId) return sendErrorReply("❌ Solo el líder del clan puede promover miembros.");
+
+    const rawMention = rest[1]?.replace(/\D/g, "");
+    if (!rawMention) return sendErrorReply(`Uso: *${PREFIX}rpg clan promover @usuario*`);
+
+    const normalizedTargetId = normalizeId(rawMention + "@s.whatsapp.net");
+
+    if (normalizedTargetId === myClan.lider) return sendErrorReply("❌ Vos ya sos el Líder.");
+    if (!myClan.miembros.includes(normalizedTargetId)) return sendErrorReply("❌ El usuario no pertenece a tu clan.");
+    if (myClan.coolideres.includes(normalizedTargetId)) return sendErrorReply("⚠️ El usuario ya es Co-Líder.");
+    if (myClan.coolideres.length >= 5) return sendErrorReply("❌ El clan ya alcanzó el límite de 5 Co-Líderes.");
+
+    myClan.coolideres.push(normalizedTargetId);
+
+    saveDB();
+    await sendSuccessReact();
+
+    const targetTag = formatUserTag(normalizedTargetId);
+    return sendReply(`⚔️ ¡${targetTag.text} ha sido promovido a *Co-Líder*!`, [targetTag.jid]);
+  }
+
+  // ------------------------------------------------
+  // DEGRADAR CO-LÍDER
+  // ------------------------------------------------
+  if (subClan === "degradar") {
+    if (!myClan) return sendErrorReply("❌ No pertenecés a ningún clan.");
+    if (myClan.lider !== normalizedUserId) return sendErrorReply("❌ Solo el líder del clan puede degradar integrantes.");
+
+    const rawMention = rest[1]?.replace(/\D/g, "");
+    if (!rawMention) return sendErrorReply(`Uso: *${PREFIX}rpg clan degradar @usuario*`);
+
+    const normalizedTargetId = normalizeId(rawMention + "@s.whatsapp.net");
+
+    if (normalizedTargetId === myClan.lider) return sendErrorReply("❌ No podés degradarte a vos mismo.");
+    if (!myClan.coolideres.includes(normalizedTargetId)) return sendErrorReply("❌ El usuario no es Co-Líder.");
+
+    myClan.coolideres = myClan.coolideres.filter(c => c !== normalizedTargetId);
+
+    saveDB();
+    await sendSuccessReact();
+
+    const targetTag = formatUserTag(normalizedTargetId);
+    return sendReply(`👤 ${targetTag.text} ha sido degradado a *Miembro*.`, [targetTag.jid]);
+  }
+
+  // ------------------------------------------------
+  // EXPULSAR
+  // ------------------------------------------------
+  if (subClan === "expulsar" || subClan === "quitar") {
+    if (!myClan) return sendErrorReply("❌ No pertenecés a ningún clan.");
+    const esLider = myClan.lider === normalizedUserId;
+    const esCoLider = myClan.coolideres.includes(normalizedUserId);
+    if (!esLider && !esCoLider) return sendErrorReply("❌ Sin permisos para expulsar.");
+
+    const rawMention = rest[1]?.replace(/\D/g, "");
+    if (!rawMention) return sendErrorReply(`Uso: *${PREFIX}rpg clan expulsar @usuario*`);
+
+    const normalizedTargetId = normalizeId(rawMention + "@s.whatsapp.net");
+
+    if (normalizedTargetId === myClan.lider) return sendErrorReply("❌ No se puede expulsar al líder.");
+    if (esCoLider && myClan.coolideres.includes(normalizedTargetId)) return sendErrorReply("❌ Co-líderes no pueden expulsar a otros co-líderes.");
+    if (!myClan.miembros.includes(normalizedTargetId)) return sendErrorReply("❌ El usuario no está en tu clan.");
+
+    myClan.miembros = myClan.miembros.filter(m => m !== normalizedTargetId);
+    myClan.coolideres = myClan.coolideres.filter(c => c !== normalizedTargetId);
+
+    const targetUser = getUser(normalizedTargetId);
+    if (targetUser) targetUser.lastClanExit = Date.now();
+
+    saveDB();
+    await sendSuccessReact();
+
+    const targetTag = formatUserTag(normalizedTargetId);
+    return sendReply(`🚫 Usuario ${targetTag.text} expulsado del clan.`, [targetTag.jid]);
+  }
+
+  // ------------------------------------------------
+  // SALIR DEL CLAN
+  // ------------------------------------------------
+  if (subClan === "salir") {
+    if (!myClan) return sendErrorReply("❌ No pertenecés a ningún clan.");
+    if (myClan.lider === normalizedUserId) return sendErrorReply("❌ El líder no puede salir, debe disolver el clan.");
+
+    myClan.miembros = myClan.miembros.filter(m => m !== normalizedUserId);
+    myClan.coolideres = myClan.coolideres.filter(c => c !== normalizedUserId);
+    you.lastClanExit = Date.now();
+
+    saveDB();
+    await sendSuccessReact();
+    return sendReply(`🚪 Saliste del clan *${myClan.nombre}*.`);
+  }
+
+  // ------------------------------------------------
+  // DISOLVER CLAN
+  // ------------------------------------------------
+  if (subClan === "disolver") {
+    if (!myClan) return sendErrorReply("❌ No pertenecés a ningún clan.");
+    if (myClan.lider !== normalizedUserId) return sendErrorReply("❌ Solo el líder puede disolver.");
+
+    myClan.miembros.forEach(m => {
+      const u = getUser(m);
+      if (u) u.lastClanExit = Date.now();
+    });
+
+    delete DB.clanes[myClan.idGrupo];
+
+    saveDB();
+    await sendSuccessReact();
+    return sendReply(`💥 El clan *${myClan.nombre}* ha sido disuelto.`);
+  }
 }
 
 if(cmd === "cooldowns"){
@@ -4791,13 +5272,28 @@ if (cmd === "evento-mascota") {
 
 // -------- RANKING GAMIFICADO --------
 if (cmd === "ranking" || cmd === "leaderboard") {
-  const arr = Object.entries(DB).map(([id, u]) => ({
-    id,
-    nivel: u.nivel || 0,
-    xp: u.xp || 0,
-    monedas: u.monedas || 0,
-    piso: u.ancestral?.floor || 0
-  }));
+  // Asegurar que la estructura de clanes exista en DB para evitar errores
+  if (!DB.clanes) DB.clanes = {};
+
+  // Helper para obtener el clan de un usuario
+  const getUserClan = (uid) => {
+    return Object.values(DB.clanes).find(c => {
+      if (!c) return false;
+      const coolideres = c.coolideres || [];
+      const miembros = c.miembros || [];
+      return c.lider === uid || coolideres.includes(uid) || miembros.includes(uid);
+    });
+  };
+
+  const arr = Object.entries(DB)
+    .filter(([id]) => id !== "clanes") // Ignorar la clave de clanes si está en la raíz de DB
+    .map(([id, u]) => ({
+      id,
+      nivel: u.nivel || 0,
+      xp: u.xp || 0,
+      monedas: u.monedas || 0,
+      piso: u.ancestral?.floor || 0
+    }));
 
   // Ordenamos por nivel, luego XP, luego piso de dungeon, luego monedas
   arr.sort((a, b) =>
@@ -4820,6 +5316,10 @@ if (cmd === "ranking" || cmd === "leaderboard") {
     const jugador = getUser(p.id);
     const numOnly = onlyNumbers(p.id);
     const displayName = jugador?.nick || numOnly;
+
+    // Buscar si el usuario pertenece a un clan
+    const clan = getUserClan(p.id);
+    const clanTxt = clan ? ` 🛡️ *Clan:* ${clan.nombre}` : "";
 
     // Emoji para el puesto
     let puestoEmoji;
@@ -4849,7 +5349,7 @@ if (cmd === "ranking" || cmd === "leaderboard") {
 
     // -------- BARRA DUNGEON --------
     const dungeonBlocks = 10;
-    const dungeonMax = 500;
+    const dungeonMax = 1000;
     const dungeonFilled = Math.floor((p.piso / dungeonMax) * dungeonBlocks);
 
     let dungeonBar = "";
@@ -4857,7 +5357,7 @@ if (cmd === "ranking" || cmd === "leaderboard") {
       dungeonBar += i < dungeonFilled ? "🟥" : "⬜";
     }
 
-    txt += `${puestoEmoji} *${displayName}* (@${numOnly})\n`;
+    txt += `${puestoEmoji} *${displayName}* (@${numOnly})${clanTxt}\n`;
     txt += `Nivel: ${lvlBar} ⭐ ${p.nivel}\n`;
     txt += `XP: ${xpBar} (${p.xp} XP)\n`;
     txt += `💰 Monedas: $${fmt(p.monedas)}\n`;

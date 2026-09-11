@@ -11,21 +11,20 @@ function normalizeJid(jid) {
   return `${number}@`;
 }
 
-// rango aventurero (igual que tu rpg.js)
- function getRangoAventurero(nivel) {
-    if (nivel >= 2000) return { rango: "SSS", emoji: "🟣", medalla: "🏆" };
-    if (nivel >= 1000) return { rango: "SS", emoji: "🔴", medalla: "🎖️" };
-    if (nivel >= 500) return { rango: "S", emoji: "🟠", medalla: "🎖️" };
-    if (nivel >= 300) return { rango: "A", emoji: "🟡", medalla: "🏅" };
-    if (nivel >= 150) return { rango: "B", emoji: "🟢", medalla: "🏅" };
-    if (nivel >= 100) return { rango: "C", emoji: "🔵", medalla: "🥈" };
-    if (nivel >= 50) return { rango: "D", emoji: "🟣", medalla: "🥉" };
-    if (nivel >= 30) return { rango: "E", emoji: "⚪", medalla: "⚪" };
-    return { rango: "F", emoji: "⚫", medalla: "⚫" };
-  }
+// Rango aventurero
+function getRangoAventurero(nivel) {
+  if (nivel >= 2000) return { rango: "SSS", emoji: "🟣", medalla: "🏆" };
+  if (nivel >= 1000) return { rango: "SS", emoji: "🔴", medalla: "🎖️" };
+  if (nivel >= 500) return { rango: "S", emoji: "🟠", medalla: "🎖️" };
+  if (nivel >= 300) return { rango: "A", emoji: "🟡", medalla: "🏅" };
+  if (nivel >= 150) return { rango: "B", emoji: "🟢", medalla: "🏅" };
+  if (nivel >= 100) return { rango: "C", emoji: "🔵", medalla: "🥈" };
+  if (nivel >= 50) return { rango: "D", emoji: "🟣", medalla: "🥉" };
+  if (nivel >= 30) return { rango: "E", emoji: "⚪", medalla: "⚪" };
+  return { rango: "F", emoji: "⚫", medalla: "⚫" };
+}
 
-
-// tiempo desde registro
+// Tiempo desde registro
 function tiempoRegistro(timestamp) {
   if (!timestamp) return "Desconocido";
 
@@ -99,12 +98,13 @@ module.exports = {
       // ====================
 
       const users = getDB("users");
-      const rpg = getDB("rpg");
+      const rpgDB = DB || getDB("rpg"); // Usa la instancia de DB activa o cae a la caché
 
-      const dbUser = users[targetJid] || {};
-      const rpgUser = rpg[targetJid] || {};
+      const dbUser = users[targetJid] || users[normalizeJid(targetJid)] || {};
+      const rpgUser = rpgDB[targetJid] || {};
 
       const age = dbUser.age || "No registrada";
+      const gender = dbUser.gender || "No registrado";
       const commandsUsed = dbUser.commandsUsed || 0;
       const name = dbUser.name || `@${targetJid.split("@")[0]}`;
 
@@ -114,6 +114,19 @@ module.exports = {
       const monedas = rpgUser.monedas || 0;
 
       const rango = getRangoAventurero(nivel);
+
+      // ====================
+      // LECTURA DE CLAN (ESTILO RPG)
+      // ====================
+      const clanes = rpgDB.clanes || {};
+      const userClan = Object.values(clanes).find(c => {
+        if (!c) return false;
+        const coolideres = c.coolideres || [];
+        const miembros = c.miembros || [];
+        return c.lider === targetJid || coolideres.includes(targetJid) || miembros.includes(targetJid);
+      });
+
+      const clanNombre = userClan ? userClan.nombre : "Sin clan";
 
       // ====================
       // MATRIMONIO
@@ -138,14 +151,16 @@ module.exports = {
 
       const mensagem = `
 👤 *Nombre:* ${name}
-🎖️ *Cargo:* ${userRole}
+🧬 *Sexo:* ${gender}
 🎂 *Edad:* ${age}
+🎖️ *Cargo:* ${userRole}
 💍 *Estado Civil:* ${estadoCivil}
 
 📅 *Registrado hace:* ${tiempo}
 ⚡ *Comandos usados:* ${commandsUsed}
 
 ⚔️ *Nivel RPG:* ${nivel}
+🛡️ *Clan:* ${clanNombre}
 🏅 *Rango Aventurero:* ${rango.emoji} ${rango.rango}
 💰 *Monedas:* ${monedas.toLocaleString("es-AR")}
 `;
@@ -164,4 +179,3 @@ module.exports = {
     }
   },
 };
-

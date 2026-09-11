@@ -71,6 +71,14 @@ setInterval(() => {
   } catch {}
 }, 300000);
 
+/* Helper para normalizar sexo */
+function parseGender(input) {
+  if (!input) return "No especificado";
+  const val = input.toLowerCase();
+  if (["h", "hombre", "masculino", "m"].includes(val)) return "Hombre 👨";
+  if (["f", "mujer", "femenino"].includes(val)) return "Mujer 👩";
+  return input.charAt(0).toUpperCase() + input.slice(1);
+}
 
 /**
  * Verifica si el usuario está registrado
@@ -78,7 +86,7 @@ setInterval(() => {
 async function requireRegistration(userJid, sendWarningReply) {
   if (!usersCache[userJid]) {
     await sendWarningReply(
-      "⚠️ Necesitas registrarte primero usando:\n.reg TuNombre Edad"
+      "⚠️ Necesitas registrarte primero usando:\n.reg TuNombre Edad Sexo\nEjemplo: .reg Leo 23 hombre"
     );
     return false;
   }
@@ -87,15 +95,16 @@ async function requireRegistration(userJid, sendWarningReply) {
 }
 
 /**
- * Registra o actualiza usuario
+ * Registra o actualiza usuario (con campo sexo/gender)
  */
-function registerUser(userJid, name, age, profilePic = null) {
+function registerUser(userJid, name, age, gender, profilePic = null) {
   const now = Date.now();
 
   if (!usersCache[userJid]) {
     usersCache[userJid] = {
       name,
       age,
+      gender,
       profilePic,
       registeredAt: now,
       commandsUsed: 0,
@@ -103,6 +112,7 @@ function registerUser(userJid, name, age, profilePic = null) {
   } else {
     usersCache[userJid].name = name;
     usersCache[userJid].age = age;
+    usersCache[userJid].gender = gender;
 
     if (profilePic) {
       usersCache[userJid].profilePic = profilePic;
@@ -147,7 +157,6 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
   /* =====================================================
      🟢 REGISTRO GLOBAL DE CONEXIÓN Y GRUPOS ACTIVOS (RPG DROPS)
   ===================================================== */
-  // Siempre actualizamos la referencia global del socket activo
   if (socket) {
     global.conn = socket;
     global.sock = socket;
@@ -165,7 +174,6 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
     });
   }
 
-  // Función global para enviar mensajes de sistema directos (sin requerir cita/quoted)
   if (!global.enviarMensajeGrupo) {
     global.enviarMensajeGrupo = async (jidGrupo, texto) => {
       const activeSocket = global.conn || global.sock || socket;
@@ -179,11 +187,6 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
 
   const message = (fullMessage || "").trim();
   const activeGroup = isActiveGroup(remoteJid);
-  
-  // Continuación de tu dynamicCommand...
-
-  // ... (a partir de aquí continúa el resto de tu código sin cambios)
-
 
   /* =========================================
      🔹 ANTILINK GLOBAL
@@ -258,29 +261,31 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
 
   if (cmd === "reg" || cmd === "reg2") {
 
-    if (args.length < 2) {
-      await sendWarningReply("Uso: .reg Nombre Edad\nEjemplo: .reg Leo 23");
+    if (args.length < 3) {
+      await sendWarningReply("Uso: .reg Nombre Edad Sexo\nEjemplo: .reg Leo 23 hombre");
       return;
     }
 
     const name = args[0];
     const age = parseInt(args[1]);
+    const genderRaw = args[2];
 
-    if (isNaN(age)) {
-      await sendWarningReply("⚠️ Edad inválida.");
+    if (isNaN(age) || !genderRaw) {
+      await sendWarningReply("⚠️ Asegúrate de ingresar una edad numérica válida y el sexo.");
       return;
     }
 
+    const gender = parseGender(genderRaw);
     let profilePic = null;
 
     try {
       profilePic = await socket.profilePictureUrl(userJid).catch(() => null);
     } catch {}
 
-    registerUser(userJid, name, age, profilePic);
+    registerUser(userJid, name, age, gender, profilePic);
 
     await sendReply(
-      `✅ Usuario registrado correctamente como ${name}, ${age} años.`
+      `✅ Usuario registrado correctamente como ${name}, ${age} años, ${gender}.`
     );
 
     return;
@@ -428,8 +433,6 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
       mentionedJid,
     });
 
-
-
   } catch (error) {
 
     if (badMacHandler.handleError(error, `command:${command?.name}`)) {
@@ -463,5 +466,4 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
     }
   }
 };
-
 
