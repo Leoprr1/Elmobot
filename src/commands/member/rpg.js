@@ -1225,23 +1225,28 @@ module.exports = {
 // -------- STATS SIN BOTONES --------
 if (cmd === "stats") {
 
- // --- BUSCAR CLAN DEL USUARIO EN STATS ---
-if (!DB.clanes) DB.clanes = {};
-const userClanObj = Object.values(DB.clanes).find(c => 
-  c.lider === normalizedUserId || c.coolideres.includes(normalizedUserId) || c.miembros.includes(normalizedUserId)
-);
+  // --- BUSCAR CLAN DEL USUARIO EN STATS (CORREGIDO) ---
+  if (!DB.clanes) DB.clanes = {};
+  const userClanObj = Object.values(DB.clanes).find(c => 
+    c && (
+      c.lider === normalizedUserId || 
+      (Array.isArray(c.coolideres) && c.coolideres.includes(normalizedUserId)) || 
+      (Array.isArray(c.miembros) && c.miembros.includes(normalizedUserId))
+    )
+  );
 
   let clanTxt = "Ninguno";
   if (userClanObj) {
     let rol = "👤 Miembro";
     if (userClanObj.lider === normalizedUserId) {
       rol = "👑 Líder";
-    } else if (userClanObj.coolideres.includes(normalizedUserId)) {
+    } else if (Array.isArray(userClanObj.coolideres) && userClanObj.coolideres.includes(normalizedUserId)) {
       rol = "⚔️ Co-Líder";
     }
 
-    clanTxt = `🏰 ${userClanObj.nombre} (${rol})`;
+    clanTxt = `🏰 ${userClanObj.nombre || "Sin Nombre"} (${rol})`;
   }
+
 
   // --- Función para obtener rango según nivel ---
   function getRangoAventurero(nivel) {
