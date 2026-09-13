@@ -155,7 +155,7 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
   } = paramsHandler;
 
   /* =====================================================
-     🟢 REGISTRO GLOBAL DE CONEXIÓN Y GRUPOS ACTIVOS (RPG DROPS)
+     🟢 CONEXIÓN GLOBAL (RPG DROPS)
   ===================================================== */
   if (socket) {
     global.conn = socket;
@@ -164,14 +164,6 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
 
   if (!global.ACTIVE_RPG_GROUPS) {
     global.ACTIVE_RPG_GROUPS = new Map();
-  }
-
-  if (remoteJid && remoteJid.endsWith("@g.us")) {
-    global.ACTIVE_RPG_GROUPS.set(remoteJid, {
-      conn: socket,
-      lastMsg: webMessage,
-      sendReply
-    });
   }
 
   if (!global.enviarMensajeGrupo) {
@@ -183,9 +175,23 @@ exports.dynamicCommand = async (paramsHandler, startProcess) => {
       return await activeSocket.sendMessage(jidGrupo, { text: texto });
     };
   }
-  /* ===================================================== */
 
   const message = (fullMessage || "").trim();
+
+  // 🎯 SOLO REGISTRA EL GRUPO EN DROPS SI SE EJECUTA UN COMANDO RPG
+  if (
+    remoteJid && 
+    remoteJid.endsWith("@g.us") && 
+    (message.startsWith(`${prefix}rpg`) || message.startsWith(".rpg"))
+  ) {
+    global.ACTIVE_RPG_GROUPS.set(remoteJid, {
+      conn: socket,
+      lastMsg: webMessage,
+      sendReply
+    });
+  }
+  /* ===================================================== */
+
   const activeGroup = isActiveGroup(remoteJid);
 
   /* =========================================

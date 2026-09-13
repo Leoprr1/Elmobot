@@ -432,7 +432,7 @@ function getUser(id) {
   }
 
   // ----------------------------
-  // 💥 LIMIT BREAKER - DRENAJE PASIVO
+  // 💥 LIMIT BREAKER - DRENAJE PASIVO (10% MAX HP & MANA)
   // ----------------------------
   const aca = user.academia?.especialidades || {};
   if (user.limitBreaker?.active) {
@@ -444,22 +444,48 @@ function getUser(id) {
       let lbTicks = Math.floor(elapsedLB / 60000);
       if (lbTicks > 60) lbTicks = 60;
 
+      // Base HP y Mana con multiplicador x2 de Limit Breaker
+      const baseHP = (user.hpMax || 0)
+        + (aca.curacion || 0) * 5
+        + (user.golem?.hpBuff || 0)
+        + (user.mascotaEquipada?.hpBuff || 0);
+      const maxHpWithLB = baseHP * 2;
+
+      const baseMana = (user.manaMax || 100);
+      const maxManaWithLB = baseMana * 2;
+
+      // 10% base
+      const rawHpDrain = maxHpWithLB * 0.10;
+      const rawManaDrain = maxManaWithLB * 0.10;
+
+      // Reducción de Mana por academia (máximo 80%)
       const manaLevel = (aca.manaMax || 0);
       const reduction = Math.min(0.8, manaLevel * 0.01);
-      const BASE_DRAIN = 2000;
-      const drainPerMin = BASE_DRAIN * (1 - reduction);
-      const totalDrain = Math.floor(drainPerMin * lbTicks);
+      const manaDrainPerMin = rawManaDrain * (1 - reduction);
+
+      const totalHpDrain = Math.floor(rawHpDrain * lbTicks);
+      const totalManaDrain = Math.floor(manaDrainPerMin * lbTicks);
 
       if (typeof user.mana !== "number") user.mana = 0;
-      user.mana -= totalDrain;
+      if (typeof user.hp !== "number") user.hp = 0;
 
-      if (user.mana <= 0) {
-        user.mana = 0;
+      user.mana -= totalManaDrain;
+      user.hp -= totalHpDrain;
+
+      if (user.mana <= 0 || user.hp <= 0) {
+        if (user.mana < 0) user.mana = 0;
+        
         user.limitBreaker.active = false;
         user.limitBreaker.lastTick = 0;
+
+        if (user.hp <= 0) user.hp = 1;
+
+        // Recalcular HP máximo normal sin el x2
+        user.hp = Math.min(user.hp, baseHP);
       } else {
         user.limitBreaker.lastTick = now;
       }
+
       saveDB();
     }
   }
@@ -1304,30 +1330,26 @@ if (cmd === "stats") {
 
   const pisoDungeon = you.ancestral?.floor || 0;
 
-  const armaTxt = you.arma ? `🗡️ ${you.arma.nombre} (+${you.arma.dano || 0} ATQ) | 💰 ${you.arma.precio?.toLocaleString("es-AR") || 0} | Usar: ${PREFIX}rpg equip ${you.arma.code}` : "Ninguna";
-  const armTxt = you.armadura ? `🛡️ ${you.armadura.nombre} (+${you.armadura.defensa || 0} DEF) | 💰 ${you.armadura.precio?.toLocaleString("es-AR") || 0} | Usar: ${PREFIX}rpg equip ${you.armadura.code}` : "Ninguna";
-  const boxTxt = you.itemBox ? `📦 ${you.itemBox.nombre} (+${you.itemBox.extraCap} Espacios) | 💰 ${you.itemBox.precio?.toLocaleString("es-AR") || 0} | Usar: ${PREFIX}rpg equip ${you.itemBox.code}` : "Ninguno";
+  // Equipamiento sin precio ni comandos de uso
+  const armaTxt = you.arma ? `🗡️ ${you.arma.nombre} (+${you.arma.dano || 0} ATQ)` : "Ninguna";
+  const armTxt = you.armadura ? `🛡️ ${you.armadura.nombre} (+${you.armadura.defensa || 0} DEF)` : "Ninguna";
+  const boxTxt = you.itemBox ? `📦 ${you.itemBox.nombre} (+${you.itemBox.extraCap} Espacios)` : "Ninguno";
 
   const maxCap = getMaxInvCapacity(you);
-  const invTxt = (you.inventario && you.inventario.length)
-    ? you.inventario.filter(i => i && i.nombre).map(i => `📦 ${i.code || "Desconocido"}`).join(", ")
-    : "Vacío";
+  const invCount = you.inventario?.length || 0;
 
   let mascotaTxt = "Ninguna";
   if (you.mascotaEquipada) {
     const m = you.mascotaEquipada;
-    const precio = m.precio ? ` | 💰 ${m.precio.toLocaleString("es-AR")}` : "";
-    const equipCode = m.uid || m.code || "Desconocido";
-    mascotaTxt = `${m.emoji || "🐾"} ${m.nombre || "Desconocida"} ` +
-                 `(+${m.atkBuff || 0} ATK, +${m.defBuff || 0} DEF, +${m.hpBuff || 0} HP)` +
-                 `${precio} | Usar: ${PREFIX}rpg equip ${equipCode}`;
+    mascotaTxt = `${m.emoji || "🐾"} ${m.nombre || "Desconocida"} (+${m.atkBuff || 0} ATK, +${m.defBuff || 0} DEF, +${m.hpBuff || 0} HP)`;
   }
 
   const casaText = you.hasHouse ? `🏠 Sí` : `❌ No`;
   const enCasaText = you.enCasa ? `✅ Sí (bonus aplicado)` : `❌ No`;
-  const cofreText = (you.homeChest && you.homeChest.length > 0)
-    ? you.homeChest.map((i, idx) => `${idx + 1}. ${i.code || "Desconocido"}`).join(", ")
-    : "Vacío";
+
+  // Cofre únicamente con la cantidad de ítems
+  const cofreCount = you.homeChest?.length || 0;
+  const cofreText = `🪙 Cofre (${cofreCount} items)`;
 
   const bonusHP = you.hpMax ? (you.enCasa ? Math.floor(you.hpMax * 0.2) : Math.floor(you.hpMax * 0.05)) : 0;
   const bonusMana = you.manamax ? (you.enCasa ? Math.floor(you.manamax * 0.4) : Math.floor(you.manamax * 0.1)) : 0;
@@ -1389,17 +1411,16 @@ if (cmd === "stats") {
     `⚔️ Arma: ${armaTxt}\n` +
     `🛡️ Armadura: ${armTxt}\n` +
     `📦 Item Box: ${boxTxt}\n` +
-    `🎒 Inventario (${you.inventario?.length || 0}/${maxCap}): ${invTxt}\n` +
-    `🐾 Mascotas:\n${mascotaTxt}\n` +
+    `🎒 Inventario (${invCount}/${maxCap})\n` +
+    `🐾 Mascota: ${mascotaTxt}\n` +
     `🏠 Casa: ${casaText}\n` +
     `🏡 Dentro de casa: ${enCasaText}\n` +
-    `🪙 Cofre: ${cofreText}\n` +
+    `${cofreText}\n` +
     `🛡️ Gólem: ${golemText}\n` +
     acaText;
 
   return sendReply(txt);
 }
-
 
 
 // -----------------------------
@@ -1992,10 +2013,9 @@ return
 
 // -------- LIMIT BREAKER --------
 if (cmd === "limit") {
-  const aca = you.academia.especialidades || {};
+  const aca = you.academia?.especialidades || {};
   const action = rest[0]?.toLowerCase();
 
-  // init
   if (!you.limitBreaker) {
     you.limitBreaker = {
       unlocked: false,
@@ -2006,6 +2026,24 @@ if (cmd === "limit") {
 
   const COST = 1_000_000_000;
 
+  // Cálculo de máximos con x2
+  const baseHP = (you.hpMax || 0)
+    + (aca.curacion || 0) * 5
+    + (you.golem?.hpBuff || 0)
+    + (you.mascotaEquipada?.hpBuff || 0);
+  const maxHpWithLB = baseHP * 2;
+
+  const baseMana = (you.manaMax || 100);
+  const maxManaWithLB = baseMana * 2;
+
+  // Cálculo de drenaje dinámico por minuto
+  const hpDrainPerMin = Math.floor(maxHpWithLB * 0.10);
+
+  const manaLevel = (aca.manaMax || 0);
+  const reduction = Math.min(0.8, manaLevel * 0.01);
+  const rawManaDrain = maxManaWithLB * 0.10;
+  const manaDrainPerMin = Math.floor(rawManaDrain * (1 - reduction));
+
   // ---------------- INFO
   if (!action) {
     if (you.limitBreaker.unlocked) {
@@ -2013,10 +2051,10 @@ if (cmd === "limit") {
 `💥 *LIMIT BREAKER*
 
 Estado: ${you.limitBreaker.active ? "🔥 ACTIVO" : "❄️ Inactivo"}
-Mana: ${you.mana}
+❤️ Vida: ${you.hp} | 💙 Maná: ${you.mana}
 
-Consumo base: 2000/min
-Reducción por academia: ${Math.min(80, (aca.manaMax || 0) * 1)}%
+🩸 Drenaje Vida: ${fmt(hpDrainPerMin)} HP/min (10% del máximo x2 - Fijo)
+💧 Drenaje Maná: ${fmt(manaDrainPerMin)} MP/min (10% del máximo x2 con ${Math.min(80, manaLevel * 1)}% de reducción por academia)
 
 ⚔️ ATK x2
 🛡️ DEF x2
@@ -2031,13 +2069,13 @@ Comandos:
     return sendReply(
 `💥 *LIMIT BREAKER*
 
-Precio: $1,000,000,000 (pago unico)
+Precio: $1,000,000,000 (pago único)
 
 ⚔️ ATK x2
 🛡️ DEF x2
 ❤️ HP x2
 
-Consumo: 2000 mana/min
+Consumo/minuto: 🩸 10% Vida Máx (${fmt(hpDrainPerMin)} HP) + 💧 10% Maná Máx (reducible con academia)
 
 Usa:
 .rpg limit comprar`
@@ -2079,24 +2117,27 @@ Usa:
     }
 
     if (!you.mana || you.mana <= 0) {
-      return sendErrorReply("❌ Sin mana.");
+      return sendErrorReply("❌ Sin maná.");
+    }
+
+    if (!you.hp || you.hp <= 0) {
+      return sendErrorReply("❌ Sin vida disponible.");
     }
 
     you.limitBreaker.active = true;
     you.limitBreaker.lastTick = Date.now();
 
-    // 🔥 RECALCULAR HP Y CURAR FULL
-    const baseHP = (you.hpMax || 0)
-      + (aca.curacion || 0) * 5
-      + (you.golem?.hpBuff || 0)
-      + (you.mascotaEquipada?.hpBuff || 0);
-
-    const totalHP = baseHP * 2;
-
-    you.hp = totalHP;
+    // Aplicar el booster de vida
+    you.hp = maxHpWithLB;
 
     saveDB();
-    return sendReply("💥🔥 LIMIT BREAKER ACTIVADO");
+    return sendReply(
+`💥🔥 *LIMIT BREAKER ACTIVADO*
+
+⚠️ *Consumo por minuto:*
+🩸 Vida: -${fmt(hpDrainPerMin)} HP/min
+💧 Maná: -${fmt(manaDrainPerMin)} MP/min`
+    );
   }
 
   // ---------------- DESACTIVAR
@@ -2108,12 +2149,6 @@ Usa:
 
     you.limitBreaker.active = false;
     you.limitBreaker.lastTick = 0;
-
-    // ❄️ RECALCULAR HP NORMAL Y AJUSTAR
-    const baseHP = (you.hpMax || 0)
-      + (aca.curacion || 0) * 5
-      + (you.golem?.hpBuff || 0)
-      + (you.mascotaEquipada?.hpBuff || 0);
 
     you.hp = Math.min(you.hp, baseHP);
 
@@ -5308,13 +5343,15 @@ if (cmd === "ranking" || cmd === "leaderboard") {
     (b.monedas - a.monedas)
   );
 
-  const top = arr.slice(0, 10);
+  const totalJugadores = arr.length;
+  const top = arr.slice(0, 20); // 👈 Ahora toma el Top 20
   if (!top.length) return sendReply("Aún no hay jugadores.");
 
   const lvlColors = ["🟥","🟧","🟨","🟩","🟦","🟪","⬛","⬜","🟫","🔵"];
   const xpColors = ["🟩","🟦","🟪","🟧","🟥","🟨","⬛","⬜","🟫","🔵"];
 
-  let txt = "🏅 *Ranking RPG* (Top 10)\n\n";
+  // 👈 Se agrega la cantidad total de aventureros en la cabecera
+  let txt = `🏆 *Ranking RPG* (Top 20)\n👥 *${totalJugadores} aventureros jugando*\n\n`;
   const mentionsList = [];
 
   top.forEach((p, index) => {
